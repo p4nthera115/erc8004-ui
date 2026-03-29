@@ -13,6 +13,34 @@ Components only need two props: `agentRegistry` (the chain+contract identifier) 
 />
 ```
 
+## Setup
+
+Install dependencies and wrap your app root:
+
+```bash
+pnpm add @tanstack/react-query
+```
+
+```tsx
+// src/main.tsx (or app/layout.tsx for Next.js)
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      gcTime: 1000 * 60 * 30,
+      retry: 2,
+    },
+  },
+})
+
+// Wrap your app:
+// <QueryClientProvider client={queryClient}><App /></QueryClientProvider>
+```
+
+`QueryClientProvider` is caching infrastructure (deduplication, stale-while-revalidate) — not a data provider. It holds no ERC-8004 state.
+
 ## Components
 
 ### FingerprintBadge (stable)
@@ -70,8 +98,9 @@ Available tools:
 
 - Self-contained: every component fetches its own data from on-chain sources
 - Trustless: components never accept display data as props, only identifiers
-- No providers, no context wrappers, no global state
-- React 19 + TypeScript strict + Tailwind CSS v4
+- No domain-layer providers or context wrappers
+- Caching via `@tanstack/react-query` — deduplication, stale-while-revalidate, background refetch
+- React 19 + TypeScript strict + Tailwind CSS v4 + SVG fingerprints
 
 ## ERC-8004 Data Model
 

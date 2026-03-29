@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FingerprintBadge } from '../../../components/FingerprintBadge'
+import { FingerprintBadge } from '../../../components/fingerprint/FingerprintBadge'
 
 const DEMO_AGENTS = [
   { registry: 'eip155:1:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD1e', id: 1 },
@@ -15,9 +15,8 @@ const PROPS = [
   { name: 'className', type: 'string', required: false, default: "''", description: 'Additional CSS classes applied to the wrapper div' },
 ]
 
-const SOURCE_SNIPPET = `import { useRef, useMemo } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
+const SOURCE_SNIPPET = `import { useMemo, useEffect } from 'react'
+import { deriveVisualConfig } from './visual-config'
 
 interface FingerprintBadgeProps {
   agentRegistry: string
@@ -29,23 +28,14 @@ interface FingerprintBadgeProps {
 export function FingerprintBadge({
   agentRegistry,
   agentId,
-  size = 200,
-  className = '',
+  size,
+  className = 'w-full h-full',
 }: FingerprintBadgeProps) {
-  const seeds = useMemo(
-    () => hashToSeeds(agentRegistry, agentId),
+  const config = useMemo(
+    () => deriveVisualConfig(agentRegistry, agentId),
     [agentRegistry, agentId],
   )
-  return (
-    <div
-      className={\`rounded-full overflow-hidden \${className}\`}
-      style={{ width: size, height: size }}
-    >
-      <Canvas camera={{ position: [0, 0, 1], fov: 50 }} gl={{ alpha: true }}>
-        <FingerprintMesh seeds={seeds} />
-      </Canvas>
-    </div>
-  )
+  // ... SVG dithering render
 }`
 
 function CodeBlock({ code, filename }: { code: string; filename?: string }) {
@@ -96,8 +86,8 @@ export function FingerprintBadgeDocs() {
         </div>
         <p className="text-text-secondary leading-relaxed">
           Deterministic visual identity generated from an agent's on-chain identifier.
-          A hash of <code className="text-accent font-mono text-sm">agentRegistry + agentId</code> drives
-          GLSL shader parameters — every agent gets a unique, unreplicable visual fingerprint.
+          A FNV-1a hash of <code className="text-accent font-mono text-sm">agentRegistry + agentId</code> drives
+          SVG dithering parameters — every agent gets a unique, unreplicable visual fingerprint.
         </p>
       </div>
 
@@ -158,7 +148,7 @@ export function FingerprintBadgeDocs() {
         <h2 className="text-lg font-semibold text-text-primary">Usage</h2>
         <CodeBlock
           filename="example.tsx"
-          code={`import { FingerprintBadge } from '@/components/FingerprintBadge'
+          code={`import { FingerprintBadge } from '@erc8004/ui'
 
 <FingerprintBadge
   agentRegistry="${activeAgent.registry}"
@@ -208,9 +198,8 @@ export function FingerprintBadgeDocs() {
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-text-primary">Source</h2>
         <p className="text-sm text-text-secondary">
-          Copy <code className="text-accent font-mono">FingerprintBadge.tsx</code> into your project.
-          Requires <code className="text-accent font-mono">@react-three/fiber</code> and{' '}
-          <code className="text-accent font-mono">three</code>.
+          Exported from <code className="text-accent font-mono">@erc8004/ui</code>.
+          Pure SVG — no canvas, no WebGL, no extra dependencies.
         </p>
         <CodeBlock filename="FingerprintBadge.tsx" code={SOURCE_SNIPPET} />
       </div>
@@ -227,13 +216,13 @@ export function FingerprintBadgeDocs() {
             },
             {
               step: '02',
-              title: 'Shader',
-              body: 'Seeds drive a GLSL fragment shader: ridge frequency, whorl offset, color hue, warp strength.',
+              title: 'Dither',
+              body: 'Seeds drive wave interference parameters: frequency, warp offset, hue, fBm domain warp. Blue noise dithering renders the pattern as SVG rects.',
             },
             {
               step: '03',
-              title: 'Animate',
-              body: 'A slow time uniform creates a living, breathing fingerprint — never static, always unique.',
+              title: 'Shimmer',
+              body: 'CSS keyframe animation on SVG groups creates a living, breathing fingerprint — never static, always unique.',
             },
           ].map((item) => (
             <div key={item.step} className="rounded-xl border border-border-subtle bg-surface-raised p-5 flex flex-col gap-2">

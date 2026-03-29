@@ -1,4 +1,4 @@
-import { FingerprintBadge } from "../components/FingerprintBadge"
+import { FingerprintBadge } from "../components/fingerprint/FingerprintBadge"
 import { navigate } from "../lib/router"
 
 const DEMO_AGENTS = [
@@ -29,9 +29,9 @@ const COMPONENTS = [
     name: "Fingerprint Badge",
     slug: "fingerprint-badge",
     description:
-      "Deterministic visual identity generated from an agent's on-chain identifier. SHA-256 hash drives GLSL shader parameters — every agent gets a unique, unreplicable visual.",
+      "Deterministic visual identity generated from an agent's on-chain identifier. FNV-1a hash drives dithering parameters — every agent gets a unique, unreplicable visual fingerprint.",
     status: "live" as const,
-    tags: ["R3F", "GLSL", "SHA-256"],
+    tags: ["SVG", "Dithering", "Deterministic"],
   },
   {
     name: "Agent Card",
@@ -147,11 +147,11 @@ export function Home() {
             </h1>
             <p className="text-lg text-text-secondary leading-relaxed">
               Self-contained React components for AI agent identity, reputation,
-              and activity. Trustless by design. Distributed{" "}
+              and activity. Trustless by design. Distributed as an{" "}
               <span className="text-text-primary font-medium">
-                shadcn-style
+                npm package
               </span>{" "}
-              — copy into your project, not install from npm.
+              — install, wrap with a provider, drop components in.
             </p>
           </div>
 
@@ -273,13 +273,13 @@ export function Home() {
             </p>
           </div>
           <div className="rounded-xl border border-border-subtle bg-surface-raised p-6">
-            <div className="text-2xl mb-3">cp</div>
+            <div className="text-2xl mb-3">npm</div>
             <h3 className="text-lg font-semibold text-text-primary mb-2">
-              shadcn-style
+              npm install
             </h3>
             <p className="text-sm text-text-secondary leading-relaxed">
-              Copy components into your project. Read the code, modify it, own
-              it. No black-box npm dependency.
+              One install. One provider. Import components. Source is open and
+              readable — hooks and utilities are public API.
             </p>
           </div>
         </div>

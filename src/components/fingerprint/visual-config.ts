@@ -1,15 +1,46 @@
-import type { VisualConfig, GeometryClass, PatternType, BorderStyle } from './types'
+// ── Types ──────────────────────────────────────────────────────────────────
+//
+// These types are internal to FingerprintBadge — not exported from the package.
+
+export interface VisualConfig {
+  primaryHue: number
+  primarySaturation: number
+  primaryLightness: number
+  secondaryHue: number
+  secondaryLightness: number
+  geometryClass: GeometryClass
+  patternType: PatternType
+  patternFrequency: number
+  patternDensity: number
+  borderStyle: BorderStyle
+  borderWidth: number
+  rotationSpeed: number
+  rotationAxis: [number, number, number]
+  particleDensity: number
+  displacementAmplitude: number
+  displacementFrequency: number
+  pulseRate: number
+  shimmerIntensity: number
+  colorShift: number
+  breatheScale: number
+}
+
+export type GeometryClass =
+  | 'sphere' | 'torus' | 'icosahedron' | 'octahedron'
+  | 'torusKnot' | 'dodecahedron' | 'tetrahedron' | 'cone'
+
+export type PatternType =
+  | 'voronoi' | 'noise' | 'rings' | 'grid'
+  | 'hexagonal' | 'spiral' | 'stripes' | 'dots'
+
+export type BorderStyle = 'none' | 'thin' | 'thick' | 'glow'
 
 // ── Deterministic field derivation ────────────────────────────────────────
-//
-// Every VisualConfig field is derived from a single numeric seed so the
-// fingerprint is stable and reproducible from the identifier alone.
 
 function fract(x: number): number {
   return x - Math.floor(x)
 }
 
-/** Derive sub-field n from a base seed in [0, 1). */
 function h(seed: number, n: number): number {
   return fract(Math.sin(seed * 127.1 + n * 311.7) * 43758.5453)
 }
@@ -17,16 +48,11 @@ function h(seed: number, n: number): number {
 /**
  * Converts agentRegistry + agentId into a deterministic VisualConfig.
  * Uses FNV-1a to hash the combined identifier string to a numeric seed,
- * then derives each field independently so no two agents share the same
- * visual fingerprint.
+ * then derives each field independently.
  */
-export function deriveVisualConfig(
-  agentRegistry: string,
-  agentId: number,
-): VisualConfig {
+export function deriveVisualConfig(agentRegistry: string, agentId: number): VisualConfig {
   const key = `${agentRegistry.toLowerCase()}-${agentId.toString()}`
 
-  // FNV-1a 32-bit hash → normalised float seed
   let n = 2166136261
   for (let i = 0; i < key.length; i++) {
     n ^= key.charCodeAt(i)
@@ -45,7 +71,6 @@ export function deriveVisualConfig(
   const borders: BorderStyle[] = ['none', 'thin', 'thick', 'glow']
 
   const primaryHue = h(seed, 0) * 360
-  // Secondary hue is offset by 120°–240° so it contrasts visually
   const secondaryHue = (primaryHue + 120 + h(seed, 3) * 120) % 360
 
   return {
@@ -69,6 +94,5 @@ export function deriveVisualConfig(
     shimmerIntensity:      h(seed, 19),
     colorShift:            h(seed, 20),
     breatheScale:          h(seed, 21),
-    reputationScore:       0,
   }
 }

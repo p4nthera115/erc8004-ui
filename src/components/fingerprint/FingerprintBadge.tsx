@@ -10,7 +10,7 @@
  */
 
 import { useMemo, useEffect, type ReactElement } from "react"
-import { deriveVisualConfig } from "../lib/visual-config"
+import { deriveVisualConfig } from "./visual-config"
 
 // ── Global shimmer keyframes ───────────────────────────────────────────────
 //
@@ -84,7 +84,6 @@ const BLUE_NOISE_16 = new Uint8Array([
 /**
  * Sample the 16×16 blue-noise tile at integer sub-pixel coordinate (px, py).
  * Tiles toroidally. Returns a threshold in [0, 1).
- * Use instead of blueNoiseIGN when strict 16×16 periodicity is required (e.g. TAA).
  */
 export function blueNoiseTile(px: number, py: number): number {
   return BLUE_NOISE_16[((py & 15) << 4) | (px & 15)] / 256
@@ -170,14 +169,12 @@ function discPattern(
 
   const r = Math.sqrt(r2)
 
-  // fBm domain warp — displaces the sample point before wave computation,
-  // turning clean planar waves into flowing, organic interference patterns
+  // fBm domain warp — displaces the sample point before wave computation
   const warpX = fbm(nx * 2.0 + seed1 * 0.07, ny * 2.0 + seed2 * 0.09, seed1, 3) * 0.18
   const warpY = fbm(nx * 2.0 + seed2 * 0.06, ny * 2.0 + seed1 * 0.08, seed2, 3) * 0.18
   const wnx = nx + warpX
   const wny = ny + warpY
 
-  // Unique wave directions per fingerprint
   const a1 = seed1 * 0.031
   const a2 = seed2 * 0.047
   const f = (3.5 + freq * 0.45) * Math.PI * 2
@@ -190,18 +187,12 @@ function discPattern(
   const w2 = Math.sin((wnx * ca2 + wny * sa2) * f * 0.73)
   const w3 = Math.sin((wnx * ca3 + wny * sa3) * f * 1.29)
 
-  // Weighted sum → normalise to [0, 1]
   const combined = (w1 + w2 * 0.75 + w3 * 0.55) / 2.3
-  // Power curve concentrates brightness at wave peaks, leaving troughs clearly empty
   const brightness = Math.pow((combined + 1) * 0.5, 1.8)
 
-  // Soft vignette so the edge fades into darkness rather than clipping hard
   const vignette = smoothstep(1.0, 0.72, r)
-
-  // Very gentle centre glow — not oscillating, so no ring appears
   const glow = smoothstep(0.55, 0, r) * 0.14
 
-  // fBm break mask — creates organic blank space throughout the pattern
   const breakNoise = fbm(nx * 2.0 + seed2 * 0.05, ny * 2.0 + seed1 * 0.07, seed2, 3)
   const breakMask = smoothstep(0.0, 0.55, breakNoise)
 
@@ -228,12 +219,10 @@ export function FingerprintBadge({ agentRegistry, agentId, size, className = "w-
   const accent = hslCss(config.primaryHue / 360, config.primarySaturation, 0.56)
   const shimmerDur = `${(1 / config.pulseRate).toFixed(2)}s`
 
-  // Left-to-right gradient: hue-shifted cool tone → primary hue bright
   const gradId = `fc-${Math.round(hue)}-${Math.round(seed1) & 0xfff}`
   const gradLeft = `hsl(${(hue + 200) % 360},${sat}%,38%)`
   const gradRight = `hsl(${hue},${sat}%,68%)`
 
-  // Centre of the 9×9 grid
   const CX = 4
   const CY = 4
 
@@ -245,12 +234,9 @@ export function FingerprintBadge({ agentRegistry, agentId, size, className = "w-
       const hash = cellHash(cx, cy, seed1, seed2)
       const isAccent = !isCenter && hash > 0.95
 
-      // Per-cell grain: subtle per-cell brightness variation (not per-sub-pixel
-      // to avoid 9×9 grid artefacts — kept small so it reads as noise, not blocks)
       const grain = cellHash(cx + 17.3, cy + 23.1, seed1, seed2)
 
       if (isCenter) {
-        // Fully lit disc pixels in accent color with shimmer
         const delay = (cellHash(cx + 89.7, cy + 71.3, seed1, seed2) * 2).toFixed(2)
         const subRects: ReactElement[] = []
         for (let ly = 0; ly < DITHER_N; ly++) {
@@ -365,7 +351,6 @@ export function FingerprintBadge({ agentRegistry, agentId, size, className = "w-
           <stop offset="100%" stopColor={gradRight} />
         </linearGradient>
       </defs>
-      {/* Disc background — dark shade of primary hue for monochromatic look */}
       <circle cx="50" cy="50" r="50" fill={`hsl(${hue},${(config.primarySaturation * 35 + 12).toFixed(1)}%,8%)`} />
       {elements}
     </svg>
@@ -376,9 +361,8 @@ export function FingerprintBadge({ agentRegistry, agentId, size, className = "w-
 
 /**
  * FingerprintCircleMini — hue-tinted circular icon.
- * Same interference pattern and Bayer dithering, but rendered in the
- * fingerprint's primary hue on a dark tinted background — distinctive at
- * avatar / favicon scale.
+ * Same interference pattern and dithering, but rendered in the fingerprint's
+ * primary hue on a dark tinted background — distinctive at avatar / favicon scale.
  */
 export function FingerprintCircleMini({
   agentRegistry,
@@ -388,7 +372,6 @@ export function FingerprintCircleMini({
 }: {
   agentRegistry: string
   agentId: number
-  /** Explicit pixel size. When omitted the SVG fills its container. */
   size?: number
   className?: string
 }) {

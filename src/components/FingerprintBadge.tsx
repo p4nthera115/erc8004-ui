@@ -9,8 +9,27 @@
  * No grid chrome, no reputation corner. Just the disc.
  */
 
-import type { ReactElement } from "react"
-import type { VisualConfig } from "../lib/types"
+import { useMemo, useEffect, type ReactElement } from "react"
+import { deriveVisualConfig } from "../lib/visual-config"
+
+// ── Global shimmer keyframes ───────────────────────────────────────────────
+//
+// The @keyframes rule uses `filter: brightness()`, which is a CSS property and
+// only works when the stylesheet lives in the HTML document. SVG <style> blocks
+// are scoped to the SVG document and do not apply CSS filters to SVG elements,
+// so the animation must be injected into <head> instead.
+
+const SHIMMER_STYLE_ID = "fp-shimmer-keyframes"
+
+function useShimmerKeyframes() {
+  useEffect(() => {
+    if (document.getElementById(SHIMMER_STYLE_ID)) return
+    const style = document.createElement("style")
+    style.id = SHIMMER_STYLE_ID
+    style.textContent = "@keyframes fp-shimmer{0%,100%{filter:brightness(.82)}50%{filter:brightness(1)}}"
+    document.head.appendChild(style)
+  }, [])
+}
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
@@ -192,13 +211,16 @@ function discPattern(
 // ── Full component ─────────────────────────────────────────────────────────
 
 interface Props {
-  config: VisualConfig
-  /** Accepted for renderer-agnostic callers; unused in this renderer. */
-  interactive?: boolean
+  agentRegistry: string
+  agentId: number
+  /** Explicit pixel size. When omitted the SVG fills its container. */
+  size?: number
   className?: string
 }
 
-export function FingerprintCircle({ config, className = "w-full h-full" }: Props) {
+export function FingerprintBadge({ agentRegistry, agentId, size, className = "w-full h-full" }: Props) {
+  useShimmerKeyframes()
+  const config = useMemo(() => deriveVisualConfig(agentRegistry, agentId), [agentRegistry, agentId])
   const seed1 = config.patternDensity * 100 + config.shimmerIntensity * 10
   const seed2 = config.breatheScale * 100 + config.colorShift * 100
   const hue = config.primaryHue
@@ -328,12 +350,14 @@ export function FingerprintCircle({ config, className = "w-full h-full" }: Props
     }
   }
 
+  const sizeStyle = size ? { width: size, height: size } : { width: "100%", height: "100%" }
+
   return (
     <svg
       viewBox="0 0 100 100"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={{ display: "block", width: "100%", height: "100%" }}
+      style={{ display: "block", ...sizeStyle }}
     >
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="100" y2="0" gradientUnits="userSpaceOnUse">
@@ -341,7 +365,6 @@ export function FingerprintCircle({ config, className = "w-full h-full" }: Props
           <stop offset="100%" stopColor={gradRight} />
         </linearGradient>
       </defs>
-      <style>{`@keyframes fp-shimmer{0%,100%{filter:brightness(.82)}50%{filter:brightness(1)}}`}</style>
       {/* Disc background — dark shade of primary hue for monochromatic look */}
       <circle cx="50" cy="50" r="50" fill={`hsl(${hue},${(config.primarySaturation * 35 + 12).toFixed(1)}%,8%)`} />
       {elements}
@@ -358,12 +381,19 @@ export function FingerprintCircle({ config, className = "w-full h-full" }: Props
  * avatar / favicon scale.
  */
 export function FingerprintCircleMini({
-  config,
+  agentRegistry,
+  agentId,
+  size,
   className = "w-full h-full",
 }: {
-  config: VisualConfig
+  agentRegistry: string
+  agentId: number
+  /** Explicit pixel size. When omitted the SVG fills its container. */
+  size?: number
   className?: string
 }) {
+  useShimmerKeyframes()
+  const config = useMemo(() => deriveVisualConfig(agentRegistry, agentId), [agentRegistry, agentId])
   const seed1 = config.patternDensity * 100 + config.shimmerIntensity * 10
   const seed2 = config.breatheScale * 100 + config.colorShift * 100
   const hue = config.primaryHue
@@ -457,7 +487,7 @@ export function FingerprintCircleMini({
       viewBox="0 0 100 100"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={{ display: "block", width: "100%", height: "100%" }}
+      style={{ display: "block", ...(size ? { width: size, height: size } : { width: "100%", height: "100%" }) }}
     >
       <defs>
         <linearGradient id={gradId} x1="0" y1="0" x2="100" y2="0" gradientUnits="userSpaceOnUse">
@@ -465,7 +495,6 @@ export function FingerprintCircleMini({
           <stop offset="100%" stopColor={gradRight} />
         </linearGradient>
       </defs>
-      <style>{`@keyframes fp-shimmer{0%,100%{filter:brightness(.82)}50%{filter:brightness(1)}}`}</style>
       <circle
         cx="50"
         cy="50"

@@ -1,8 +1,8 @@
 import type { RegistrationFile } from '../types';
 
 export interface IdentityFetchParams {
-  agentRegistry: `0x${string}`;
-  agentId: bigint;
+  agentRegistry: string;
+  agentId: number;
 }
 
 /**

@@ -1,6 +1,7 @@
 export interface SharedProps {
-  agentRegistry: `0x${string}`;
-  agentId: bigint;
+  /** CAIP-10 identifier: `{namespace}:{chainId}:{registryAddress}` e.g. `eip155:1:0x742...` */
+  agentRegistry: string;
+  agentId: number;
   className?: string;
 }
 
@@ -21,18 +22,18 @@ export interface EndpointDefinition {
 
 export interface FeedbackEntry {
   id: string;
-  reviewer: `0x${string}`;
-  agentRegistry: `0x${string}`;
-  agentId: bigint;
+  reviewer: string;
+  agentRegistry: string;
+  agentId: number;
   score: number;
   comment?: string;
   timestamp: number;
-  transactionHash: `0x${string}`;
+  transactionHash: string;
 }
 
 export interface ReputationSummary {
-  agentRegistry: `0x${string}`;
-  agentId: bigint;
+  agentRegistry: string;
+  agentId: number;
   totalFeedback: number;
   averageScore: number;
   scoreDistribution: Record<number, number>;
@@ -42,13 +43,13 @@ export interface ReputationSummary {
 export interface ActivityEvent {
   id: string;
   type: ActivityEventType;
-  agentRegistry: `0x${string}`;
-  agentId: bigint;
-  actor?: `0x${string}`;
+  agentRegistry: string;
+  agentId: number;
+  actor?: string;
   data?: Record<string, unknown>;
   timestamp: number;
   blockNumber: number;
-  transactionHash: `0x${string}`;
+  transactionHash: string;
 }
 
 /**

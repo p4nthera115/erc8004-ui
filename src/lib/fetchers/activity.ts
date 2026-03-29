@@ -1,10 +1,10 @@
 import type { ActivityEvent } from '../types';
 
 export interface ActivityFetchParams {
-  agentRegistry: `0x${string}`;
-  agentId: bigint;
+  agentRegistry: string;
+  agentId: number;
   limit?: number;
-  fromBlock?: bigint;
+  fromBlock?: number;
 }
 
 /**

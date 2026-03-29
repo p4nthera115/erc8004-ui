@@ -1,8 +1,8 @@
 import type { ReputationSummary } from '../types';
 
 export interface ReputationFetchParams {
-  agentRegistry: `0x${string}`;
-  agentId: bigint;
+  agentRegistry: string;
+  agentId: number;
 }
 
 /**

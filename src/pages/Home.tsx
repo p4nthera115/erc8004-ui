@@ -1,68 +1,103 @@
-import { FingerprintBadge } from '../components/FingerprintBadge'
-import { navigate } from '../lib/router'
+import { FingerprintBadge } from "../components/FingerprintBadge"
+import { navigate } from "../lib/router"
 
 const DEMO_AGENTS = [
-  { registry: 'eip155:1:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD1e', id: 1, label: 'Agent #1' },
-  { registry: 'eip155:1:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD1e', id: 22, label: 'Agent #22' },
-  { registry: 'eip155:137:0x8Ba1f109551bD432803012645Ac136ddd64DBA72', id: 7, label: 'Agent #7' },
-  { registry: 'eip155:8453:0xdAC17F958D2ee523a2206206994597C13D831ec7', id: 100, label: 'Agent #100' },
+  {
+    registry: "eip155:1:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD1e",
+    id: 1,
+    label: "Agent #1",
+  },
+  {
+    registry: "eip155:1:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD1e",
+    id: 22,
+    label: "Agent #22",
+  },
+  {
+    registry: "eip155:137:0x8Ba1f109551bD432803012645Ac136ddd64DBA72",
+    id: 7,
+    label: "Agent #7",
+  },
+  {
+    registry: "eip155:8453:0xdAC17F958D2ee523a2206206994597C13D831ec7",
+    id: 100,
+    label: "Agent #100",
+  },
 ]
 
 const COMPONENTS = [
   {
-    name: 'Fingerprint Badge',
-    slug: 'fingerprint-badge',
-    description: 'Deterministic visual identity generated from an agent\'s on-chain identifier. SHA-256 hash drives GLSL shader parameters — every agent gets a unique, unreplicable visual.',
-    status: 'live' as const,
-    tags: ['R3F', 'GLSL', 'SHA-256'],
+    name: "Fingerprint Badge",
+    slug: "fingerprint-badge",
+    description:
+      "Deterministic visual identity generated from an agent's on-chain identifier. SHA-256 hash drives GLSL shader parameters — every agent gets a unique, unreplicable visual.",
+    status: "live" as const,
+    tags: ["R3F", "GLSL", "SHA-256"],
   },
   {
-    name: 'Agent Card',
-    slug: 'agent-card',
-    description: 'Complete identity card: fingerprint badge, name, description, services, and reputation summary. The primary way to display an agent.',
-    status: 'next' as const,
-    tags: ['Identity', 'Composite'],
+    name: "Agent Card",
+    slug: "agent-card",
+    description:
+      "Complete identity card: fingerprint badge, name, description, services, and reputation summary. The primary way to display an agent.",
+    status: "next" as const,
+    tags: ["Identity", "Composite"],
   },
   {
-    name: 'Reputation Display',
-    slug: 'reputation-display',
-    description: 'Aggregate score visualization with individual reviews. Tag-aware rendering for labels like "starred", "uptime", "reachable".',
-    status: 'planned' as const,
-    tags: ['Feedback', 'Tags'],
+    name: "Reputation Display",
+    slug: "reputation-display",
+    description:
+      'Aggregate score visualization with individual reviews. Tag-aware rendering for labels like "starred", "uptime", "reachable".',
+    status: "planned" as const,
+    tags: ["Feedback", "Tags"],
   },
   {
-    name: 'Endpoint Status',
-    slug: 'endpoint-status',
-    description: 'Live service list with real-time health checks. Shows protocol, URL, and current availability for each registered endpoint.',
-    status: 'planned' as const,
-    tags: ['Health', 'Services'],
+    name: "Endpoint Status",
+    slug: "endpoint-status",
+    description:
+      "Live service list with real-time health checks. Shows protocol, URL, and current availability for each registered endpoint.",
+    status: "planned" as const,
+    tags: ["Health", "Services"],
   },
   {
-    name: 'Activity Log',
-    slug: 'activity-log',
-    description: 'Chronological on-chain events feed — registrations, updates, feedback, endpoint calls, deregistrations.',
-    status: 'planned' as const,
-    tags: ['Events', 'Timeline'],
+    name: "Activity Log",
+    slug: "activity-log",
+    description:
+      "Chronological on-chain events feed — registrations, updates, feedback, endpoint calls, deregistrations.",
+    status: "planned" as const,
+    tags: ["Events", "Timeline"],
   },
 ]
 
-function StatusBadge({ status }: { status: 'live' | 'next' | 'planned' }) {
+function StatusBadge({ status }: { status: "live" | "next" | "planned" }) {
   const config = {
-    live: { label: 'Live', dotClass: 'bg-green pulse-dot', textClass: 'text-green' },
-    next: { label: 'Next', dotClass: 'bg-amber', textClass: 'text-amber' },
-    planned: { label: 'Planned', dotClass: 'bg-text-muted', textClass: 'text-text-muted' },
+    live: {
+      label: "Live",
+      dotClass: "bg-green pulse-dot",
+      textClass: "text-green",
+    },
+    next: { label: "Next", dotClass: "bg-amber", textClass: "text-amber" },
+    planned: {
+      label: "Planned",
+      dotClass: "bg-text-muted",
+      textClass: "text-text-muted",
+    },
   }
   const c = config[status]
   return (
-    <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${c.textClass}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 text-xs font-medium ${c.textClass}`}
+    >
       <span className={`w-1.5 h-1.5 rounded-full ${c.dotClass}`} />
       {c.label}
     </span>
   )
 }
 
-function ComponentCard({ component }: { component: typeof COMPONENTS[number] }) {
-  const canNavigate = component.status === 'live' || component.status === 'next'
+function ComponentCard({
+  component,
+}: {
+  component: (typeof COMPONENTS)[number]
+}) {
+  const canNavigate = component.status === "live" || component.status === "next"
   return (
     <button
       onClick={() => navigate(`/docs/components/${component.slug}`)}
@@ -70,14 +105,16 @@ function ComponentCard({ component }: { component: typeof COMPONENTS[number] }) 
       className="component-card rounded-xl border border-border-subtle bg-surface-raised p-6 flex flex-col gap-3 text-left w-full disabled:cursor-default"
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-text-primary">{component.name}</h3>
+        <h3 className="text-lg font-semibold text-text-primary">
+          {component.name}
+        </h3>
         <StatusBadge status={component.status} />
       </div>
       <p className="text-sm text-text-secondary leading-relaxed flex-1">
         {component.description}
       </p>
       <div className="flex gap-2 flex-wrap pt-1">
-        {component.tags.map(tag => (
+        {component.tags.map((tag) => (
           <span
             key={tag}
             className="text-xs px-2 py-0.5 rounded-full bg-accent-glow text-accent font-mono"
@@ -106,19 +143,21 @@ export function Home() {
 
           <div className="flex flex-col gap-4 max-w-2xl">
             <h1 className="text-5xl font-bold tracking-tight text-text-primary leading-tight">
-              The visual layer for{' '}
-              <span className="text-accent">ERC-8004</span>
+              The visual layer for <span className="text-accent">ERC-8004</span>
             </h1>
             <p className="text-lg text-text-secondary leading-relaxed">
-              Self-contained React components for AI agent identity, reputation, and activity.
-              Trustless by design. Distributed{' '}
-              <span className="text-text-primary font-medium">shadcn-style</span> — copy into your project, not install from npm.
+              Self-contained React components for AI agent identity, reputation,
+              and activity. Trustless by design. Distributed{" "}
+              <span className="text-text-primary font-medium">
+                shadcn-style
+              </span>{" "}
+              — copy into your project, not install from npm.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate('/docs/components/fingerprint-badge')}
+              onClick={() => navigate("/docs/components/fingerprint-badge")}
               className="px-5 py-2.5 rounded-lg bg-accent text-white font-medium text-sm hover:bg-accent-dim transition-colors"
             >
               Browse Components
@@ -128,14 +167,25 @@ export function Home() {
                 <span className="w-2 h-2 rounded-full bg-red/60" />
                 <span className="w-2 h-2 rounded-full bg-amber/60" />
                 <span className="w-2 h-2 rounded-full bg-green/60" />
-                <span className="ml-2 text-xs text-text-muted font-mono">usage.tsx</span>
+                <span className="ml-2 text-xs text-text-muted font-mono">
+                  usage.tsx
+                </span>
               </div>
               <pre className="px-5 py-3 text-sm font-mono text-left">
                 <code>
-                  <span className="text-accent">{'<AgentCard'}</span>{'\n'}
-                  {'  '}<span className="text-amber">agentRegistry</span><span className="text-text-muted">=</span><span className="text-green">{'"eip155:1:0x742..."'}</span>{'\n'}
-                  {'  '}<span className="text-amber">agentId</span><span className="text-text-muted">=</span><span className="text-accent">{'{22}'}</span>{'\n'}
-                  <span className="text-accent">{'/>'}</span>
+                  <span className="text-accent">{"<AgentCard"}</span>
+                  {"\n"}
+                  {"  "}
+                  <span className="text-amber">agentRegistry</span>
+                  <span className="text-text-muted">=</span>
+                  <span className="text-green">{'"eip155:1:0x742..."'}</span>
+                  {"\n"}
+                  {"  "}
+                  <span className="text-amber">agentId</span>
+                  <span className="text-text-muted">=</span>
+                  <span className="text-accent">{"{22}"}</span>
+                  {"\n"}
+                  <span className="text-accent">{"/>"}</span>
                 </code>
               </pre>
             </div>
@@ -150,12 +200,16 @@ export function Home() {
             Every agent, a unique fingerprint
           </h2>
           <p className="text-text-secondary">
-            Same shader, different seeds. The identity is derived deterministically from on-chain data.
+            Same shader, different seeds. The identity is derived
+            deterministically from on-chain data.
           </p>
         </div>
         <div className="flex justify-center gap-8 flex-wrap">
           {DEMO_AGENTS.map((agent) => (
-            <div key={`${agent.registry}:${agent.id}`} className="flex flex-col items-center gap-3">
+            <div
+              key={`${agent.registry}:${agent.id}`}
+              className="flex flex-col items-center gap-3"
+            >
               <div className="rounded-2xl border border-border-subtle bg-surface-raised p-3">
                 <FingerprintBadge
                   agentRegistry={agent.registry}
@@ -164,9 +218,12 @@ export function Home() {
                 />
               </div>
               <div className="text-center">
-                <p className="text-sm font-medium text-text-primary">{agent.label}</p>
+                <p className="text-sm font-medium text-text-primary">
+                  {agent.label}
+                </p>
                 <p className="text-xs text-text-muted font-mono">
-                  {agent.registry.split(':')[2].slice(0, 6)}...{agent.registry.split(':')[2].slice(-4)}
+                  {agent.registry.split(":")[2].slice(0, 6)}...
+                  {agent.registry.split(":")[2].slice(-4)}
                 </p>
               </div>
             </div>
@@ -177,9 +234,12 @@ export function Home() {
       {/* Components grid */}
       <section className="max-w-6xl mx-auto px-6 py-16 border-t border-border-subtle">
         <div className="text-center mb-10">
-          <h2 className="text-2xl font-bold text-text-primary mb-2">Components</h2>
+          <h2 className="text-2xl font-bold text-text-primary mb-2">
+            Components
+          </h2>
           <p className="text-text-secondary">
-            Each component is self-contained. Pass identifiers, it fetches its own on-chain data.
+            Each component is self-contained. Pass identifiers, it fetches its
+            own on-chain data.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -194,23 +254,32 @@ export function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="rounded-xl border border-border-subtle bg-surface-raised p-6">
             <div className="text-2xl mb-3">{"{"}</div>
-            <h3 className="text-lg font-semibold text-text-primary mb-2">Trustless</h3>
+            <h3 className="text-lg font-semibold text-text-primary mb-2">
+              Trustless
+            </h3>
             <p className="text-sm text-text-secondary leading-relaxed">
-              Components never accept display data as props. Only identifiers go in — all rendered data comes from on-chain sources.
+              Components never accept display data as props. Only identifiers go
+              in — all rendered data comes from on-chain sources.
             </p>
           </div>
           <div className="rounded-xl border border-border-subtle bg-surface-raised p-6">
             <div className="text-2xl mb-3">0x</div>
-            <h3 className="text-lg font-semibold text-text-primary mb-2">Self-contained</h3>
+            <h3 className="text-lg font-semibold text-text-primary mb-2">
+              Self-contained
+            </h3>
             <p className="text-sm text-text-secondary leading-relaxed">
-              No providers. No wrappers. No global state. Drop a component in, pass the agent identifier, it works.
+              No providers. No wrappers. No global state. Drop a component in,
+              pass the agent identifier, it works.
             </p>
           </div>
           <div className="rounded-xl border border-border-subtle bg-surface-raised p-6">
             <div className="text-2xl mb-3">cp</div>
-            <h3 className="text-lg font-semibold text-text-primary mb-2">shadcn-style</h3>
+            <h3 className="text-lg font-semibold text-text-primary mb-2">
+              shadcn-style
+            </h3>
             <p className="text-sm text-text-secondary leading-relaxed">
-              Copy components into your project. Read the code, modify it, own it. No black-box npm dependency.
+              Copy components into your project. Read the code, modify it, own
+              it. No black-box npm dependency.
             </p>
           </div>
         </div>

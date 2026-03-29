@@ -1,0 +1,113 @@
+{% comment %}
+  Showcase3D Viewer Block
+  Premium 3D product visualization for Shopify
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "3D Product Viewer",
+  "target": "section",
+  "javascript": "viewer.js",
+  "stylesheet": "viewer.css",
+  "settings": [
+    {
+      "type": "text",
+      "id": "model_id",
+      "label": "3D Model ID",
+      "info": "Enter the model ID from your Showcase3D dashboard"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_rotate",
+      "label": "Auto-rotate",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_controls",
+      "label": "Show controls hint",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "environment",
+      "label": "Lighting Environment",
+      "options": [
+        { "value": "studio", "label": "Studio" },
+        { "value": "city", "label": "City" },
+        { "value": "sunset", "label": "Sunset" },
+        { "value": "night", "label": "Night" },
+        { "value": "warehouse", "label": "Industrial" },
+        { "value": "forest", "label": "Nature" }
+      ],
+      "default": "studio"
+    },
+    {
+      "type": "range",
+      "id": "height",
+      "min": 300,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "label": "Viewer Height",
+      "default": 500
+    },
+    {
+      "type": "select",
+      "id": "corner_style",
+      "label": "Corner Style",
+      "options": [
+        { "value": "rounded", "label": "Rounded" },
+        { "value": "sharp", "label": "Sharp" }
+      ],
+      "default": "rounded"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_glow",
+      "label": "Show luxury glow effect",
+      "default": true
+    }
+  ]
+}
+{% endschema %}
+
+<div 
+  class="showcase3d-viewer-container"
+  data-model-id="{{ block.settings.model_id }}"
+  data-product-id="{{ product.id }}"
+  data-shop="{{ shop.permanent_domain }}"
+  data-auto-rotate="{{ block.settings.auto_rotate }}"
+  data-show-controls="{{ block.settings.show_controls }}"
+  data-environment="{{ block.settings.environment }}"
+  style="--viewer-height: {{ block.settings.height }}px;"
+  {% if block.settings.corner_style == 'rounded' %}data-rounded{% endif %}
+  {% if block.settings.show_glow %}data-glow{% endif %}
+>
+  <div class="showcase3d-viewer" id="showcase3d-{{ block.id }}">
+    <!-- Loading State -->
+    <div class="showcase3d-loading">
+      <div class="showcase3d-spinner"></div>
+      <span class="showcase3d-loading-text">Loading 3D View...</span>
+    </div>
+    
+    <!-- Canvas will be injected here -->
+    <canvas class="showcase3d-canvas"></canvas>
+    
+    <!-- Controls hint -->
+    {% if block.settings.show_controls %}
+    <div class="showcase3d-controls-hint">
+      <span>Drag to rotate</span>
+      <span class="showcase3d-separator">•</span>
+      <span>Scroll to zoom</span>
+    </div>
+    {% endif %}
+    
+    <!-- Luxury corner accents -->
+    <div class="showcase3d-corner showcase3d-corner-tl"></div>
+    <div class="showcase3d-corner showcase3d-corner-tr"></div>
+    <div class="showcase3d-corner showcase3d-corner-bl"></div>
+    <div class="showcase3d-corner showcase3d-corner-br"></div>
+  </div>
+</div>
+

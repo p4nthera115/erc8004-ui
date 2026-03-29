@@ -1,0 +1,88 @@
+# erc8004-ui
+
+> React component library for ERC-8004 AI agent identity. Self-contained, trustless components that fetch on-chain data internally. Styled with Tailwind CSS v4. Distributed shadcn-style (copy components into your project).
+
+## Quick Start
+
+Components only need two props: `agentRegistry` (the chain+contract identifier) and `agentId` (the ERC-721 token ID).
+
+```tsx
+<FingerprintBadge
+  agentRegistry="eip155:1:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD68"
+  agentId={22}
+/>
+```
+
+## Components
+
+### FingerprintBadge (stable)
+Deterministic SVG visual identity badge. Each agent gets a unique, unreplicable fingerprint pattern generated from its on-chain identifier.
+- Props: `agentRegistry: string`, `agentId: number`, `size?: number`, `className?: string`
+- Dependencies: none
+- Category: identity
+
+### AgentCard (planned)
+Complete agent identity card with fingerprint, name, description, services, and reputation summary.
+- Props: `agentRegistry: string`, `agentId: number`, `className?: string`
+- Dependencies: FingerprintBadge, types, utils
+- Category: identity
+
+### ReputationDisplay (planned)
+Aggregate reputation score and individual feedback entries with tag-aware rendering.
+- Props: `agentRegistry: string`, `agentId: number`, `className?: string`
+- Dependencies: types, utils
+- Category: reputation
+
+### EndpointStatus (planned)
+Service endpoints with live health check status indicators.
+- Props: `agentRegistry: string`, `agentId: number`, `className?: string`
+- Dependencies: types, utils
+- Category: status
+
+### ActivityLog (planned)
+Chronological feed of on-chain events: registration, updates, feedback, endpoint calls, deregistration.
+- Props: `agentRegistry: string`, `agentId: number`, `limit?: number`, `className?: string`
+- Dependencies: types, utils
+- Category: activity
+
+## MCP Server
+
+AI coding tools (Claude Code, Cursor, etc.) can connect to the ERC-8004 UI MCP server for direct component access.
+
+Configure in your MCP settings:
+```json
+{
+  "erc8004-ui": {
+    "command": "node",
+    "args": ["./packages/mcp-server/dist/index.js"]
+  }
+}
+```
+
+Available tools:
+- `list_components` — catalog of all components
+- `get_component` — full source code + deps + usage for a specific component
+- `get_setup_guide` — framework-specific setup instructions (vite, nextjs)
+- `get_types` — TypeScript type definitions
+- `get_hooks` — shared hooks and fetcher functions
+
+## Architecture
+
+- Self-contained: every component fetches its own data from on-chain sources
+- Trustless: components never accept display data as props, only identifiers
+- No providers, no context wrappers, no global state
+- React 19 + TypeScript strict + Tailwind CSS v4
+
+## ERC-8004 Data Model
+
+Each agent is identified by:
+- `agentRegistry`: `{namespace}:{chainId}:{identityRegistryAddress}` (e.g. `eip155:1:0x742...`)
+- `agentId`: ERC-721 token ID
+
+Data comes from The Graph subgraph (primary) and Agent0 SDK (secondary).
+
+## Links
+
+- ERC-8004 Spec: https://eips.ethereum.org/EIPS/eip-8004
+- Agent0 SDK: https://docs.sdk.ag0.xyz/
+- Agent0 TypeScript SDK: https://github.com/agent0lab/agent0-ts

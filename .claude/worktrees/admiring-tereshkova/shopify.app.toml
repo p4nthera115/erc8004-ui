@@ -1,0 +1,30 @@
+# Learn more: https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "c491285a5460dd53c19acf05893b5fe0"
+name = "Showcase3D"
+application_url = "https://localhost:3000"
+embedded = true
+
+[access_scopes]
+scopes = "read_products,write_products,read_themes,write_themes"
+
+[auth]
+redirect_urls = [
+  "https://your-app.ngrok.io/api/auth/callback",
+  "https://your-app.ngrok.io/api/auth/shopify/callback"
+]
+
+[webhooks]
+api_version = "2024-10"
+
+[pos]
+embedded = false
+
+[build]
+include_config_on_deploy = true
+
+[app_proxy]
+url = "https://your-app.ngrok.io/api/proxy"
+subpath = "showcase3d"
+prefix = "apps"
+

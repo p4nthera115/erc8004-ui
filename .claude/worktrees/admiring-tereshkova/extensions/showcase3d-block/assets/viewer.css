@@ -1,0 +1,214 @@
+/* Showcase3D Viewer Styles */
+/* Premium 3D visualization for Shopify storefronts */
+
+:root {
+  --showcase3d-gold: #d4a24a;
+  --showcase3d-gold-muted: #a36d31;
+  --showcase3d-obsidian: #09090a;
+  --showcase3d-obsidian-light: #121214;
+  --showcase3d-platinum: #e5e7eb;
+  --showcase3d-platinum-muted: #9ca3af;
+}
+
+.showcase3d-viewer-container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.showcase3d-viewer {
+  position: relative;
+  width: 100%;
+  height: var(--viewer-height, 500px);
+  background: linear-gradient(
+    180deg,
+    var(--showcase3d-obsidian-light) 0%,
+    var(--showcase3d-obsidian) 100%
+  );
+  overflow: hidden;
+}
+
+[data-rounded] .showcase3d-viewer {
+  border-radius: 16px;
+}
+
+[data-glow] .showcase3d-viewer {
+  box-shadow: 0 0 20px rgba(212, 162, 74, 0.15),
+    0 0 40px rgba(212, 162, 74, 0.1), 0 0 60px rgba(212, 162, 74, 0.05);
+}
+
+/* Canvas */
+.showcase3d-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Loading State */
+.showcase3d-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: var(--showcase3d-obsidian);
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+
+.showcase3d-loading.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.showcase3d-spinner {
+  width: 48px;
+  height: 48px;
+  border: 2px solid rgba(212, 162, 74, 0.2);
+  border-top-color: var(--showcase3d-gold);
+  border-radius: 50%;
+  animation: showcase3d-spin 1s linear infinite;
+}
+
+@keyframes showcase3d-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.showcase3d-loading-text {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  color: var(--showcase3d-platinum-muted);
+}
+
+/* Controls Hint */
+.showcase3d-controls-hint {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(18, 18, 20, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(229, 231, 235, 0.1);
+  border-radius: 100px;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  color: var(--showcase3d-platinum-muted);
+  opacity: 0;
+  animation: showcase3d-fadeIn 0.6s ease 1s forwards;
+  z-index: 5;
+}
+
+.showcase3d-separator {
+  color: rgba(156, 163, 175, 0.5);
+}
+
+@keyframes showcase3d-fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Luxury Corner Accents */
+.showcase3d-corner {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.showcase3d-corner-tl {
+  top: 0;
+  left: 0;
+  border-left: 2px solid rgba(212, 162, 74, 0.2);
+  border-top: 2px solid rgba(212, 162, 74, 0.2);
+}
+
+.showcase3d-corner-tr {
+  top: 0;
+  right: 0;
+  border-right: 2px solid rgba(212, 162, 74, 0.2);
+  border-top: 2px solid rgba(212, 162, 74, 0.2);
+}
+
+.showcase3d-corner-bl {
+  bottom: 0;
+  left: 0;
+  border-left: 2px solid rgba(212, 162, 74, 0.2);
+  border-bottom: 2px solid rgba(212, 162, 74, 0.2);
+}
+
+.showcase3d-corner-br {
+  bottom: 0;
+  right: 0;
+  border-right: 2px solid rgba(212, 162, 74, 0.2);
+  border-bottom: 2px solid rgba(212, 162, 74, 0.2);
+}
+
+[data-rounded] .showcase3d-corner-tl {
+  border-top-left-radius: 16px;
+}
+
+[data-rounded] .showcase3d-corner-tr {
+  border-top-right-radius: 16px;
+}
+
+[data-rounded] .showcase3d-corner-bl {
+  border-bottom-left-radius: 16px;
+}
+
+[data-rounded] .showcase3d-corner-br {
+  border-bottom-right-radius: 16px;
+}
+
+/* Error State */
+.showcase3d-error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--showcase3d-obsidian);
+  color: var(--showcase3d-platinum-muted);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  text-align: center;
+  padding: 24px;
+}
+
+.showcase3d-error-icon {
+  width: 48px;
+  height: 48px;
+  border: 2px solid rgba(212, 162, 74, 0.3);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--showcase3d-gold-muted);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .showcase3d-viewer {
+    height: calc(var(--viewer-height, 500px) * 0.8);
+  }
+
+  .showcase3d-controls-hint {
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+
+  .showcase3d-corner {
+    width: 32px;
+    height: 32px;
+  }
+}

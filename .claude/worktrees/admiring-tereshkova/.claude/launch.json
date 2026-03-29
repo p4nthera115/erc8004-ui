@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "/Users/asad/Documents/dev/erc8004-ui", "dev"],
+      "port": 5173
+    }
+  ]
+}

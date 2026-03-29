@@ -15,13 +15,20 @@ export const components: ComponentDefinition[] = [
       },
     ],
     dependencies: {},
-    internalDeps: [],
-    usage: `import { FingerprintBadge } from "./components/erc8004/FingerprintBadge";
+    internalDeps: ["visual-config", "types"],
+    usage: `import { FingerprintBadge, FingerprintCircleMini } from "./components/erc8004/FingerprintBadge";
 
+// Full badge (any size)
 <FingerprintBadge
   agentRegistry="eip155:1:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD68"
   agentId={22}
   size={200}
+/>
+
+// Avatar-scale circle (32–64px)
+<FingerprintCircleMini
+  agentRegistry="eip155:1:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD68"
+  agentId={22}
 />`,
   },
   {

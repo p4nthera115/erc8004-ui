@@ -1,5 +1,5 @@
+import { Link } from '@tanstack/react-router'
 import { FingerprintBadge } from "../components/fingerprint/FingerprintBadge"
-import { navigate } from "../lib/router"
 
 const DEMO_AGENTS = [
   {
@@ -99,10 +99,12 @@ function ComponentCard({
 }) {
   const canNavigate = component.status === "live" || component.status === "next"
   return (
-    <button
-      onClick={() => navigate(`/docs/components/${component.slug}`)}
+    <Link
+      to="/docs/components/$slug"
+      params={{ slug: component.slug }}
       disabled={!canNavigate}
-      className="component-card rounded-xl border border-border-subtle bg-surface-raised p-6 flex flex-col gap-3 text-left w-full disabled:cursor-default"
+      className="component-card rounded-xl border border-border-subtle bg-surface-raised p-6 flex flex-col gap-3 text-left w-full"
+      style={{ pointerEvents: canNavigate ? undefined : 'none' }}
     >
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-text-primary">
@@ -123,7 +125,7 @@ function ComponentCard({
           </span>
         ))}
       </div>
-    </button>
+    </Link>
   )
 }
 
@@ -156,12 +158,13 @@ export function Home() {
           </div>
 
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/docs/components/fingerprint-badge")}
+            <Link
+              to="/docs/components/$slug"
+              params={{ slug: 'fingerprint-badge' }}
               className="px-5 py-2.5 rounded-lg bg-accent text-white font-medium text-sm hover:bg-accent-dim transition-colors"
             >
               Browse Components
-            </button>
+            </Link>
             <div className="rounded-xl border border-border-subtle bg-surface-raised overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-2 border-b border-border-subtle">
                 <span className="w-2 h-2 rounded-full bg-red/60" />

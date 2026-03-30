@@ -7,10 +7,11 @@ import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 const REPUTATION_QUERY = `#graphql
 query ($id: ID!){
   agentStats(id: $id) {
-    averageValue
+    averageFeedbackValue
     totalFeedback
   }
 }
+
 `
 
 export function useReputation(agentRegistry: string, agentId: number) {
@@ -24,11 +25,15 @@ export function useReputation(agentRegistry: string, agentId: number) {
 
       const variables = { id: `${chainId}:${agentId}` }
 
-      const data = await subgraphFetch<{ agentStats: AgentStats }>(
+      const data = await subgraphFetch<{ agentStats: AgentStats | null }>(
         url,
         REPUTATION_QUERY,
         variables
       )
+
+      if (!data.agentStats) {
+        throw new Error(`Agent not found: ${agentRegistry} #${agentId}`)
+      }
 
       return data.agentStats
     },

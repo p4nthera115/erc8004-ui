@@ -9,7 +9,7 @@ export interface ParsedRegistry {
  * Format: `{namespace}:{chainId}:{contractAddress}` e.g. `eip155:1:0x742...`
  */
 export function parseAgentRegistry(registry: string): ParsedRegistry {
-  const parts = registry.split(':')
+  const parts = registry.split(":")
   if (parts.length !== 3) {
     throw new Error(`Invalid agentRegistry format: "${registry}"`)
   }

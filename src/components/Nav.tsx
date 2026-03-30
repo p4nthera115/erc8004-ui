@@ -1,26 +1,27 @@
-import { navigate } from '../lib/router'
+import { Link } from '@tanstack/react-router'
 
 export function Nav() {
   return (
     <header className="sticky top-0 z-50 border-b border-border-subtle bg-surface/80 backdrop-blur-sm">
       <div className="max-w-screen-2xl mx-auto px-6 h-14 flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <button
-            onClick={() => navigate('/')}
+          <Link
+            to="/"
             className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
           >
             <div className="w-7 h-7 rounded-md bg-accent/20 flex items-center justify-center">
               <span className="text-accent font-bold text-xs">8K</span>
             </div>
             <span className="font-semibold text-text-primary tracking-tight">erc8004-ui</span>
-          </button>
+          </Link>
           <nav className="hidden md:flex items-center gap-1">
-            <button
-              onClick={() => navigate('/docs/components/fingerprint-badge')}
+            <Link
+              to="/docs/components/$slug"
+              params={{ slug: 'fingerprint-badge' }}
               className="text-sm text-text-secondary hover:text-text-primary transition-colors px-3 py-1.5 rounded-md hover:bg-surface-raised"
             >
               Docs
-            </button>
+            </Link>
           </nav>
         </div>
         <div className="flex items-center gap-4">

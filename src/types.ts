@@ -60,16 +60,15 @@ export interface ReputationData {
   feedback: Feedback[]
 }
 
-// ? Temporarily added optional fields to avoid type errors during development — they should all always be present in the subgraph response
 export interface AgentStats {
-  id?: string // "chainId:agentId"
+  id: string // "chainId:agentId"
   totalFeedback: number
   averageFeedbackValue: number // BigDecimal — parsed from string
-  totalValidations?: number
-  completedValidations?: number
-  averageValidationScore?: number
-  lastActivity?: number
-  updatedAt?: number
+  totalValidations: number
+  completedValidations: number
+  averageValidationScore: number
+  lastActivity: number
+  updatedAt: number
 }
 
 export interface Feedback {

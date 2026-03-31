@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link } from "@tanstack/react-router"
 
 export function Nav() {
   return (
@@ -9,15 +9,15 @@ export function Nav() {
             to="/"
             className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
           >
-            <div className="w-7 h-7 rounded-md bg-accent/20 flex items-center justify-center">
-              <span className="text-accent font-bold text-xs">8K</span>
-            </div>
-            <span className="font-semibold text-text-primary tracking-tight">erc8004-ui</span>
+            <img src="/favicon.svg" alt="ERC-8004 UI" className="w-7 h-7" />
+            <span className="font-semibold text-text-primary tracking-tight">
+              erc8004-ui
+            </span>
           </Link>
           <nav className="hidden md:flex items-center gap-1">
             <Link
               to="/docs/components/$slug"
-              params={{ slug: 'fingerprint-badge' }}
+              params={{ slug: "fingerprint-badge" }}
               className="text-sm text-text-secondary hover:text-text-primary transition-colors px-3 py-1.5 rounded-md hover:bg-surface-raised"
             >
               Docs

@@ -1,6 +1,78 @@
 import { useState, useMemo, useRef, useCallback } from "react"
-import type { SharedProps } from "@/types"
-import { useFeedbackList } from "./useReputation"
+import { useQuery } from "@tanstack/react-query"
+import type { SharedProps, Feedback } from "@/types"
+import { useERC8004Config } from "@/provider/ERC8004Provider"
+import { parseAgentRegistry } from "@/lib/parse-registry"
+import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
+import * as v from "valibot"
+
+type TimelineResponse = {
+  feedbacks: Array<Pick<Feedback, "id" | "value" | "createdAt">>
+}
+
+const timelineSchema = v.object({
+  feedbacks: v.pipe(
+    v.array(
+      v.object({
+        id: v.string(),
+        value: v.string(),
+        createdAt: v.string(),
+      })
+    ),
+    v.transform((raw) =>
+      raw.map((item) => ({
+        id: item.id,
+        value: parseFloat(item.value),
+        createdAt: parseInt(item.createdAt, 10),
+      }))
+    )
+  ),
+})
+
+const TIMELINE_QUERY = `#graphql
+  query ($id: ID!, $first: Int!) {
+    feedbacks(
+      where: { agent_: { id: $id }, isRevoked: false },
+      orderBy: createdAt,
+      orderDirection: desc,
+      first: $first
+    ) {
+      id
+      value
+      createdAt
+    }
+  }
+`
+
+function useFeedbackTimeline(agentRegistry: string, agentId: number) {
+  const { apiKey, subgraphOverrides } = useERC8004Config()
+
+  return useQuery({
+    queryKey: ["reputation-timeline", agentRegistry, agentId],
+    queryFn: async (): Promise<TimelineResponse> => {
+      const { chainId } = parseAgentRegistry(agentRegistry)
+      const url = getSubgraphUrl(chainId, apiKey, subgraphOverrides)
+      const variables = { id: `${chainId}:${agentId}`, first: 100 }
+
+      const data = await subgraphFetch<TimelineResponse>(
+        url,
+        TIMELINE_QUERY,
+        variables
+      )
+
+      try {
+        return v.parse(timelineSchema, data)
+      } catch (error) {
+        if (v.isValiError(error)) {
+          throw new Error(
+            `Invalid subgraph response: ${error.issues[0].message}`
+          )
+        }
+        throw error
+      }
+    },
+  })
+}
 
 // ============================================================================
 // TIMELINE LAYOUT
@@ -141,7 +213,7 @@ export function ReputationTimeline({ agentRegistry, agentId }: SharedProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const svgRef = useRef<SVGSVGElement>(null)
 
-  const { data, isLoading, error } = useFeedbackList(agentRegistry, agentId)
+  const { data, isLoading, error } = useFeedbackTimeline(agentRegistry, agentId)
 
   // Sort feedback by time ascending (oldest first) so the line goes
   // left to right. The subgraph returns newest-first, so we reverse.

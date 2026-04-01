@@ -4,6 +4,7 @@ import { PlaceholderDocs } from "../pages/docs/components/PlaceholderDocs"
 import { ReputationScore } from "@/components/reputation/reputation-score"
 import { ReputationDistribution } from "@/components/reputation/reputation-distribution"
 import { ReputationTimeline } from "@/components/reputation/reputation-timeline"
+import { FeedbackList } from "@/components/reputation/feedback-list"
 
 const COMPONENT_PAGES: Record<string, React.ReactNode> = {
   "fingerprint-badge": <FingerprintBadgeDocs />,
@@ -25,6 +26,10 @@ const COMPONENT_PAGES: Record<string, React.ReactNode> = {
         agentId={1073}
       />
       <ReputationTimeline
+        agentRegistry="eip155:11155111:0x8004A818BFB912233c491871b3d84c89A494BD9e"
+        agentId={1073}
+      />
+      <FeedbackList
         agentRegistry="eip155:11155111:0x8004A818BFB912233c491871b3d84c89A494BD9e"
         agentId={1073}
       />

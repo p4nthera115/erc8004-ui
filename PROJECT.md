@@ -32,7 +32,7 @@ The original plan was shadcn-style distribution: developers copy component sourc
 
 More importantly, the target audience is backend blockchain developers who build frontends entirely with AI coding agents. For them, `npm install @erc8004/ui` followed by a single provider wrapper and component import is the fastest possible path. Every AI coding agent already knows this pattern. A custom CLI or manual file-copying workflow adds friction that this audience won't tolerate.
 
-The source code remains fully readable and well-documented on GitHub. Hooks and utilities are exported as public API so developers can build custom UIs on top of the data layer. The npm package is not a black box — it's a convenience layer over open, inspectable code.
+The source code remains fully readable and well-documented on GitHub. The npm package is not a black box — it's a convenience layer over open, inspectable code. If developers need raw data access for custom UIs in the future, hooks can be extracted from components at that point.
 
 ---
 
@@ -126,13 +126,18 @@ function App() {
 
 ### Caching with TanStack Query
 
-All data hooks use `@tanstack/react-query` internally. This provides:
+All components use `@tanstack/react-query` internally for data fetching. This provides:
 
-- **Deduplication** — multiple components requesting the same agent on one page share a single fetch
 - **Caching** — data is cached in memory (5 min stale, 30 min gc by default) so navigating away and back doesn't refetch
 - **Background refetch** — stale data is served instantly while fresh data loads silently
 
 `@tanstack/react-query` and `react` are peer dependencies — not bundled.
+
+### Data Fetching: Component-Internal
+
+Each component owns its data fetching entirely. There are no shared hooks — every component defines its own GraphQL query, return type, validation schema, and `useQuery` call internally. This avoids overfetching (e.g., ReputationScore only queries 2 aggregate fields, not the 20+ fields FeedbackList needs) and keeps each component fully independent with no unnecessary coupling between them.
+
+Components use the shared infrastructure from `lib/` (subgraph client, registry parser, provider config) but their specific queries are private to each component. Hooks are NOT exported as public API — the library's public surface is components and types only.
 
 ---
 
@@ -154,11 +159,11 @@ type SharedProps = {
 
 ### Reputation Components
 
-Reputation was broken into focused sub-components so developers can use exactly what they need — a compact badge for a marketplace listing, a full review panel for a profile page, or anything in between. All reputation components share the `useReputation` hook internally, and TanStack Query deduplicates fetches when multiple reputation components appear on the same page for the same agent.
+Reputation was broken into focused sub-components so developers can use exactly what they need — a compact badge for a marketplace listing, a full review panel for a profile page, or anything in between. Each component fetches only the data it needs — no overfetching.
 
-3. **ReputationScore** — compact badge showing the aggregate average score + total review count. Designed for marketplace cards, search results, compact listings. Smallest footprint.
-4. **ReputationChart** — visual score distribution (histogram of rating ranges) or chronological timeline of scores over time. For developers who want to show rating trends.
-5. **FeedbackList** — scrollable list of individual feedback entries, each showing value, tags (as pills), reviewer address (truncated), timestamp, review text (if available from feedbackFile), and agent responses. Like a reviews section on Amazon.
+3. **ReputationScore** — compact badge showing the aggregate average score + total review count. Fetches only `agentStats` (2 fields). Designed for marketplace cards, search results, compact listings. Smallest footprint.
+4. **ReputationChart** — visual score distribution histogram. Fetches only feedback `value` + `createdAt`. For developers who want to show rating trends.
+5. **FeedbackList** — scrollable list of individual feedback entries, each showing value, tags (as pills), reviewer address (truncated), timestamp, review text (if available from feedbackFile), and agent responses. Fetches full feedback detail with pagination via Subgraph `first`/`skip`. Like a reviews section on Amazon.
 6. **ReputationDisplay** — composed convenience component that combines ReputationScore + ReputationChart + FeedbackList into a single well-laid-out view. For developers who want a complete reputation section without assembling pieces.
 
 ### Infrastructure Components
@@ -168,22 +173,9 @@ Reputation was broken into focused sub-components so developers can use exactly 
 
 ---
 
-## Shared Data Hooks (Public API)
-
-All hooks use `useQuery` from `@tanstack/react-query`. Query keys follow the pattern `[resource, agentRegistry, agentId]`. These are exported as public API so developers can build custom UIs on top of the data layer. Each hook lives in its component category directory (e.g., `useReputation` lives alongside the reputation components), not in a global hooks folder — they're tightly coupled to their consumers.
-
-- `useAgent(agentRegistry, agentId)` — fetches identity + registration file
-- `useReputation(agentRegistry, agentId)` — fetches aggregate stats (averageValue, totalFeedback) + individual feedback entries from a single GraphQL query
-- `useActivity(agentRegistry, agentId, limit?)` — fetches activity events
-- `useEndpointStatus(agentRegistry, agentId)` — fetches endpoints + health checks
-
-Hook return types are TanStack Query's native shape: `{ data, isLoading, error, isFetching, ... }`.
-
----
-
 ## Shared Utilities
 
-Global utilities in `lib/` (used across all categories):
+Global utilities in `lib/` (used by all components internally):
 
 - **`parseAgentRegistry(registry)`** — extracts namespace, chainId, and contract address from `eip155:{chainId}:{address}` format
 - **`getSubgraphUrl(chainId, apiKey)`** — maps chainId to the correct Graph endpoint, injecting the API key from the provider
@@ -203,7 +195,7 @@ The primary consumers of this library are AI coding agents. Two distribution lay
 
 stdio-based MCP server that AI tools (Claude Code, Cursor, etc.) connect to. Serves component documentation, usage examples, types, and setup guides.
 
-Tools: `list_components`, `get_component`, `get_setup_guide`, `get_types`, `get_hooks`
+Tools: `list_components`, `get_component`, `get_setup_guide`, `get_types`
 
 ### llms.txt
 

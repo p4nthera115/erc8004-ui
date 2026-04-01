@@ -17,7 +17,7 @@ Read `PROJECT.md` for the full context, architecture decisions, data model, and 
 - **React 19** + **TypeScript** (strict mode)
 - **Tailwind CSS v4** for styling — no other CSS-in-JS, no external UI libraries
 - **SVG-based Fingerprint Badge** — deterministic visual identity, pure SVG with dithering algorithms (not Three.js/R3F)
-- **@tanstack/react-query v5** — data caching, deduplication, and stale-while-revalidate for all hooks
+- **@tanstack/react-query v5** — data caching, deduplication, and stale-while-revalidate for all component data fetching
 - **The Graph Subgraph** — primary data source, direct GraphQL queries to per-chain endpoints
 - **Vite** for development; **tsup** (or Rollup) for package bundling
 - **pnpm** for package management
@@ -79,16 +79,13 @@ All data comes from The Graph's Subgraph via direct GraphQL fetch calls. No SDK 
 
 URL format: `https://gateway.thegraph.com/api/{API_KEY}/subgraphs/id/{SUBGRAPH_ID}`
 
-### Shared Data Hooks
+### Data Fetching: Component-Internal
 
-All hooks use `useQuery` from `@tanstack/react-query`. Query keys follow the pattern `[resource, agentRegistry, agentId]`. Hooks are exported as public API so developers can build custom UIs. Each hook lives in its component category directory (e.g., `useReputation` lives in `components/reputation/`), not in a global hooks folder.
+Each component owns its data fetching. There are no shared hooks — every component defines its own GraphQL query, return type, and `useQuery` call internally. This avoids overfetching (e.g., ReputationScore only fetches 2 fields, not the 20+ fields FeedbackList needs) and keeps each component fully independent.
 
-- `useAgent(agentRegistry, agentId)` — in `components/agent-card/` — fetches identity + registration file
-- `useReputation(agentRegistry, agentId)` — in `components/reputation/` — fetches AgentStats (averageValue, totalFeedback) + individual Feedback entries in a single GraphQL query
-- `useActivity(agentRegistry, agentId, limit?)` — in `components/activity/` — fetches activity events
-- `useEndpointStatus(agentRegistry, agentId)` — in `components/endpoint/` — fetches endpoints + health checks
+Components use the shared infrastructure from `lib/` (subgraph client, registry parser, provider config) but define their own queries. `useQuery` query keys follow the pattern `[component-name, agentRegistry, agentId]`.
 
-Hook return types are TanStack Query's native shape: `{ data, isLoading, error, isFetching, ... }`.
+Hooks are NOT exported as public API. The library's public surface is components and types only. If developers need raw data access in the future, hooks can be extracted from components at that point.
 
 ### Parsing agentRegistry
 
@@ -162,9 +159,9 @@ type SharedProps = {
 
 Reputation is broken into focused sub-components. All share `useReputation` internally; TanStack Query deduplicates fetches when multiple appear on the same page for the same agent.
 
-3. **ReputationScore** — compact badge: average score + total review count. For marketplace cards, search results.
-4. **ReputationChart** — score distribution histogram or chronological score timeline. For rating trends.
-5. **FeedbackList** — scrollable individual reviews: value, tag pills, truncated reviewer address, timestamp, review text (from feedbackFile), agent responses. Paginated via Subgraph `first`/`skip`.
+3. **ReputationScore** — compact badge: average score + total review count. For marketplace cards, search results. Fetches only `agentStats`.
+4. **ReputationChart** — score distribution histogram. Fetches feedback `value` + `createdAt` only.
+5. **FeedbackList** — scrollable individual reviews: value, tag pills, truncated reviewer address, timestamp, review text (from feedbackFile), agent responses. Paginated via Subgraph `first`/`skip`. Fetches full feedback detail.
 6. **ReputationDisplay** — composed convenience component combining Score + Chart + FeedbackList.
 
 ### Infrastructure Components
@@ -195,24 +192,23 @@ Category-specific utilities live in their component directories (e.g., `componen
 3. FingerprintBadge — SVG-based, stable ✓
 4. ERC8004Provider — lightweight context for API key + Subgraph URL resolution
 5. Subgraph client + shared utilities — GraphQL fetcher, chain resolver, address truncation, time formatting
-6. `useReputation` hook — single GraphQL query returning AgentStats + Feedback list
-7. ReputationScore — simplest reputation component, validates the data layer
-8. ReputationChart — score distribution / timeline visual
-9. FeedbackList — individual reviews with tags, text, responses
-10. ReputationDisplay — composed component combining 7 + 8 + 9
-11. `useAgent` hook + AgentCard — establishes broader design system
-12. EndpointStatus — including health check logic
-13. ActivityLog — most complex, build last
-14. Package build setup — tsup/Rollup bundling, tree-shaking, peer deps, package.json exports
-15. Demo app — showcase all components with real on-chain data
-16. MCP server + llms.txt — AI-agent discovery and documentation
-17. Docs site — component previews, install instructions, props docs
+6. ReputationScore — simplest component, validates the data layer ✓
+7. ReputationChart — score distribution histogram
+8. FeedbackList — individual reviews with tags, text, responses, pagination
+9. ReputationDisplay — composed component combining 6 + 7 + 8
+10. AgentCard — identity + registration data display
+11. EndpointStatus — including health check logic
+12. ActivityLog — most complex, build last
+13. Package build setup — tsup/Rollup bundling, tree-shaking, peer deps, package.json exports
+14. Demo app — showcase all components with real on-chain data
+15. MCP server + llms.txt — AI-agent discovery and documentation
+16. Docs site — component previews, install instructions, props docs
 
 ---
 
 ## Package Structure
 
-Components are grouped by category. Each category directory contains its components, its data hook, and any category-specific utilities. Hooks live next to the components that use them — not in a global hooks folder — because they're tightly coupled. Truly shared utilities (Subgraph client, registry parser, address truncation) live in `/lib/` since every category needs them.
+Components are grouped by category. Each category directory contains its components and any category-specific utilities. Data fetching lives inside each component — there are no separate hook files. Truly shared utilities (Subgraph client, registry parser, address truncation) live in `/lib/` since every component needs them.
 
 The public API stays flat — developers import `{ ReputationScore }` from `'@erc8004/ui'`, never from subdirectories. `index.ts` re-exports everything.
 
@@ -225,20 +221,16 @@ The public API stays flat — developers import `{ ReputationScore }` from `'@er
 │   │   ├── fingerprint/
 │   │   │   └── FingerprintBadge.tsx
 │   │   ├── reputation/
-│   │   │   ├── useReputation.ts       # hook co-located with its consumers
-│   │   │   ├── ReputationScore.tsx
-│   │   │   ├── ReputationChart.tsx
-│   │   │   ├── FeedbackList.tsx
-│   │   │   ├── ReputationDisplay.tsx
+│   │   │   ├── ReputationScore.tsx     # owns its own query (agentStats only)
+│   │   │   ├── ReputationChart.tsx     # owns its own query (feedback value + createdAt)
+│   │   │   ├── FeedbackList.tsx        # owns its own query (full feedback detail + pagination)
+│   │   │   ├── ReputationDisplay.tsx   # composes Score + Chart + FeedbackList
 │   │   │   └── utils.ts               # tag frequency calc, score formatting
 │   │   ├── agent-card/
-│   │   │   ├── useAgent.ts
 │   │   │   └── AgentCard.tsx
 │   │   ├── endpoint/
-│   │   │   ├── useEndpointStatus.ts
 │   │   │   └── EndpointStatus.tsx
 │   │   └── activity/
-│   │       ├── useActivity.ts
 │   │       └── ActivityLog.tsx
 │   ├── lib/                            # globally shared utilities
 │   │   ├── subgraph-client.ts
@@ -267,12 +259,6 @@ export { ActivityLog } from "./components/activity/ActivityLog"
 
 // Provider
 export { ERC8004Provider } from "./provider/ERC8004Provider"
-
-// Hooks (public API for custom UIs)
-export { useAgent } from "./components/agent-card/useAgent"
-export { useReputation } from "./components/reputation/useReputation"
-export { useActivity } from "./components/activity/useActivity"
-export { useEndpointStatus } from "./components/endpoint/useEndpointStatus"
 
 // Types
 export type {
@@ -316,7 +302,7 @@ Every component must handle:
 
 stdio-based MCP server that AI tools connect to. Serves component documentation, usage examples, types, and setup guides.
 
-Tools: `list_components`, `get_component`, `get_setup_guide`, `get_types`, `get_hooks`
+Tools: `list_components`, `get_component`, `get_setup_guide`, `get_types`
 
 ### llms.txt
 

@@ -1,6 +1,64 @@
 import { useMemo } from "react"
-import type { SharedProps } from "@/types"
-import { useFeedbackList } from "./useReputation"
+import { useQuery } from "@tanstack/react-query"
+import type { SharedProps, Feedback } from "@/types"
+import { useERC8004Config } from "@/provider/ERC8004Provider"
+import { parseAgentRegistry } from "@/lib/parse-registry"
+import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
+import * as v from "valibot"
+
+type DistributionResponse = {
+  feedbacks: Array<Pick<Feedback, "value">>
+}
+
+const distributionSchema = v.object({
+  feedbacks: v.pipe(
+    v.array(v.object({ value: v.string() })),
+    v.transform((raw) => raw.map((item) => ({ value: parseFloat(item.value) })))
+  ),
+})
+
+const DISTRIBUTION_QUERY = `#graphql
+  query ($id: ID!, $first: Int!) {
+    feedbacks(
+      where: { agent_: { id: $id }, isRevoked: false },
+      orderBy: createdAt,
+      orderDirection: desc,
+      first: $first
+    ) {
+      value
+    }
+  }
+`
+
+function useFeedbackDistribution(agentRegistry: string, agentId: number) {
+  const { apiKey, subgraphOverrides } = useERC8004Config()
+
+  return useQuery({
+    queryKey: ["reputation-distribution", agentRegistry, agentId],
+    queryFn: async (): Promise<DistributionResponse> => {
+      const { chainId } = parseAgentRegistry(agentRegistry)
+      const url = getSubgraphUrl(chainId, apiKey, subgraphOverrides)
+      const variables = { id: `${chainId}:${agentId}`, first: 1000 }
+
+      const data = await subgraphFetch<DistributionResponse>(
+        url,
+        DISTRIBUTION_QUERY,
+        variables
+      )
+
+      try {
+        return v.parse(distributionSchema, data)
+      } catch (error) {
+        if (v.isValiError(error)) {
+          throw new Error(
+            `Invalid subgraph response: ${error.issues[0].message}`
+          )
+        }
+        throw error
+      }
+    },
+  })
+}
 
 // ============================================================================
 // BUCKET DEFINITIONS
@@ -88,7 +146,7 @@ export function ReputationDistribution({
   // Fetch reputation data. If another reputation component on the page
   // already requested data for the same agent, TanStack Query reuses the
   // cached result — no duplicate network requests.
-  const { data, isLoading, error } = useFeedbackList(agentRegistry, agentId)
+  const { data, isLoading, error } = useFeedbackDistribution(agentRegistry, agentId)
 
   // useMemo ensures we only re-compute buckets when the underlying
   // feedback array actually changes — not on every render.

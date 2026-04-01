@@ -94,16 +94,18 @@ Parse this to determine chain, contract address, and subgraph endpoint.
 
 ---
 
-## Reputation Data Model
+## Data Models
+
+### Reputation Data
 
 The Subgraph provides two key entities for reputation:
 
-### AgentStats (aggregate)
+#### AgentStats (aggregate)
 
 ```graphql
 type AgentStats {
   totalFeedback: BigInt!
-  averageValue: BigDecimal!
+  averageFeedbackValue: BigDecimal!
   totalValidations: BigInt!
   completedValidations: BigInt!
   averageValidationScore: BigDecimal!
@@ -111,7 +113,7 @@ type AgentStats {
 }
 ```
 
-### Feedback (individual entries)
+#### Feedback (individual entries)
 
 ```graphql
 type Feedback {
@@ -137,9 +139,33 @@ type FeedbackFile {
 
 Note: `value` has no universal scale — different agents may receive scores on different ranges. Tag frequency must be computed client-side by counting tag1/tag2 across the feedback list. The Subgraph does not pre-aggregate tags.
 
+### Validation Data
+
+The Subgraph stores independent third-party verification results. Aggregate stats are on `AgentStats` (see above). Individual entries use the `Validation` entity:
+
+```graphql
+type Validation {
+  id: ID!
+  validatorAddress: Bytes!
+  requestUri: String
+  requestHash: Bytes!
+  response: Int # 0-100, null if pending
+  responseUri: String
+  responseHash: Bytes
+  tag: String # what aspect was validated
+  status: ValidationStatus! # PENDING | COMPLETED | EXPIRED
+  createdAt: BigInt!
+  updatedAt: BigInt!
+}
+```
+
+Note: Validation scores are on a fixed 0-100 scale (unlike feedback values). There are typically far fewer validations than feedback entries — validations come from specialised verifiers, not everyday users. The Validation Registry is not yet deployed to mainnet but the subgraph schema supports it.
+
 ---
 
 ## Components
+
+Components are organised around ERC-8004's three registries (Identity, Reputation, Validation) plus standalone cross-registry components. Each category contains **atomic** (smallest useful piece) and **composed** (pre-built combinations) components. TanStack Query deduplicates fetches when multiple components target the same agent.
 
 ### Shared Props
 
@@ -150,24 +176,56 @@ type SharedProps = {
 }
 ```
 
-### Identity Components
+### Identity Components (Identity Registry)
 
-1. **FingerprintBadge** — deterministic SVG visual identity ✓ (first draft complete)
-2. **AgentCard** — fingerprint + name, description, services, reputation summary
+Data source: `Agent` + `AgentRegistrationFile` subgraph entities.
 
-### Reputation Components
+**Atomic:**
 
-Reputation is broken into focused sub-components. All share `useReputation` internally; TanStack Query deduplicates fetches when multiple appear on the same page for the same agent.
+1. **FingerprintBadge** — deterministic SVG visual identity. No data fetch — generated from identifiers. ✓
+2. **AgentName** — agent's registered name. Fetches `registrationFile.name` only. Falls back to truncated agent ID.
+3. **AgentImage** — agent's registered image (IPFS/HTTPS/base64). Fetches `registrationFile.image` only. Falls back to FingerprintBadge.
+4. **AgentDescription** — agent's description text. Fetches `registrationFile.description` only.
 
-3. **ReputationScore** — compact badge: average score + total review count. For marketplace cards, search results. Fetches only `agentStats`.
-4. **ReputationChart** — score distribution histogram. Fetches feedback `value` + `createdAt` only.
-5. **FeedbackList** — scrollable individual reviews: value, tag pills, truncated reviewer address, timestamp, review text (from feedbackFile), agent responses. Paginated via Subgraph `first`/`skip`. Fetches full feedback detail.
-6. **ReputationDisplay** — composed convenience component combining Score + Chart + FeedbackList.
+**Composed:**
 
-### Infrastructure Components
+5. **AgentCard** — FingerprintBadge/AgentImage + AgentName + AgentDescription + protocol icons + owner address. Fetches `Agent` + `AgentRegistrationFile` top-level fields.
+6. **EndpointStatus** — service endpoints list (MCP, A2A, OASF, web, email) with protocol labels + optional live health checks. Fetches endpoint fields from `AgentRegistrationFile`.
+7. **IdentityDisplay** — AgentCard + EndpointStatus combined.
 
-7. **EndpointStatus** — services list with live health checks
-8. **ActivityLog** — chronological on-chain events feed
+### Reputation Components (Reputation Registry)
+
+Data source: `AgentStats`, `Feedback`, `FeedbackFile`, `FeedbackResponse` subgraph entities.
+
+**Atomic:**
+
+8. **ReputationScore** — compact badge: average score + total review count. Fetches only `agentStats`. ✓
+9. **ReputationChart** — score distribution histogram. Fetches feedback `value` + `createdAt` only. ✓
+10. **FeedbackList** — scrollable individual reviews: value, tag pills, truncated reviewer address, timestamp, review text (from feedbackFile), agent responses. Paginated via Subgraph `first`/`skip`. ✓
+11. **TagCloud** — weighted tag pills showing most frequent feedback tags. Fetches only `tag1` + `tag2` from all feedback, counts frequencies client-side. Answers "what does this agent specialise in?"
+
+**Composed:**
+
+12. **ReputationDisplay** — ReputationScore + ReputationChart + FeedbackList combined. ✓
+
+### Validation Components (Validation Registry)
+
+Data source: `Validation` entity + validation fields on `AgentStats`.
+
+**Atomic:**
+
+13. **VerificationBadge** — compact visual verification indicator (checkmark-style icon) with tier metadata. Fetches 3 fields from `AgentStats`: `totalValidations`, `completedValidations`, `averageValidationScore`. Place next to any agent name/avatar.
+14. **ValidationScore** — aggregate average validation score + completed count badge. Fetches validation fields from `AgentStats`.
+15. **ValidationList** — scrollable individual validation entries: validator address, score (0-100), tag, status, timestamp. Paginated via Subgraph `first`/`skip`.
+
+**Composed:**
+
+16. **ValidationDisplay** — VerificationBadge + ValidationScore + ValidationList combined.
+
+### Standalone Components (Cross-Registry)
+
+17. **LastActivity** — relative timestamp ("Active 3 hours ago"). Fetches 1 field from `AgentStats`: `lastActivity`. Cross-registry — reflects most recent event of any kind.
+18. **ActivityLog** — chronological feed of all on-chain events across all registries. Most complex component — build last.
 
 ---
 
@@ -190,25 +248,35 @@ Category-specific utilities live in their component directories (e.g., `componen
 1. Project scaffolding — Vite + React + TypeScript + Tailwind setup ✓
 2. Types and constants — `types.ts`, `constants.ts`, `parse-registry.ts` ✓
 3. FingerprintBadge — SVG-based, stable ✓
-4. ERC8004Provider — lightweight context for API key + Subgraph URL resolution
-5. Subgraph client + shared utilities — GraphQL fetcher, chain resolver, address truncation, time formatting
-6. ReputationScore — simplest component, validates the data layer ✓
-7. ReputationChart — score distribution histogram
-8. FeedbackList — individual reviews with tags, text, responses, pagination
-9. ReputationDisplay — composed component combining 6 + 7 + 8
-10. AgentCard — identity + registration data display
-11. EndpointStatus — including health check logic
-12. ActivityLog — most complex, build last
-13. Package build setup — tsup/Rollup bundling, tree-shaking, peer deps, package.json exports
-14. Demo app — showcase all components with real on-chain data
-15. MCP server + llms.txt — AI-agent discovery and documentation
-16. Docs site — component previews, install instructions, props docs
+4. ERC8004Provider — lightweight context for API key + Subgraph URL resolution ✓
+5. Subgraph client + shared utilities — GraphQL fetcher, chain resolver, address truncation, time formatting ✓
+6. ReputationScore — simplest data component, validates the data layer ✓
+7. ReputationChart — score distribution histogram ✓
+8. FeedbackList — individual reviews with tags, text, responses, pagination ✓
+9. ReputationDisplay — composed component combining 6 + 7 + 8 ✓
+10. AgentName — atomic, fetches one field, validates identity data layer
+11. AgentImage — atomic, IPFS/HTTPS/base64 handling + FingerprintBadge fallback
+12. AgentDescription — atomic, fetches one field
+13. TagCloud — tag frequency aggregation from feedback data
+14. LastActivity — atomic, fetches one field from AgentStats
+15. AgentCard — composed identity card from atomic pieces
+16. EndpointStatus — endpoint listing + optional health check logic
+17. IdentityDisplay — composed identity view
+18. VerificationBadge — compact verification indicator with tier metadata
+19. ValidationScore — aggregate validation stats badge
+20. ValidationList — individual validation entries with pagination
+21. ValidationDisplay — composed validation view
+22. ActivityLog — cross-registry chronological event feed, most complex, build last
+23. Package build setup — tsup/Rollup bundling, tree-shaking, peer deps, package.json exports
+24. Demo app — showcase all components with real on-chain data
+25. MCP server + llms.txt — AI-agent discovery and documentation
+26. Docs site — component previews, install instructions, props docs
 
 ---
 
 ## Package Structure
 
-Components are grouped by category. Each category directory contains its components and any category-specific utilities. Data fetching lives inside each component — there are no separate hook files. Truly shared utilities (Subgraph client, registry parser, address truncation) live in `/lib/` since every component needs them.
+Components are grouped by registry category. Each category directory contains its components and any category-specific utilities. Data fetching lives inside each component — there are no separate hook files. Truly shared utilities (Subgraph client, registry parser, address truncation) live in `/lib/` since every component needs them.
 
 The public API stays flat — developers import `{ ReputationScore }` from `'@erc8004/ui'`, never from subdirectories. `index.ts` re-exports everything.
 
@@ -218,27 +286,36 @@ The public API stays flat — developers import `{ ReputationScore }` from `'@er
 │   ├── provider/
 │   │   └── ERC8004Provider.tsx
 │   ├── components/
-│   │   ├── fingerprint/
-│   │   │   └── FingerprintBadge.tsx
+│   │   ├── identity/
+│   │   │   ├── FingerprintBadge.tsx     # deterministic SVG, no data fetch
+│   │   │   ├── AgentName.tsx            # fetches registrationFile.name only
+│   │   │   ├── AgentImage.tsx           # fetches registrationFile.image, falls back to FingerprintBadge
+│   │   │   ├── AgentDescription.tsx     # fetches registrationFile.description only
+│   │   │   ├── AgentCard.tsx            # composes atomic identity pieces
+│   │   │   ├── EndpointStatus.tsx       # endpoint listing + health checks
+│   │   │   └── IdentityDisplay.tsx      # composes AgentCard + EndpointStatus
 │   │   ├── reputation/
-│   │   │   ├── ReputationScore.tsx     # owns its own query (agentStats only)
-│   │   │   ├── ReputationChart.tsx     # owns its own query (feedback value + createdAt)
-│   │   │   ├── FeedbackList.tsx        # owns its own query (full feedback detail + pagination)
-│   │   │   ├── ReputationDisplay.tsx   # composes Score + Chart + FeedbackList
-│   │   │   └── utils.ts               # tag frequency calc, score formatting
-│   │   ├── agent-card/
-│   │   │   └── AgentCard.tsx
-│   │   ├── endpoint/
-│   │   │   └── EndpointStatus.tsx
+│   │   │   ├── ReputationScore.tsx      # owns its own query (agentStats only)
+│   │   │   ├── ReputationChart.tsx      # owns its own query (feedback value + createdAt)
+│   │   │   ├── FeedbackList.tsx         # owns its own query (full feedback detail + pagination)
+│   │   │   ├── TagCloud.tsx             # owns its own query (tag1 + tag2 only)
+│   │   │   ├── ReputationDisplay.tsx    # composes Score + Chart + FeedbackList
+│   │   │   └── utils.ts                # tag frequency calc, score formatting
+│   │   ├── validation/
+│   │   │   ├── VerificationBadge.tsx    # compact verification indicator
+│   │   │   ├── ValidationScore.tsx      # aggregate validation stats
+│   │   │   ├── ValidationList.tsx       # individual validation entries + pagination
+│   │   │   └── ValidationDisplay.tsx    # composes Badge + Score + List
 │   │   └── activity/
-│   │       └── ActivityLog.tsx
-│   ├── lib/                            # globally shared utilities
+│   │       ├── LastActivity.tsx         # single timestamp from AgentStats
+│   │       └── ActivityLog.tsx          # cross-registry event feed
+│   ├── lib/                             # globally shared utilities
 │   │   ├── subgraph-client.ts
 │   │   ├── parse-registry.ts
 │   │   ├── constants.ts
 │   │   └── utils.ts
-│   ├── types.ts                        # shared types across all categories
-│   └── index.ts                        # flat public exports
+│   ├── types.ts                         # shared types across all categories
+│   └── index.ts                         # flat public exports
 ├── package.json
 ├── tsconfig.json
 └── tsup.config.ts
@@ -247,14 +324,30 @@ The public API stays flat — developers import `{ ReputationScore }` from `'@er
 ### Package Exports
 
 ```typescript
-// Components
-export { FingerprintBadge } from "./components/fingerprint/FingerprintBadge"
+// Identity Components
+export { FingerprintBadge } from "./components/identity/FingerprintBadge"
+export { AgentName } from "./components/identity/AgentName"
+export { AgentImage } from "./components/identity/AgentImage"
+export { AgentDescription } from "./components/identity/AgentDescription"
+export { AgentCard } from "./components/identity/AgentCard"
+export { EndpointStatus } from "./components/identity/EndpointStatus"
+export { IdentityDisplay } from "./components/identity/IdentityDisplay"
+
+// Reputation Components
 export { ReputationScore } from "./components/reputation/ReputationScore"
 export { ReputationChart } from "./components/reputation/ReputationChart"
 export { FeedbackList } from "./components/reputation/FeedbackList"
+export { TagCloud } from "./components/reputation/TagCloud"
 export { ReputationDisplay } from "./components/reputation/ReputationDisplay"
-export { AgentCard } from "./components/agent-card/AgentCard"
-export { EndpointStatus } from "./components/endpoint/EndpointStatus"
+
+// Validation Components
+export { VerificationBadge } from "./components/validation/VerificationBadge"
+export { ValidationScore } from "./components/validation/ValidationScore"
+export { ValidationList } from "./components/validation/ValidationList"
+export { ValidationDisplay } from "./components/validation/ValidationDisplay"
+
+// Standalone Components
+export { LastActivity } from "./components/activity/LastActivity"
 export { ActivityLog } from "./components/activity/ActivityLog"
 
 // Provider
@@ -264,9 +357,14 @@ export { ERC8004Provider } from "./provider/ERC8004Provider"
 export type {
   SharedProps,
   AgentData,
+  AgentRegistrationFile,
   ReputationData,
+  AgentStats,
   Feedback,
   FeedbackFile,
+  FeedbackResponse,
+  Validation,
+  EndpointDefinition,
 } from "./types"
 ```
 

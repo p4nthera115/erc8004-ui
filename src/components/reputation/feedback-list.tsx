@@ -207,13 +207,23 @@ export function FeedbackList({ agentRegistry, agentId }: SharedProps) {
 
   if (isLoading) {
     return (
-      <div className="w-full space-y-3">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-20 animate-pulse rounded-lg border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900"
-          />
-        ))}
+      <div className="w-full rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
+          <div className="h-4 w-16 animate-pulse rounded bg-zinc-100 dark:bg-zinc-800" />
+        </div>
+        <div className="space-y-3 p-5">
+          {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+            <div
+              key={i}
+              className="h-20 animate-pulse rounded-lg border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900"
+            />
+          ))}
+          <div className="flex items-center justify-between pt-1">
+            <div className="h-7 w-20 animate-pulse rounded-md bg-zinc-100 dark:bg-zinc-800" />
+            <div className="h-4 w-12 animate-pulse rounded bg-zinc-100 dark:bg-zinc-800" />
+            <div className="h-7 w-14 animate-pulse rounded-md bg-zinc-100 dark:bg-zinc-800" />
+          </div>
+        </div>
       </div>
     )
   }
@@ -244,32 +254,37 @@ export function FeedbackList({ agentRegistry, agentId }: SharedProps) {
   const hasPrev = page > 0
 
   return (
-    <div className="w-full space-y-3">
-      {feedbacks.map((item) => (
-        <FeedbackCard key={item.id} item={item} />
-      ))}
+    <div className="w-full rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
+        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Feedback</h3>
+      </div>
+      <div className="space-y-3 p-5">
+        {feedbacks.map((item) => (
+          <FeedbackCard key={item.id} item={item} />
+        ))}
 
-      {(hasPrev || hasNext) && (
-        <div className="flex items-center justify-between pt-1">
-          <button
-            onClick={() => setPage((p) => p - 1)}
-            disabled={!hasPrev}
-            className="rounded-md px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-900 disabled:opacity-30 disabled:cursor-not-allowed dark:text-zinc-400 dark:hover:text-zinc-100"
-          >
-            ← Previous
-          </button>
-          <span className="text-xs text-zinc-400 dark:text-zinc-500">
-            Page {page + 1}
-          </span>
-          <button
-            onClick={() => setPage((p) => p + 1)}
-            disabled={!hasNext}
-            className="rounded-md px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-900 disabled:opacity-30 disabled:cursor-not-allowed dark:text-zinc-400 dark:hover:text-zinc-100"
-          >
-            Next →
-          </button>
-        </div>
-      )}
+        {(hasPrev || hasNext) && (
+          <div className="flex items-center justify-between pt-1">
+            <button
+              onClick={() => setPage((p) => p - 1)}
+              disabled={!hasPrev}
+              className="rounded-md px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-900 disabled:opacity-30 disabled:cursor-not-allowed dark:text-zinc-400 dark:hover:text-zinc-100"
+            >
+              ← Previous
+            </button>
+            <span className="text-xs text-zinc-400 dark:text-zinc-500">
+              Page {page + 1}
+            </span>
+            <button
+              onClick={() => setPage((p) => p + 1)}
+              disabled={!hasNext}
+              className="rounded-md px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-900 disabled:opacity-30 disabled:cursor-not-allowed dark:text-zinc-400 dark:hover:text-zinc-100"
+            >
+              Next →
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

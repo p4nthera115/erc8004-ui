@@ -5,12 +5,15 @@ import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import * as v from "valibot"
 
-type ReputationResponse = {
+// ============================================================================
+// useReputationStats
+// ============================================================================
+
+type ReputationStatsResponse = {
   agentStats: Pick<AgentStats, "averageFeedbackValue" | "totalFeedback">
-  feedbacks: Pick<Feedback, "value" | "createdAt">[]
 }
 
-const reputationResponseSchema = v.object({
+const reputationStatsSchema = v.object({
   agentStats: v.pipe(
     v.object({
       averageFeedbackValue: v.string(),
@@ -21,6 +24,56 @@ const reputationResponseSchema = v.object({
       averageFeedbackValue: parseFloat(raw.averageFeedbackValue),
     }))
   ),
+})
+
+const REPUTATION_STATS_QUERY = `#graphql
+  query ($id: ID!) {
+    agentStats(id: $id) {
+      averageFeedbackValue
+      totalFeedback
+    }
+  }
+`
+
+export function useReputationStats(agentRegistry: string, agentId: number) {
+  const { apiKey, subgraphOverrides } = useERC8004Config()
+
+  return useQuery({
+    queryKey: ["reputationStats", agentRegistry, agentId],
+    queryFn: async (): Promise<ReputationStatsResponse> => {
+      const { chainId } = parseAgentRegistry(agentRegistry)
+      const url = getSubgraphUrl(chainId, apiKey, subgraphOverrides)
+      const variables = { id: `${chainId}:${agentId}` }
+
+      const data = await subgraphFetch<ReputationStatsResponse>(
+        url,
+        REPUTATION_STATS_QUERY,
+        variables
+      )
+
+      try {
+        return v.parse(reputationStatsSchema, data)
+      } catch (error) {
+        if (v.isValiError(error)) {
+          throw new Error(
+            `Invalid subgraph response: ${error.issues[0].message}`
+          )
+        }
+        throw error
+      }
+    },
+  })
+}
+
+// ============================================================================
+// useFeedbackList
+// ============================================================================
+
+type FeedbackListResponse = {
+  feedbacks: Pick<Feedback, "value" | "createdAt">[]
+}
+
+const feedbackListSchema = v.object({
   feedbacks: v.pipe(
     v.array(
       v.object({
@@ -37,12 +90,8 @@ const reputationResponseSchema = v.object({
   ),
 })
 
-const REPUTATION_QUERY = `#graphql
-  query ($id: ID!){
-    agentStats(id: $id) {
-      averageFeedbackValue
-      totalFeedback
-    }
+const FEEDBACK_LIST_QUERY = `#graphql
+  query ($id: ID!) {
     feedbacks(
       where: { agent_: { id: $id }, isRevoked: false },
       orderBy: createdAt,
@@ -55,27 +104,24 @@ const REPUTATION_QUERY = `#graphql
   }
 `
 
-export function useReputation(agentRegistry: string, agentId: number) {
+export function useFeedbackList(agentRegistry: string, agentId: number) {
   const { apiKey, subgraphOverrides } = useERC8004Config()
 
   return useQuery({
-    queryKey: ["reputation", agentRegistry, agentId],
-    queryFn: async (): Promise<ReputationResponse> => {
+    queryKey: ["feedbackList", agentRegistry, agentId],
+    queryFn: async (): Promise<FeedbackListResponse> => {
       const { chainId } = parseAgentRegistry(agentRegistry)
       const url = getSubgraphUrl(chainId, apiKey, subgraphOverrides)
-
       const variables = { id: `${chainId}:${agentId}` }
 
-      const data = await subgraphFetch<ReputationResponse>(
+      const data = await subgraphFetch<FeedbackListResponse>(
         url,
-        REPUTATION_QUERY,
+        FEEDBACK_LIST_QUERY,
         variables
       )
 
-      console.log(data)
-
       try {
-        return v.parse(reputationResponseSchema, data)
+        return v.parse(feedbackListSchema, data)
       } catch (error) {
         if (v.isValiError(error)) {
           throw new Error(

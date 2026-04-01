@@ -1,4 +1,4 @@
-import { useReputation } from "./useReputation"
+import { useReputationStats } from "./useReputation"
 
 function scoreColor(value: number) {
   if (value >= 7) return "bg-emerald-500"
@@ -13,7 +13,7 @@ export function ReputationScore({
   agentRegistry: string
   agentId: number
 }) {
-  const { data, isLoading, error } = useReputation(agentRegistry, agentId)
+  const { data, isLoading, error } = useReputationStats(agentRegistry, agentId)
 
   if (isLoading) {
     return (

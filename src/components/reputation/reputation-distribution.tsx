@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 import type { SharedProps } from "@/types"
-import { useReputation } from "./useReputation"
+import { useFeedbackList } from "./useReputation"
 
 // ============================================================================
 // BUCKET DEFINITIONS
@@ -88,7 +88,7 @@ export function ReputationDistribution({
   // Fetch reputation data. If another reputation component on the page
   // already requested data for the same agent, TanStack Query reuses the
   // cached result — no duplicate network requests.
-  const { data, isLoading, error } = useReputation(agentRegistry, agentId)
+  const { data, isLoading, error } = useFeedbackList(agentRegistry, agentId)
 
   // useMemo ensures we only re-compute buckets when the underlying
   // feedback array actually changes — not on every render.

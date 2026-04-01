@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useCallback } from "react"
 import type { SharedProps } from "@/types"
-import { useReputation } from "./useReputation"
+import { useFeedbackList } from "./useReputation"
 
 // ============================================================================
 // TIMELINE LAYOUT
@@ -141,7 +141,7 @@ export function ReputationTimeline({ agentRegistry, agentId }: SharedProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const svgRef = useRef<SVGSVGElement>(null)
 
-  const { data, isLoading, error } = useReputation(agentRegistry, agentId)
+  const { data, isLoading, error } = useFeedbackList(agentRegistry, agentId)
 
   // Sort feedback by time ascending (oldest first) so the line goes
   // left to right. The subgraph returns newest-first, so we reverse.

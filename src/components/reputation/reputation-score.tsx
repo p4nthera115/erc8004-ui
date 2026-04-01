@@ -1,5 +1,11 @@
 import { useReputation } from "./useReputation"
 
+function scoreColor(value: number) {
+  if (value >= 7) return "bg-emerald-500"
+  if (value >= 4) return "bg-amber-400"
+  return "bg-red-500"
+}
+
 export function ReputationScore({
   agentRegistry,
   agentId,
@@ -11,40 +17,31 @@ export function ReputationScore({
 
   if (isLoading) {
     return (
-      <div className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-1.5 animate-pulse">
-        <div className="h-4 w-8 rounded bg-white/10" />
-        <div className="h-3 w-px bg-white/10" />
-        <div className="h-3 w-12 rounded bg-white/10" />
+      <div className="inline-flex items-center gap-1.5 animate-pulse">
+        <div className="h-1.5 w-1.5 rounded-full bg-white/20" />
+        <div className="h-3 w-8 rounded bg-white/10" />
       </div>
     )
   }
 
-  if (error) {
-    return (
-      <div className="inline-flex items-center gap-1.5 rounded-md border border-red-500/20 bg-red-500/5 px-3 py-1.5 text-xs text-red-400">
-        <span>⚠</span>
-        <span>Failed to load</span>
-      </div>
-    )
-  }
-
-  if (!data?.agentStats) {
-    return (
-      <div className="inline-flex items-center rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/30">
-        No reputation data
-      </div>
-    )
+  if (error || !data?.agentStats) {
+    return <div className="h-1.5 w-1.5 rounded-full bg-white/20" />
   }
 
   const { averageFeedbackValue, totalFeedback } = data.agentStats
-  const score = averageFeedbackValue.toFixed(2)
+  const score = averageFeedbackValue.toFixed(1)
 
   return (
-    <div className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-mono">
-      <span className="font-semibold text-white">{score}</span>
-      <span className="h-3 w-px bg-white/20" />
-      <span className="text-white/50">
-        {totalFeedback} {totalFeedback === 1 ? "review" : "reviews"}
+    <div
+      className="group inline-flex items-center gap-3 cursor-default"
+      title={`${totalFeedback} ${totalFeedback === 1 ? "review" : "reviews"}`}
+    >
+      <div
+        className={`h-2 w-2 rounded-full ${scoreColor(averageFeedbackValue)}`}
+      />
+      <span className="font-mono text-xl text-white/80">{score}</span>
+      <span className="text-xs text-white/30 opacity-0 group-hover:opacity-100 transition-opacity">
+        ({totalFeedback})
       </span>
     </div>
   )

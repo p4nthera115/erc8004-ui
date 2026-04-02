@@ -124,6 +124,41 @@ function App() {
 }
 ```
 
+### AgentProvider (Optional Convenience Wrapper)
+
+When building a page about a single agent (like a profile page), you'd end up passing the same `agentRegistry` and `agentId` to every component. `AgentProvider` eliminates that repetition by setting default identity values for all components nested inside it.
+
+**This is entirely optional.** Every component still accepts `agentRegistry` and `agentId` as direct props and works without any `AgentProvider`. The provider is purely a convenience for the common "one agent, many components" pattern.
+
+**Resolution order:** explicit props → AgentProvider context → error. Props always win, so you can still override individual components inside a provider.
+
+```tsx
+// Profile page — one agent, many components, no repetition:
+<ERC8004Provider apiKey="your-graph-api-key">
+  <AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+    <AgentName />
+    <AgentImage />
+    <ReputationScore />
+    <FeedbackList />
+  </AgentProvider>
+</ERC8004Provider>
+
+// Override one component inside the provider:
+<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+  <AgentName />                                                    {/* agent 374 */}
+  <AgentName agentRegistry="eip155:1:0x999..." agentId={12} />    {/* different agent */}
+</AgentProvider>
+
+// Marketplace grid — no provider needed, direct props:
+{agents.map(a => (
+  <AgentCard key={a.id} agentRegistry={a.registry} agentId={a.id} />
+))}
+```
+
+**Important:** `AgentProvider` is a _separate_ provider from `ERC8004Provider`. They have different jobs — `ERC8004Provider` holds app-wide infrastructure config (API key), while `AgentProvider` scopes agent identity to a section of the component tree. Don't merge them.
+
+Internally, every component calls `useAgentIdentity()` (an internal hook, not exported) to resolve its identity. This hook checks props first, then context, then throws a clear error explaining what's missing.
+
 ### Caching with TanStack Query
 
 All components use `@tanstack/react-query` internally for data fetching. This provides:

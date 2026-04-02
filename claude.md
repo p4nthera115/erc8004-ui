@@ -61,6 +61,33 @@ Lightweight React context provider that holds infrastructure config only:
 
 This is NOT a data provider. It holds no agent data or chain state. It exists to avoid passing `apiKey` as a prop to every component. Components read the API key from this provider internally.
 
+### AgentProvider (Optional Convenience Wrapper)
+
+Separate provider from `ERC8004Provider`. Sets default `agentRegistry` + `agentId` for all child components, eliminating prop repetition when many components target the same agent.
+
+- **Optional** — every component still works with direct props and no AgentProvider
+- **Resolution order:** explicit props → AgentProvider context → error
+- **Props always win** — override individual components inside a provider by passing their own props
+- **Partial props are an error** — passing `agentRegistry` without `agentId` (or vice versa) throws, preventing silent bugs from mixing prop and context values
+
+```tsx
+// Profile page — provider eliminates repetition:
+;<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+  <AgentName />
+  <ReputationScore />
+  <FeedbackList />
+</AgentProvider>
+
+// Marketplace grid — no provider, direct props:
+{
+  agents.map((a) => (
+    <AgentCard key={a.id} agentRegistry={a.registry} agentId={a.id} />
+  ))
+}
+```
+
+Internally, every component calls `useAgentIdentity({ agentRegistry, agentId })` to resolve its identity. This hook is in `lib/useAgentIdentity.ts` and is NOT exported from the package.
+
 ### Trustless Data
 
 Components NEVER accept display data as props. The only inputs from the developer are identifiers. All rendered data comes from on-chain sources via the Subgraph.
@@ -284,7 +311,8 @@ The public API stays flat — developers import `{ ReputationScore }` from `'@er
 @erc8004/ui
 ├── src/
 │   ├── provider/
-│   │   └── ERC8004Provider.tsx
+│   │   ├── ERC8004Provider.tsx
+│   │   └── AgentProvider.tsx      # optional convenience wrapper for agent identity
 │   ├── components/
 │   │   ├── identity/
 │   │   │   ├── FingerprintBadge.tsx     # deterministic SVG, no data fetch
@@ -313,6 +341,7 @@ The public API stays flat — developers import `{ ReputationScore }` from `'@er
 │   │   ├── subgraph-client.ts
 │   │   ├── parse-registry.ts
 │   │   ├── constants.ts
+│   │   ├── useAgentIdentity.ts          # internal hook: resolves props vs AgentProvider context
 │   │   └── utils.ts
 │   ├── types.ts                         # shared types across all categories
 │   └── index.ts                         # flat public exports
@@ -352,6 +381,7 @@ export { ActivityLog } from "./components/activity/ActivityLog"
 
 // Provider
 export { ERC8004Provider } from "./provider/ERC8004Provider"
+export { AgentProvider } from "./provider/AgentProvider"
 
 // Types
 export type {

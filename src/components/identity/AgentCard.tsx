@@ -3,7 +3,7 @@ import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { truncateAddress } from "@/lib/utils"
-import type { SharedProps } from "@/types"
+import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
 import * as v from "valibot"
 import { FingerprintBadge } from "../fingerprint/FingerprintBadge"
 
@@ -109,7 +109,8 @@ const PROTOCOL_LABELS: Array<{
   { key: "emailEndpoint", label: "Email" },
 ]
 
-export function AgentCard({ agentRegistry, agentId }: SharedProps) {
+export function AgentCard(props: AgentIdentityProps) {
+  const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useAgentCard(agentRegistry, agentId)
 
   if (isLoading) {

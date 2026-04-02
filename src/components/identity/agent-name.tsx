@@ -1,7 +1,11 @@
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
-import type { AgentRegistrationFile, SharedProps } from "@/types"
+import {
+  useAgentIdentity,
+  type AgentIdentityProps,
+} from "@/lib/useAgentIdentity"
+import type { AgentRegistrationFile } from "@/types"
 import { useQuery } from "@tanstack/react-query"
 import * as v from "valibot"
 
@@ -61,7 +65,8 @@ function useAgentName(agentRegistry: string, agentId: number) {
   })
 }
 
-export function AgentName({ agentRegistry, agentId }: SharedProps) {
+export function AgentName(props: AgentIdentityProps) {
+  const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useAgentName(agentRegistry, agentId)
 
   if (isLoading) {

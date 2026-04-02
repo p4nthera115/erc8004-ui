@@ -1,14 +1,14 @@
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
-import type { AgentRegistrationFile, SharedProps } from "@/types"
+import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
 import { useQuery } from "@tanstack/react-query"
 import * as v from "valibot"
 import { FingerprintBadge } from "../fingerprint/FingerprintBadge"
 
 type AgentImageResponse = {
   agent: {
-    registrationFile: Pick<AgentRegistrationFile, "image"> | null
+    registrationFile: { image: string | null } | null
   } | null
 }
 
@@ -62,7 +62,8 @@ function useAgentImage(agentRegistry: string, agentId: number) {
   })
 }
 
-export function AgentImage({ agentRegistry, agentId }: SharedProps) {
+export function AgentImage(props: AgentIdentityProps) {
+  const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useAgentImage(agentRegistry, agentId)
 
   if (isLoading) {

@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useCallback } from "react"
 import { useQuery } from "@tanstack/react-query"
-import type { SharedProps, Feedback } from "@/types"
+import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
+import type { Feedback } from "@/types"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
@@ -209,7 +210,8 @@ function dotColor(score: number): string {
 // COMPONENT
 // ============================================================================
 
-export function ReputationTimeline({ agentRegistry, agentId }: SharedProps) {
+export function ReputationTimeline(props: AgentIdentityProps) {
+  const { agentRegistry, agentId } = useAgentIdentity(props)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const svgRef = useRef<SVGSVGElement>(null)
 

@@ -3,7 +3,7 @@ import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { truncateAddress } from "@/lib/utils"
-import type { SharedProps } from "@/types"
+import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
 import * as v from "valibot"
 import { FingerprintBadge } from "../fingerprint/FingerprintBadge"
 
@@ -125,11 +125,12 @@ const ENDPOINT_DEFS = [
   { key: "emailEndpoint" as const, versionKey: null, label: "Email", isEmail: true },
 ]
 
-interface Props extends SharedProps {
+interface Props extends AgentIdentityProps {
   showHealthChecks?: boolean
 }
 
-export function IdentityDisplay({ agentRegistry, agentId }: Props) {
+export function IdentityDisplay(props: Props) {
+  const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useIdentityDisplay(agentRegistry, agentId)
 
   if (isLoading) {

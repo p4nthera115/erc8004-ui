@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
-import type { SharedProps } from "@/types"
+import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
 import * as v from "valibot"
 
 type EndpointStatusResponse = {
@@ -182,16 +182,13 @@ function HealthIndicator({ url }: { url: string }) {
   )
 }
 
-interface Props extends SharedProps {
+interface Props extends AgentIdentityProps {
   /** Show live HTTP health check dots. Default: false */
   showHealthChecks?: boolean
 }
 
-export function EndpointStatus({
-  agentRegistry,
-  agentId,
-  showHealthChecks = false,
-}: Props) {
+export function EndpointStatus({ showHealthChecks = false, ...agentProps }: Props) {
+  const { agentRegistry, agentId } = useAgentIdentity(agentProps)
   const { data, isLoading, error } = useEndpointStatus(agentRegistry, agentId)
 
   if (isLoading) {

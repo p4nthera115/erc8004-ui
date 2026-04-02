@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
+import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
 import type { AgentStats } from "@/types"
 import * as v from "valibot"
 
@@ -67,13 +68,8 @@ function scoreColor(value: number) {
   return "bg-red-500"
 }
 
-export function ReputationScore({
-  agentRegistry,
-  agentId,
-}: {
-  agentRegistry: string
-  agentId: number
-}) {
+export function ReputationScore(props: AgentIdentityProps) {
+  const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useReputationStats(agentRegistry, agentId)
 
   if (isLoading) {

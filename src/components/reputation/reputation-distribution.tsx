@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
-import type { SharedProps, Feedback } from "@/types"
+import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
+import type { Feedback } from "@/types"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
@@ -139,10 +140,8 @@ function bucketFeedback(values: number[]): BucketCount[] {
 // COMPONENT
 // ============================================================================
 
-export function ReputationDistribution({
-  agentRegistry,
-  agentId,
-}: SharedProps) {
+export function ReputationDistribution(props: AgentIdentityProps) {
+  const { agentRegistry, agentId } = useAgentIdentity(props)
   // Fetch reputation data. If another reputation component on the page
   // already requested data for the same agent, TanStack Query reuses the
   // cached result — no duplicate network requests.

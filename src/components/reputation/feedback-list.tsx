@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import type { SharedProps, Feedback, FeedbackFile, FeedbackResponse } from "@/types"
+import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
+import type { Feedback, FeedbackFile, FeedbackResponse } from "@/types"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
@@ -201,7 +202,8 @@ function FeedbackCard({ item }: { item: FeedbackItem }) {
   )
 }
 
-export function FeedbackList({ agentRegistry, agentId }: SharedProps) {
+export function FeedbackList(props: AgentIdentityProps) {
+  const { agentRegistry, agentId } = useAgentIdentity(props)
   const [page, setPage] = useState(0)
   const { data, isLoading, error } = useFeedbackList(agentRegistry, agentId, page)
 

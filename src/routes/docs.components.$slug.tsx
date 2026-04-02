@@ -8,10 +8,11 @@ import { FeedbackList } from "@/components/reputation/feedback-list"
 import { AgentName } from "@/components/identity/agent-name"
 import { AgentImage } from "@/components/identity/agent-image"
 import { AgentDescription } from "@/components/identity/agent-description"
-import { AgentCard } from "@/components/identity/AgentCard"
-import { EndpointStatus } from "@/components/identity/EndpointStatus"
-import { IdentityDisplay } from "@/components/identity/IdentityDisplay"
+import { AgentCard } from "@/components/identity/agent-card"
+import { EndpointStatus } from "@/components/identity/endpoint-status"
+import { IdentityDisplay } from "@/components/identity/identity-display"
 import { AgentProvider } from "@/provider/AgentProvider"
+import { LastActivity } from "@/components/cross-registry/last-activity"
 
 function ComponentPreview({
   name,
@@ -127,24 +128,33 @@ const COMPONENT_PAGES: Record<string, React.ReactNode> = {
       </div>
     </AgentProvider>
   ),
-  "endpoint-status": (
+  validation: (
     <AgentProvider agentRegistry={REGISTRY} agentId={AGENT_ID}>
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-10">
         <ComponentPreview
-          name="EndpointStatus"
-          description="Lists all registered service endpoints (MCP, A2A, OASF, web, email) with protocol labels and optional live health checks."
+          name="ValidationScore"
+          description="Compact badge showing average validation score and total validation count."
         >
-          <EndpointStatus />
+          <PlaceholderDocs
+            name="ValidationScore"
+            description="Compact badge showing average validation score and total validation count."
+            status="planned"
+          />
         </ComponentPreview>
       </div>
     </AgentProvider>
   ),
-  "activity-log": (
-    <PlaceholderDocs
-      name="Activity Log"
-      description="Chronological on-chain events feed — registrations, updates, feedback, endpoint calls, deregistrations."
-      status="planned"
-    />
+  "cross-registry": (
+    <AgentProvider agentRegistry={REGISTRY} agentId={AGENT_ID}>
+      <div className="flex flex-col gap-10">
+        <ComponentPreview
+          name="LastActivity"
+          description="Single timestamp from AgentStats."
+        >
+          <LastActivity />
+        </ComponentPreview>
+      </div>
+    </AgentProvider>
   ),
   introduction: (
     <PlaceholderDocs

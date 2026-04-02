@@ -1,10 +1,13 @@
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
-import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
+import {
+  useAgentIdentity,
+  type AgentIdentityProps,
+} from "@/lib/useAgentIdentity"
 import { useQuery } from "@tanstack/react-query"
 import * as v from "valibot"
-import { FingerprintBadge } from "../fingerprint/FingerprintBadge"
+import { FingerprintBadge } from "./FingerprintBadge"
 
 type AgentImageResponse = {
   agent: {

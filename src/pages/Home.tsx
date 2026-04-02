@@ -1,5 +1,5 @@
-import { Link } from '@tanstack/react-router'
-import { FingerprintBadge } from "../components/fingerprint/FingerprintBadge"
+import { Link } from "@tanstack/react-router"
+import { FingerprintBadge } from "../components/identity/FingerprintBadge"
 
 const DEMO_AGENTS = [
   {
@@ -104,7 +104,7 @@ function ComponentCard({
       params={{ slug: component.slug }}
       disabled={!canNavigate}
       className="component-card rounded-xl border border-border-subtle bg-surface-raised p-6 flex flex-col gap-3 text-left w-full"
-      style={{ pointerEvents: canNavigate ? undefined : 'none' }}
+      style={{ pointerEvents: canNavigate ? undefined : "none" }}
     >
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-text-primary">
@@ -150,9 +150,7 @@ export function Home() {
             <p className="text-lg text-text-secondary leading-relaxed">
               Self-contained React components for AI agent identity, reputation,
               and activity. Trustless by design. Distributed as an{" "}
-              <span className="text-text-primary font-medium">
-                npm package
-              </span>{" "}
+              <span className="text-text-primary font-medium">npm package</span>{" "}
               — install, wrap with a provider, drop components in.
             </p>
           </div>
@@ -160,7 +158,7 @@ export function Home() {
           <div className="flex items-center gap-3">
             <Link
               to="/docs/components/$slug"
-              params={{ slug: 'fingerprint-badge' }}
+              params={{ slug: "fingerprint-badge" }}
               className="px-5 py-2.5 rounded-lg bg-accent text-white font-medium text-sm hover:bg-accent-dim transition-colors"
             >
               Browse Components

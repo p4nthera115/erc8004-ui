@@ -3,9 +3,12 @@ import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { truncateAddress } from "@/lib/utils"
-import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
+import {
+  useAgentIdentity,
+  type AgentIdentityProps,
+} from "@/lib/useAgentIdentity"
 import * as v from "valibot"
-import { FingerprintBadge } from "../fingerprint/FingerprintBadge"
+import { FingerprintBadge } from "./FingerprintBadge"
 
 type IdentityDisplayResponse = {
   agent: {
@@ -118,11 +121,36 @@ function truncateUrl(url: string, maxLen = 38): string {
 }
 
 const ENDPOINT_DEFS = [
-  { key: "mcpEndpoint" as const, versionKey: "mcpVersion" as const, label: "MCP", isEmail: false },
-  { key: "a2aEndpoint" as const, versionKey: "a2aVersion" as const, label: "A2A", isEmail: false },
-  { key: "oasfEndpoint" as const, versionKey: "oasfVersion" as const, label: "OASF", isEmail: false },
-  { key: "webEndpoint" as const, versionKey: null, label: "Web", isEmail: false },
-  { key: "emailEndpoint" as const, versionKey: null, label: "Email", isEmail: true },
+  {
+    key: "mcpEndpoint" as const,
+    versionKey: "mcpVersion" as const,
+    label: "MCP",
+    isEmail: false,
+  },
+  {
+    key: "a2aEndpoint" as const,
+    versionKey: "a2aVersion" as const,
+    label: "A2A",
+    isEmail: false,
+  },
+  {
+    key: "oasfEndpoint" as const,
+    versionKey: "oasfVersion" as const,
+    label: "OASF",
+    isEmail: false,
+  },
+  {
+    key: "webEndpoint" as const,
+    versionKey: null,
+    label: "Web",
+    isEmail: false,
+  },
+  {
+    key: "emailEndpoint" as const,
+    versionKey: null,
+    label: "Email",
+    isEmail: true,
+  },
 ]
 
 interface Props extends AgentIdentityProps {
@@ -159,7 +187,9 @@ export function IdentityDisplay(props: Props) {
   if (error) {
     return (
       <div className="w-full rounded-xl border border-red-200 bg-red-50 p-5 dark:border-red-900/50 dark:bg-red-950/30">
-        <p className="text-sm text-red-600 dark:text-red-400">Failed to load agent identity.</p>
+        <p className="text-sm text-red-600 dark:text-red-400">
+          Failed to load agent identity.
+        </p>
         <p className="mt-1 text-xs text-red-500/70 dark:text-red-500/50">
           {error instanceof Error ? error.message : "Unknown error"}
         </p>
@@ -170,7 +200,9 @@ export function IdentityDisplay(props: Props) {
   if (!data?.agent) {
     return (
       <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">Agent not found.</p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          Agent not found.
+        </p>
       </div>
     )
   }
@@ -195,9 +227,17 @@ export function IdentityDisplay(props: Props) {
       <div className="flex gap-4 p-5">
         <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full">
           {imageUrl ? (
-            <img src={imageUrl} alt={name} className="h-full w-full object-cover" />
+            <img
+              src={imageUrl}
+              alt={name}
+              className="h-full w-full object-cover"
+            />
           ) : (
-            <FingerprintBadge agentRegistry={agentRegistry} agentId={agentId} size={64} />
+            <FingerprintBadge
+              agentRegistry={agentRegistry}
+              agentId={agentId}
+              size={64}
+            />
           )}
         </div>
 
@@ -210,7 +250,10 @@ export function IdentityDisplay(props: Props) {
               {description}
             </p>
           )}
-          <p className="mt-2 font-mono text-xs text-zinc-400 dark:text-zinc-500" title={owner}>
+          <p
+            className="mt-2 font-mono text-xs text-zinc-400 dark:text-zinc-500"
+            title={owner}
+          >
             {truncateAddress(owner)}
           </p>
         </div>

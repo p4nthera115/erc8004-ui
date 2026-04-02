@@ -3,9 +3,12 @@ import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { truncateAddress } from "@/lib/utils"
-import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
+import {
+  useAgentIdentity,
+  type AgentIdentityProps,
+} from "@/lib/useAgentIdentity"
 import * as v from "valibot"
-import { FingerprintBadge } from "../fingerprint/FingerprintBadge"
+import { FingerprintBadge } from "./FingerprintBadge"
 
 type AgentCardResponse = {
   agent: {
@@ -99,7 +102,12 @@ function resolveImageUrl(uri: string): string {
 }
 
 const PROTOCOL_LABELS: Array<{
-  key: "mcpEndpoint" | "a2aEndpoint" | "oasfEndpoint" | "webEndpoint" | "emailEndpoint"
+  key:
+    | "mcpEndpoint"
+    | "a2aEndpoint"
+    | "oasfEndpoint"
+    | "webEndpoint"
+    | "emailEndpoint"
   label: string
 }> = [
   { key: "mcpEndpoint", label: "MCP" },
@@ -156,9 +164,7 @@ export function AgentCard(props: AgentIdentityProps) {
   const description = rf?.description ?? null
   const imageUrl = rf?.image ? resolveImageUrl(rf.image) : null
 
-  const activeProtocols = PROTOCOL_LABELS.filter(
-    ({ key }) => rf?.[key] != null
-  )
+  const activeProtocols = PROTOCOL_LABELS.filter(({ key }) => rf?.[key] != null)
 
   return (
     <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">

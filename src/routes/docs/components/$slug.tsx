@@ -1,6 +1,4 @@
 import { createFileRoute, notFound } from "@tanstack/react-router"
-import { FingerprintBadgeDocs } from "../pages/docs/components/FingerprintBadgeDocs"
-import { PlaceholderDocs } from "../pages/docs/components/PlaceholderDocs"
 import { ReputationScore } from "@/components/reputation/reputation-score"
 import { ReputationDistribution } from "@/components/reputation/reputation-distribution"
 import { ReputationTimeline } from "@/components/reputation/reputation-timeline"
@@ -50,7 +48,6 @@ const REGISTRY = "eip155:11155111:0x8004A818BFB912233c491871b3d84c89A494BD9e"
 const AGENT_ID = 1073
 
 const COMPONENT_PAGES: Record<string, React.ReactNode> = {
-  "fingerprint-badge": <FingerprintBadgeDocs />,
   identity: (
     <AgentProvider agentRegistry={REGISTRY} agentId={AGENT_ID}>
       <div className="flex flex-col gap-10">
@@ -194,20 +191,8 @@ const COMPONENT_PAGES: Record<string, React.ReactNode> = {
       </div>
     </AgentProvider>
   ),
-  introduction: (
-    <PlaceholderDocs
-      name="Introduction"
-      description="ERC-8004 Agent Identity Component Library — a set of self-contained React components for AI agent identity, reputation, and activity."
-      status="planned"
-    />
-  ),
-  installation: (
-    <PlaceholderDocs
-      name="Installation"
-      description="Components are distributed shadcn-style. Copy the source directly into your project."
-      status="planned"
-    />
-  ),
+  introduction: <></>,
+  installation: <></>,
 }
 
 export const Route = createFileRoute("/docs/components/$slug")({

@@ -3,7 +3,7 @@ import { FaGithub } from "react-icons/fa"
 
 export function Nav() {
   return (
-    <header className="sticky top-0 z-50 p-4 px-8 border-b border-white/25">
+    <header className="sticky top-0 z-50 p-4 px-8 border-b border-white/25 bg-surface">
       <div className="flex items-center justify-between font-mono">
         <div className="flex items-center gap-8">
           <NavLogo />

@@ -39,3 +39,16 @@ body {
   background: var(--color-border-default);
   border-radius: 3px;
 }
+
+.diagonal-lines {
+  background-color: #181818;
+  opacity: 1;
+  background-size: 7px 7px;
+  background-image: repeating-linear-gradient(
+    45deg,
+    #3c3c3c 0,
+    #3c3c3c 0.7000000000000001px,
+    #181818 0,
+    #181818 50%
+  );
+}

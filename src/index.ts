@@ -13,6 +13,13 @@ export { ReputationScore } from "./components/reputation/reputation-score"
 export { FeedbackList } from "./components/reputation/feedback-list"
 export { ReputationTimeline } from "./components/reputation/reputation-timeline"
 export { ReputationDistribution } from "./components/reputation/reputation-distribution"
+export { TagCloud } from "./components/reputation/tag-cloud"
+export { VerificationBadge } from "./components/validation/verification-badge"
+export { ValidationScore } from "./components/validation/validation-score"
+export { ValidationList } from "./components/validation/validation-list"
+export { ValidationDisplay } from "./components/validation/validation-display"
+export { LastActivity } from "./components/cross-registry/last-activity"
+export { ActivityLog } from "./components/activity/activity-log"
 
 // Provider
 export { ERC8004Provider } from "./provider/ERC8004Provider"

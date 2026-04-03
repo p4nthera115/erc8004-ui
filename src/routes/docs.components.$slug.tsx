@@ -5,6 +5,7 @@ import { ReputationScore } from "@/components/reputation/reputation-score"
 import { ReputationDistribution } from "@/components/reputation/reputation-distribution"
 import { ReputationTimeline } from "@/components/reputation/reputation-timeline"
 import { FeedbackList } from "@/components/reputation/feedback-list"
+import { TagCloud } from "@/components/reputation/tag-cloud"
 import { AgentName } from "@/components/identity/agent-name"
 import { AgentImage } from "@/components/identity/agent-image"
 import { AgentDescription } from "@/components/identity/agent-description"
@@ -13,6 +14,11 @@ import { EndpointStatus } from "@/components/identity/endpoint-status"
 import { IdentityDisplay } from "@/components/identity/identity-display"
 import { AgentProvider } from "@/provider/AgentProvider"
 import { LastActivity } from "@/components/cross-registry/last-activity"
+import { ActivityLog } from "@/components/activity/activity-log"
+import { VerificationBadge } from "@/components/validation/verification-badge"
+import { ValidationScore } from "@/components/validation/validation-score"
+import { ValidationList } from "@/components/validation/validation-list"
+import { ValidationDisplay } from "@/components/validation/validation-display"
 
 function ComponentPreview({
   name,
@@ -120,6 +126,12 @@ const COMPONENT_PAGES: Record<string, React.ReactNode> = {
           <ReputationTimeline />
         </ComponentPreview>
         <ComponentPreview
+          name="TagCloud"
+          description="Weighted tag pills showing the agent's most frequent feedback tags. Pill size reflects mention frequency."
+        >
+          <TagCloud />
+        </ComponentPreview>
+        <ComponentPreview
           name="FeedbackList"
           description="Paginated list of individual reviews with tags, reviewer address, and timestamps."
         >
@@ -132,15 +144,35 @@ const COMPONENT_PAGES: Record<string, React.ReactNode> = {
     <AgentProvider agentRegistry={REGISTRY} agentId={AGENT_ID}>
       <div className="flex flex-col gap-10">
         <ComponentPreview
-          name="ValidationScore"
-          description="Compact badge showing average validation score and total validation count."
+          name="VerificationBadge"
+          description="Compact inline badge showing verification tier derived from completed validations and average score."
         >
-          <PlaceholderDocs
-            name="ValidationScore"
-            description="Compact badge showing average validation score and total validation count."
-            status="planned"
-          />
+          <VerificationBadge />
         </ComponentPreview>
+        <ComponentPreview
+          name="ValidationScore"
+          description="Average validation score (0–100) with a fill bar and completed/pending counts."
+        >
+          <ValidationScore />
+        </ComponentPreview>
+        <ComponentPreview
+          name="ValidationList"
+          description="Paginated list of individual validation entries with score, status, tag, validator address, and timestamp."
+        >
+          <ValidationList />
+        </ComponentPreview>
+
+        <section className="flex flex-col gap-6">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+            Full Display
+          </h2>
+          <ComponentPreview
+            name="ValidationDisplay"
+            description="VerificationBadge, ValidationScore, and ValidationList composed into a single view."
+          >
+            <ValidationDisplay />
+          </ComponentPreview>
+        </section>
       </div>
     </AgentProvider>
   ),
@@ -152,6 +184,12 @@ const COMPONENT_PAGES: Record<string, React.ReactNode> = {
           description="Single timestamp from AgentStats."
         >
           <LastActivity />
+        </ComponentPreview>
+        <ComponentPreview
+          name="ActivityLog"
+          description="Chronological feed of all on-chain events across all registries — feedback and validations merged and sorted by time."
+        >
+          <ActivityLog />
         </ComponentPreview>
       </div>
     </AgentProvider>

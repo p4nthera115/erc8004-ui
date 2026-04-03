@@ -221,7 +221,7 @@ These render data from the `AgentStats`, `Feedback`, `FeedbackFile`, and `Feedba
 
 **Composed:**
 
-12. **ReputationDisplay** — composed convenience component combining ReputationScore + ReputationChart + FeedbackList into a single well-laid-out view. For developers who want a complete reputation section without assembling pieces. ✓
+12. **ReputationDisplay** — composed convenience component combining ReputationScore + ReputationChart + FeedbackList into a single well-laid-out view. For developers who want a complete reputation section without assembling pieces.
 
 ### Validation Components (Validation Registry)
 

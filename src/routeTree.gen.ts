@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DocsIntroductionRouteImport } from './routes/docs/introduction'
+import { Route as DocsComponentsRouteImport } from './routes/docs/components'
 import { Route as DocsComponentsSlugRouteImport } from './routes/docs.components.$slug'
 
 const DocsRoute = DocsRouteImport.update({
@@ -23,34 +25,66 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DocsComponentsSlugRoute = DocsComponentsSlugRouteImport.update({
-  id: '/components/$slug',
-  path: '/components/$slug',
+const DocsIntroductionRoute = DocsIntroductionRouteImport.update({
+  id: '/introduction',
+  path: '/introduction',
   getParentRoute: () => DocsRoute,
+} as any)
+const DocsComponentsRoute = DocsComponentsRouteImport.update({
+  id: '/components',
+  path: '/components',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsComponentsSlugRoute = DocsComponentsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => DocsComponentsRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/docs': typeof DocsRouteWithChildren
+  '/docs/components': typeof DocsComponentsRouteWithChildren
+  '/docs/introduction': typeof DocsIntroductionRoute
   '/docs/components/$slug': typeof DocsComponentsSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/docs': typeof DocsRouteWithChildren
+  '/docs/components': typeof DocsComponentsRouteWithChildren
+  '/docs/introduction': typeof DocsIntroductionRoute
   '/docs/components/$slug': typeof DocsComponentsSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/docs': typeof DocsRouteWithChildren
+  '/docs/components': typeof DocsComponentsRouteWithChildren
+  '/docs/introduction': typeof DocsIntroductionRoute
   '/docs/components/$slug': typeof DocsComponentsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/docs' | '/docs/components/$slug'
+  fullPaths:
+    | '/'
+    | '/docs'
+    | '/docs/components'
+    | '/docs/introduction'
+    | '/docs/components/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/docs' | '/docs/components/$slug'
-  id: '__root__' | '/' | '/docs' | '/docs/components/$slug'
+  to:
+    | '/'
+    | '/docs'
+    | '/docs/components'
+    | '/docs/introduction'
+    | '/docs/components/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/docs'
+    | '/docs/components'
+    | '/docs/introduction'
+    | '/docs/components/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -74,22 +108,50 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/docs/introduction': {
+      id: '/docs/introduction'
+      path: '/introduction'
+      fullPath: '/docs/introduction'
+      preLoaderRoute: typeof DocsIntroductionRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/components': {
+      id: '/docs/components'
+      path: '/components'
+      fullPath: '/docs/components'
+      preLoaderRoute: typeof DocsComponentsRouteImport
+      parentRoute: typeof DocsRoute
+    }
     '/docs/components/$slug': {
       id: '/docs/components/$slug'
-      path: '/components/$slug'
+      path: '/$slug'
       fullPath: '/docs/components/$slug'
       preLoaderRoute: typeof DocsComponentsSlugRouteImport
-      parentRoute: typeof DocsRoute
+      parentRoute: typeof DocsComponentsRoute
     }
   }
 }
 
-interface DocsRouteChildren {
+interface DocsComponentsRouteChildren {
   DocsComponentsSlugRoute: typeof DocsComponentsSlugRoute
 }
 
-const DocsRouteChildren: DocsRouteChildren = {
+const DocsComponentsRouteChildren: DocsComponentsRouteChildren = {
   DocsComponentsSlugRoute: DocsComponentsSlugRoute,
+}
+
+const DocsComponentsRouteWithChildren = DocsComponentsRoute._addFileChildren(
+  DocsComponentsRouteChildren,
+)
+
+interface DocsRouteChildren {
+  DocsComponentsRoute: typeof DocsComponentsRouteWithChildren
+  DocsIntroductionRoute: typeof DocsIntroductionRoute
+}
+
+const DocsRouteChildren: DocsRouteChildren = {
+  DocsComponentsRoute: DocsComponentsRouteWithChildren,
+  DocsIntroductionRoute: DocsIntroductionRoute,
 }
 
 const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)

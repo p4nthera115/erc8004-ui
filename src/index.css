@@ -8,7 +8,7 @@
   --color-border-default: #fff;
   --color-text-primary: #f0f0f5;
   --color-text-secondary: #8888a0;
-  --color-text-muted: #555566;
+  --color-text-muted: #555555;
   --color-accent: #a855f7;
   --color-accent-dim: #7c3aed;
   --color-accent-glow: rgba(168, 85, 247, 0.15);
@@ -43,11 +43,11 @@ body {
 .diagonal-lines {
   background-color: #181818;
   opacity: 1;
-  background-size: 7px 7px;
+  background-size: 10px 10px;
   background-image: repeating-linear-gradient(
     45deg,
-    #3c3c3c 0,
-    #3c3c3c 0.7000000000000001px,
+    #525252 0,
+    #525252 0.7000000000000001px,
     #181818 0,
     #181818 50%
   );

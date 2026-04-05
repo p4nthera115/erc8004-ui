@@ -38,7 +38,7 @@ export function Home() {
       <div className="col-span-1 diagonal-lines flex flex-col justify-between items-center">
         <div
           className={`h-full p-20 flex ${
-            active ? "pt-13" : "pt-22"
+            active ? "pt-15" : "pt-22"
           } transition-all duration-350`}
         >
           <MockAgentCard
@@ -290,7 +290,7 @@ function CodeBlock({
                 exit={{ opacity: 0 }}
               >
                 <Line
-                  n={6}
+                  n={5}
                   indent={1}
                   highlighted={highlighted === "AgentImage"}
                   {...lineHoverProps("AgentImage")}
@@ -300,7 +300,7 @@ function CodeBlock({
                   <Punct>{">"}</Punct>
                 </Line>
                 <Line
-                  n={7}
+                  n={6}
                   indent={1}
                   highlighted={highlighted === "AgentName"}
                   {...lineHoverProps("AgentName")}
@@ -310,7 +310,7 @@ function CodeBlock({
                   <Punct>{">"}</Punct>
                 </Line>
                 <Line
-                  n={8}
+                  n={7}
                   indent={1}
                   highlighted={highlighted === "ReputationScore"}
                   {...lineHoverProps("ReputationScore")}
@@ -320,7 +320,7 @@ function CodeBlock({
                   <Punct>{">"}</Punct>
                 </Line>
                 <Line
-                  n={9}
+                  n={8}
                   indent={1}
                   highlighted={highlighted === "AgentDescription"}
                   {...lineHoverProps("AgentDescription")}
@@ -332,7 +332,7 @@ function CodeBlock({
               </motion.div>
             )}
             <motion.div layout>
-              <Line n={!active ? 10 : 6}>
+              <Line n={!active ? 9 : 6}>
                 <Punct>{"</"}</Punct>
                 <Tag>AgentProvider</Tag>
                 <Punct>{">"}</Punct>
@@ -342,7 +342,7 @@ function CodeBlock({
         </pre>
       </motion.div>
       <div className=" absolute w-1/2 bottom-0 h-12.5 z-100 bg-neutral-950 text-sm px-6">
-        <Line n={active ? 10 : 6}>
+        <Line n={active ? 9 : 6}>
           <Punct>{"</"}</Punct>
           <Tag>AgentProvider</Tag>
           <Punct>{">"}</Punct>

@@ -6,6 +6,7 @@ export const Route = createFileRoute("/")({ component: Home })
 
 export function Home() {
   const [active, setActive] = useState(false)
+  const [hoveredElement, setHoveredElement] = useState<string | null>(null)
   return (
     <div className="h-[calc(100svh-80px)] border-b border-white/25 grid grid-cols-2 font-mono overflow-x-hidden">
       <div className="col-span-1 flex flex-col py-14 px-14 gap-10 border-r border-white/25">
@@ -37,12 +38,21 @@ export function Home() {
       <div className="col-span-1 diagonal-lines flex flex-col justify-between items-center">
         <div
           className={`h-full p-20 flex ${
-            active ? "pt-16" : "pt-24"
+            active ? "pt-13" : "pt-22"
           } transition-all duration-350`}
         >
-          <MockAgentCard active={active} setActive={setActive} />
+          <MockAgentCard
+            active={active}
+            setActive={setActive}
+            hoveredElement={hoveredElement}
+            setHoveredElement={setHoveredElement}
+          />
         </div>
-        <CodeBlock active={active} />
+        <CodeBlock
+          active={active}
+          hoveredElement={hoveredElement}
+          setHoveredElement={setHoveredElement}
+        />
       </div>
     </div>
   )
@@ -51,36 +61,71 @@ export function Home() {
 function MockAgentCard({
   active,
   setActive,
+  hoveredElement,
+  setHoveredElement,
 }: {
   active: boolean
   setActive: (active: boolean) => void
+  hoveredElement: string | null
+  setHoveredElement: (el: string | null) => void
 }) {
+  const hoverProps = (label: string) =>
+    active
+      ? {
+          onMouseEnter: () => setHoveredElement(label),
+          onMouseLeave: () => setHoveredElement(null),
+        }
+      : {}
+
+  const highlight = (label: string) =>
+    active && hoveredElement === label
+      ? "outline outline-1 outline-white/30"
+      : ""
+
   return (
     <div
       onClick={() => setActive(!active)}
-      className={`bg-surface border border-white/25 flex flex-col p-8  h-fit ${
-        !active ? "cursor-pointer hover:border-white/75" : "cursor-default"
+      className={`bg-surface border border-white/25 flex flex-col p-8 h-fit ${
+        !active ? "cursor-pointer hover:border-white/75" : "cursor-pointer"
       }`}
     >
       {/* top row */}
       <div className="flex flex-row justify-between gap-20">
         {/* avatar */}
         <div className="flex flex-row gap-6">
-          <div className="bg-surface border border-white/25 flex rounded-lg size-16"></div>
+          <div
+            aria-label="agent-image"
+            className={`bg-surface border border-white/25 flex rounded-lg size-16 ${highlight(
+              "agent-image"
+            )}`}
+            {...hoverProps("agent-image")}
+          ></div>
           {/* name and address */}
           <div className="flex flex-col gap-2">
-            <h2 className="text-2xl">
+            <h2
+              aria-label="agent-name"
+              className={`text-2xl ${highlight("agent-name")}`}
+              {...hoverProps("agent-name")}
+            >
               Agent Name
-              <span className="text-text-muted/50 text-xs inline-block">•</span>
             </h2>
-            <p className="text-text-muted/50 text-xs">
+            <p
+              aria-label="agent-address"
+              className="text-text-muted/50 text-xs absolute translate-y-10"
+            >
               0x742d35Cc6634C0...f2bD68
             </p>
           </div>
         </div>
         {/* reputation */}
         <div>
-          <div className="justify-center items-center flex size-16 text-2xl underline decoration-green-400 underline-offset-8">
+          <div
+            aria-label="reputation-score"
+            className={`justify-center items-center flex size-16 text-2xl underline decoration-green-400 underline-offset-8 ${highlight(
+              "reputation-score"
+            )}`}
+            {...hoverProps("reputation-score")}
+          >
             88
           </div>
         </div>
@@ -88,7 +133,11 @@ function MockAgentCard({
       <hr className="my-6 border-white/25" />
       {/* bottom row */}
       <div className="flex flex-row justify-between gap-20">
-        <p className="text-sm">
+        <p
+          aria-label="agent-description"
+          className={`text-sm ${highlight("agent-description")}`}
+          {...hoverProps("agent-description")}
+        >
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias
           enim minima quos numquam animi ut amet quae iusto nam consectetur.
         </p>
@@ -100,7 +149,9 @@ function MockAgentCard({
 function LineNum({ n }: { n: number }) {
   return (
     <span
-      className={`text-text-muted/30 select-none ${n < 10 ? "mr-6" : "mr-4"}`}
+      className={`text-text-muted/30 select-none pl-1 ${
+        n < 10 ? "mr-6" : "mr-4"
+      }`}
     >
       {n}
     </span>
@@ -130,31 +181,70 @@ function Punct({ children }: { children: string }) {
 function Line({
   n,
   indent = 0,
+  highlighted = false,
+  onMouseEnter,
+  onMouseLeave,
   children,
 }: {
   n: number
   indent?: number
+  highlighted?: boolean
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
   children: ReactNode
 }) {
   return (
-    <>
+    <span
+      className={`block ${highlighted ? "bg-white/8" : ""} ${
+        onMouseEnter ? "cursor-default" : ""
+      }`}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       <LineNum n={n} />
       {"  ".repeat(indent)}
       {children}
       {"\n"}
-    </>
+    </span>
   )
 }
 
-function CodeBlock({ active }: { active: boolean }) {
+const ELEMENT_TO_COMPONENT: Record<string, string> = {
+  "agent-image": "AgentImage",
+  "agent-name": "AgentName",
+  "reputation-score": "ReputationScore",
+  "agent-description": "AgentDescription",
+}
+
+const COMPONENT_TO_ELEMENT: Record<string, string> = Object.fromEntries(
+  Object.entries(ELEMENT_TO_COMPONENT).map(([k, v]) => [v, k])
+)
+
+function CodeBlock({
+  active,
+  hoveredElement,
+  setHoveredElement,
+}: {
+  active: boolean
+  hoveredElement: string | null
+  setHoveredElement: (el: string | null) => void
+}) {
+  const highlighted = hoveredElement
+    ? ELEMENT_TO_COMPONENT[hoveredElement]
+    : null
+
+  const lineHoverProps = (component: string) => ({
+    onMouseEnter: () => setHoveredElement(COMPONENT_TO_ELEMENT[component]),
+    onMouseLeave: () => setHoveredElement(null),
+  })
   return (
     <AnimatePresence mode="wait">
       <motion.div
         layout
         className="bg-neutral-950 border-t border-white/15 flex absolute w-1/2 right-0 bottom-0 overflow-hidden"
       >
-        <pre className="px-6 py-8 text-sm overflow-hidden">
-          <code className="font-mono">
+        <pre className="px-6 py-8 pt-4 text-sm overflow-hidden w-full">
+          <code className="font-mono pl-2">
             <motion.div layout>
               <Line n={1}>
                 <Punct>{"<"}</Punct>
@@ -199,22 +289,42 @@ function CodeBlock({ active }: { active: boolean }) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <Line n={6} indent={1}>
+                <Line
+                  n={6}
+                  indent={1}
+                  highlighted={highlighted === "AgentImage"}
+                  {...lineHoverProps("AgentImage")}
+                >
                   <Punct>{"</"}</Punct>
                   <Tag>AgentImage</Tag>
                   <Punct>{">"}</Punct>
                 </Line>
-                <Line n={7} indent={1}>
+                <Line
+                  n={7}
+                  indent={1}
+                  highlighted={highlighted === "AgentName"}
+                  {...lineHoverProps("AgentName")}
+                >
                   <Punct>{"</"}</Punct>
                   <Tag>AgentName</Tag>
                   <Punct>{">"}</Punct>
                 </Line>
-                <Line n={8} indent={1}>
+                <Line
+                  n={8}
+                  indent={1}
+                  highlighted={highlighted === "ReputationScore"}
+                  {...lineHoverProps("ReputationScore")}
+                >
                   <Punct>{"</"}</Punct>
                   <Tag>ReputationScore</Tag>
                   <Punct>{">"}</Punct>
                 </Line>
-                <Line n={9} indent={1}>
+                <Line
+                  n={9}
+                  indent={1}
+                  highlighted={highlighted === "AgentDescription"}
+                  {...lineHoverProps("AgentDescription")}
+                >
                   <Punct>{"</"}</Punct>
                   <Tag>AgentDescription</Tag>
                   <Punct>{">"}</Punct>
@@ -232,7 +342,7 @@ function CodeBlock({ active }: { active: boolean }) {
         </pre>
       </motion.div>
       <div className=" absolute w-1/2 bottom-0 h-12.5 z-100 bg-neutral-950 text-sm px-6">
-        <Line n={!active ? 10 : 6}>
+        <Line n={active ? 10 : 6}>
           <Punct>{"</"}</Punct>
           <Tag>AgentProvider</Tag>
           <Punct>{">"}</Punct>

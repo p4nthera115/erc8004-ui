@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router"
 import { AnimatePresence, motion } from "motion/react"
-import { type ReactNode, useState } from "react"
+import { type ReactNode, useEffect, useRef, useState } from "react"
 
 export const Route = createFileRoute("/")({ component: Home })
 
@@ -69,43 +69,109 @@ function MockAgentCard({
   hoveredElement: string | null
   setHoveredElement: (el: string | null) => void
 }) {
-  const hoverProps = (label: string) =>
+  const containerRef = useRef<HTMLDivElement>(null)
+  const agentImageRef = useRef<HTMLDivElement>(null)
+  const agentNameRef = useRef<HTMLHeadingElement>(null)
+  const reputationScoreRef = useRef<HTMLDivElement>(null)
+  const agentDescriptionRef = useRef<HTMLParagraphElement>(null)
+  const isMouseInCard = useRef(false)
+
+  const [highlightBox, setHighlightBox] = useState<{
+    top: number
+    left: number
+    width: number
+    height: number
+  } | null>(null)
+
+  const refMap: Record<string, React.RefObject<HTMLElement | null>> = {
+    "agent-image": agentImageRef,
+    "agent-name": agentNameRef,
+    "reputation-score": reputationScoreRef,
+    "agent-description": agentDescriptionRef,
+  }
+
+  // Reacts to hoveredElement set externally (CodeBlock hover)
+  useEffect(() => {
+    if (!active) return
+    if (hoveredElement) {
+      const ref = refMap[hoveredElement]
+      if (ref?.current && containerRef.current) {
+        const elRect = ref.current.getBoundingClientRect()
+        const containerRect = containerRef.current.getBoundingClientRect()
+        setHighlightBox({
+          top: elRect.top - containerRect.top,
+          left: elRect.left - containerRect.left,
+          width: elRect.width,
+          height: elRect.height,
+        })
+      }
+    } else if (!isMouseInCard.current) {
+      // Only clear if the mouse isn't in the card — avoids flicker between elements
+      setHighlightBox(null)
+    }
+  }, [hoveredElement, active])
+
+  const hoverProps = (label: string, ref: React.RefObject<HTMLElement | null>) =>
     active
       ? {
-          onMouseEnter: () => setHoveredElement(label),
+          onMouseEnter: () => {
+            setHoveredElement(label)
+            if (ref.current && containerRef.current) {
+              const elRect = ref.current.getBoundingClientRect()
+              const containerRect = containerRef.current.getBoundingClientRect()
+              setHighlightBox({
+                top: elRect.top - containerRect.top,
+                left: elRect.left - containerRect.left,
+                width: elRect.width,
+                height: elRect.height,
+              })
+            }
+          },
           onMouseLeave: () => setHoveredElement(null),
         }
       : {}
 
-  const highlight = (label: string) =>
-    active && hoveredElement === label
-      ? "outline outline-1 outline-white/30"
-      : ""
-
   return (
     <div
+      ref={containerRef}
       onClick={() => setActive(!active)}
-      className={`bg-surface border border-white/25 flex flex-col p-8 h-fit ${
+      onMouseEnter={() => { isMouseInCard.current = true }}
+      onMouseLeave={() => {
+        isMouseInCard.current = false
+        setHighlightBox(null)
+      }}
+      className={`relative bg-surface border border-white/25 flex flex-col p-8 h-fit ${
         !active ? "cursor-pointer hover:border-white/75" : "cursor-pointer"
       }`}
     >
+      {active && highlightBox && (
+        <div
+          className="absolute border border-white/30 pointer-events-none transition-all duration-150 ease-out"
+          style={{
+            top: highlightBox.top,
+            left: highlightBox.left,
+            width: highlightBox.width,
+            height: highlightBox.height,
+          }}
+        />
+      )}
       {/* top row */}
       <div className="flex flex-row justify-between gap-20">
         {/* avatar */}
         <div className="flex flex-row gap-6">
           <div
+            ref={agentImageRef}
             aria-label="agent-image"
-            className={`bg-surface border border-white/25 flex rounded-lg size-16 ${highlight(
-              "agent-image"
-            )}`}
-            {...hoverProps("agent-image")}
+            className="bg-surface border border-white/25 flex rounded-lg size-16"
+            {...hoverProps("agent-image", agentImageRef)}
           ></div>
           {/* name and address */}
           <div className="flex flex-col gap-2">
             <h2
+              ref={agentNameRef}
               aria-label="agent-name"
-              className={`text-2xl ${highlight("agent-name")}`}
-              {...hoverProps("agent-name")}
+              className="text-2xl"
+              {...hoverProps("agent-name", agentNameRef)}
             >
               Agent Name
             </h2>
@@ -120,11 +186,10 @@ function MockAgentCard({
         {/* reputation */}
         <div>
           <div
+            ref={reputationScoreRef}
             aria-label="reputation-score"
-            className={`justify-center items-center flex size-16 text-2xl underline decoration-green-400 underline-offset-8 ${highlight(
-              "reputation-score"
-            )}`}
-            {...hoverProps("reputation-score")}
+            className="justify-center items-center flex size-16 text-2xl underline decoration-green-400 underline-offset-8"
+            {...hoverProps("reputation-score", reputationScoreRef)}
           >
             88
           </div>
@@ -134,9 +199,10 @@ function MockAgentCard({
       {/* bottom row */}
       <div className="flex flex-row justify-between gap-20">
         <p
+          ref={agentDescriptionRef}
           aria-label="agent-description"
-          className={`text-sm ${highlight("agent-description")}`}
-          {...hoverProps("agent-description")}
+          className="text-sm"
+          {...hoverProps("agent-description", agentDescriptionRef)}
         >
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestias
           enim minima quos numquam animi ut amet quae iusto nam consectetur.

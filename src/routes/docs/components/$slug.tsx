@@ -44,8 +44,10 @@ function ComponentPreview({
   )
 }
 
-const REGISTRY = "eip155:11155111:0x8004A818BFB912233c491871b3d84c89A494BD9e"
-const AGENT_ID = 1073
+const REGISTRY = "eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
+const AGENT_ID = 2290
+// const REGISTRY = "eip155:11155111:0x8004A818BFB912233c491871b3d84c89A494BD9e"
+// const AGENT_ID = 1073
 
 const COMPONENT_PAGES: Record<string, React.ReactNode> = {
   identity: (

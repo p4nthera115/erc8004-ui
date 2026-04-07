@@ -7,6 +7,7 @@ export const Route = createFileRoute("/")({ component: Home })
 export function Home() {
   const [active, setActive] = useState(false)
   const [hoveredElement, setHoveredElement] = useState<string | null>(null)
+  const [codeBlockHeight, setCodeBlockHeight] = useState(0)
   return (
     <div className="h-[calc(100svh-80px)] border-b border-white/25 grid grid-cols-2 font-mono overflow-x-hidden">
       <div className="col-span-1 flex flex-col py-14 px-14 gap-10 border-r border-white/25">
@@ -35,11 +36,10 @@ export function Home() {
           </Link>
         </div>
       </div>
-      <div className="col-span-1 diagonal-lines flex flex-col justify-between items-center">
+      <div className="col-span-1 diagonal-lines flex flex-col justify-between items-center overflow-hidden">
         <div
-          className={`h-full p-20 flex ${
-            active ? "pt-15" : "pt-22"
-          } transition-all duration-350`}
+          className="h-full px-20 pt-20 flex items-center justify-center transition-all duration-350"
+          style={{ paddingBottom: `calc(5rem + ${codeBlockHeight}px)` }}
         >
           <MockAgentCard
             active={active}
@@ -52,6 +52,7 @@ export function Home() {
           active={active}
           hoveredElement={hoveredElement}
           setHoveredElement={setHoveredElement}
+          onHeightChange={setCodeBlockHeight}
         />
       </div>
     </div>
@@ -111,7 +112,10 @@ function MockAgentCard({
     }
   }, [hoveredElement, active])
 
-  const hoverProps = (label: string, ref: React.RefObject<HTMLElement | null>) =>
+  const hoverProps = (
+    label: string,
+    ref: React.RefObject<HTMLElement | null>
+  ) =>
     active
       ? {
           onMouseEnter: () => {
@@ -135,12 +139,14 @@ function MockAgentCard({
     <div
       ref={containerRef}
       onClick={() => setActive(!active)}
-      onMouseEnter={() => { isMouseInCard.current = true }}
+      onMouseEnter={() => {
+        isMouseInCard.current = true
+      }}
       onMouseLeave={() => {
         isMouseInCard.current = false
         setHighlightBox(null)
       }}
-      className={`relative bg-surface border border-white/25 flex flex-col p-8 h-fit ${
+      className={`relative rounded-xl shadow-xl shadow-black/30 bg-surface border border-white/25 flex flex-col p-8 h-fit ${
         !active ? "cursor-pointer hover:border-white/75" : "cursor-pointer"
       }`}
     >
@@ -290,11 +296,25 @@ function CodeBlock({
   active,
   hoveredElement,
   setHoveredElement,
+  onHeightChange,
 }: {
   active: boolean
   hoveredElement: string | null
   setHoveredElement: (el: string | null) => void
+  onHeightChange: (height: number) => void
 }) {
+  const blockRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = blockRef.current
+    if (!el) return
+    const observer = new ResizeObserver((entries) => {
+      onHeightChange(entries[0].contentRect.height)
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [onHeightChange])
+
   const highlighted = hoveredElement
     ? ELEMENT_TO_COMPONENT[hoveredElement]
     : null
@@ -306,6 +326,7 @@ function CodeBlock({
   return (
     <AnimatePresence mode="wait">
       <motion.div
+        ref={blockRef}
         layout
         className="bg-neutral-950 border-t border-white/15 flex absolute w-1/2 right-0 bottom-0 overflow-hidden"
       >

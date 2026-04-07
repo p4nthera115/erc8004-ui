@@ -138,11 +138,12 @@ function DocsSidebar() {
         .docs-sidebar::-webkit-scrollbar-thumb { background: transparent; border-radius: 0px; transition: background 0.3s; }
         .docs-sidebar[data-scrolling="true"]::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 0px; }
       `}</style>
+
       <aside
         ref={ref}
         onScroll={handleScroll}
         data-scrolling={scrolling}
-        className="docs-sidebar min-h-full w-60 shrink-0 sticky top-[81px] h-[calc(100svh-80px)] overflow-y-auto py-8 pr-4 border-r border-white/25 font-mono"
+        className="docs-sidebar min-h-full w-60 shrink-0 sticky top-[81px] h-[calc(100svh-81px)] overflow-y-auto py-8 pr-4 border-r border-white/25 font-mono"
         style={{
           scrollbarColor: scrolling
             ? "rgba(255,255,255,0.25) transparent"

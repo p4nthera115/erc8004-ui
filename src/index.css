@@ -19,6 +19,10 @@
   --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", monospace;
 }
 
+html {
+  overscroll-behavior-y: none;
+}
+
 body {
   margin: 0;
   background: var(--color-surface);

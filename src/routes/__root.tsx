@@ -3,7 +3,7 @@ import { Nav } from "../components/Nav"
 
 export const Route = createRootRoute({
   component: () => (
-    <div className="min-h-screen grid-bg">
+    <div className="min-h-screen">
       <Nav />
       <Outlet />
     </div>

@@ -236,23 +236,31 @@ function LineNum({ n }: { n: number }) {
 }
 
 function Tag({ children }: { children: string }) {
-  return <span className="text-sky-300/70">{children}</span>
+  return <span style={{ color: "#79B8FF" }}>{children}</span>
 }
 
 function Attr({ children }: { children: string }) {
-  return <span className="text-text/60">{children}</span>
+  return <span style={{ color: "#b392f0" }}>{children}</span>
 }
 
 function Str({ children }: { children: string }) {
-  return <span className="text-amber-300/50">{children}</span>
+  return <span style={{ color: "#9ECBFF" }}>{children}</span>
 }
 
 function Num({ children }: { children: number }) {
-  return <span className="text-violet-300/60">{children}</span>
+  return <span style={{ color: "#79B8FF" }}>{children}</span>
 }
 
 function Punct({ children }: { children: string }) {
-  return <span className="text-text-muted/50">{children}</span>
+  return <span style={{ color: "#ffffff" }}>{children}</span>
+}
+
+function Operator({ children }: { children: string }) {
+  return <span style={{ color: "#F97583" }}>{children}</span>
+}
+
+function Brace({ children }: { children: string }) {
+  return <span style={{ color: "#facc15" }}>{children}</span>
 }
 
 function Line({
@@ -344,14 +352,15 @@ function CodeBlock({
               </Line>
               <Line n={2} indent={1}>
                 <Attr>agentRegistry</Attr>
-                <Punct>=</Punct>
+                <Operator>=</Operator>
                 <Str>{'"eip155:1:0x742d...beb7"'}</Str>
               </Line>
               <Line n={3} indent={1}>
                 <Attr>agentId</Attr>
-                <Punct>{"={"}</Punct>
+                <Operator>=</Operator>
+                <Brace>{"{"}</Brace>
                 <Num>{374}</Num>
-                <Punct>{"}"}</Punct>
+                <Brace>{"}"}</Brace>
               </Line>
               <Line n={4}>
                 <Punct>{">"}</Punct>

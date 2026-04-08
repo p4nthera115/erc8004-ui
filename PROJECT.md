@@ -106,8 +106,27 @@ Components NEVER accept display data as props. The only inputs from the develope
 
 A lightweight provider that holds infrastructure configuration — specifically the developer's Graph API key and optionally custom Subgraph URL overrides. This is NOT a data provider — it holds no agent state or chain config. It exists to avoid passing `apiKey` as a prop to every component.
 
+It also **auto-detects TanStack Query**: if no `QueryClientProvider` exists above it in the React tree, it creates its own internal `QueryClient` with sensible defaults for blockchain data (5 min stale time, 30 min gc, 2 retries, no refetch on window focus). If a `QueryClientProvider` already exists, it uses that one — preserving the shared cache and deduplication.
+
+This means most developers only need one line of setup:
+
 ```tsx
-// The complete developer setup:
+// Minimal setup — no TanStack Query knowledge required:
+import { ERC8004Provider } from "@erc8004/ui"
+
+function App() {
+  return (
+    <ERC8004Provider apiKey="your-graph-api-key">
+      <ReputationScore agentRegistry="eip155:1:0x742..." agentId={374} />
+    </ERC8004Provider>
+  )
+}
+```
+
+If the app already uses TanStack Query, `ERC8004Provider` integrates seamlessly — it detects the existing client and shares its cache:
+
+```tsx
+// With an existing TanStack Query setup — works seamlessly:
 import { ERC8004Provider } from "@erc8004/ui"
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 

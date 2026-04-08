@@ -4,7 +4,7 @@ export const Route = createFileRoute("/docs/components/")({
   beforeLoad: () => {
     throw redirect({
       to: "/docs/components/$slug",
-      params: { slug: "identity" },
+      params: { slug: "erc8004-provider" },
     })
   },
   component: () => null,

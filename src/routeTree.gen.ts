@@ -13,7 +13,6 @@ import { Route as DocsRouteImport } from './routes/docs'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsThemingRouteImport } from './routes/docs/theming'
 import { Route as DocsRecipesRouteImport } from './routes/docs/recipes'
-import { Route as DocsIntroductionRouteImport } from './routes/docs/introduction'
 import { Route as DocsGettingStartedRouteImport } from './routes/docs/getting-started'
 import { Route as DocsConceptsRouteImport } from './routes/docs/concepts'
 import { Route as DocsApiKeysRouteImport } from './routes/docs/api-keys'
@@ -38,11 +37,6 @@ const DocsThemingRoute = DocsThemingRouteImport.update({
 const DocsRecipesRoute = DocsRecipesRouteImport.update({
   id: '/recipes',
   path: '/recipes',
-  getParentRoute: () => DocsRoute,
-} as any)
-const DocsIntroductionRoute = DocsIntroductionRouteImport.update({
-  id: '/introduction',
-  path: '/introduction',
   getParentRoute: () => DocsRoute,
 } as any)
 const DocsGettingStartedRoute = DocsGettingStartedRouteImport.update({
@@ -77,7 +71,6 @@ export interface FileRoutesByFullPath {
   '/docs/api-keys': typeof DocsApiKeysRoute
   '/docs/concepts': typeof DocsConceptsRoute
   '/docs/getting-started': typeof DocsGettingStartedRoute
-  '/docs/introduction': typeof DocsIntroductionRoute
   '/docs/recipes': typeof DocsRecipesRoute
   '/docs/theming': typeof DocsThemingRoute
   '/docs/components/$slug': typeof DocsComponentsSlugRoute
@@ -89,7 +82,6 @@ export interface FileRoutesByTo {
   '/docs/api-keys': typeof DocsApiKeysRoute
   '/docs/concepts': typeof DocsConceptsRoute
   '/docs/getting-started': typeof DocsGettingStartedRoute
-  '/docs/introduction': typeof DocsIntroductionRoute
   '/docs/recipes': typeof DocsRecipesRoute
   '/docs/theming': typeof DocsThemingRoute
   '/docs/components/$slug': typeof DocsComponentsSlugRoute
@@ -102,7 +94,6 @@ export interface FileRoutesById {
   '/docs/api-keys': typeof DocsApiKeysRoute
   '/docs/concepts': typeof DocsConceptsRoute
   '/docs/getting-started': typeof DocsGettingStartedRoute
-  '/docs/introduction': typeof DocsIntroductionRoute
   '/docs/recipes': typeof DocsRecipesRoute
   '/docs/theming': typeof DocsThemingRoute
   '/docs/components/$slug': typeof DocsComponentsSlugRoute
@@ -116,7 +107,6 @@ export interface FileRouteTypes {
     | '/docs/api-keys'
     | '/docs/concepts'
     | '/docs/getting-started'
-    | '/docs/introduction'
     | '/docs/recipes'
     | '/docs/theming'
     | '/docs/components/$slug'
@@ -128,7 +118,6 @@ export interface FileRouteTypes {
     | '/docs/api-keys'
     | '/docs/concepts'
     | '/docs/getting-started'
-    | '/docs/introduction'
     | '/docs/recipes'
     | '/docs/theming'
     | '/docs/components/$slug'
@@ -140,7 +129,6 @@ export interface FileRouteTypes {
     | '/docs/api-keys'
     | '/docs/concepts'
     | '/docs/getting-started'
-    | '/docs/introduction'
     | '/docs/recipes'
     | '/docs/theming'
     | '/docs/components/$slug'
@@ -180,13 +168,6 @@ declare module '@tanstack/react-router' {
       path: '/recipes'
       fullPath: '/docs/recipes'
       preLoaderRoute: typeof DocsRecipesRouteImport
-      parentRoute: typeof DocsRoute
-    }
-    '/docs/introduction': {
-      id: '/docs/introduction'
-      path: '/introduction'
-      fullPath: '/docs/introduction'
-      preLoaderRoute: typeof DocsIntroductionRouteImport
       parentRoute: typeof DocsRoute
     }
     '/docs/getting-started': {
@@ -231,7 +212,6 @@ interface DocsRouteChildren {
   DocsApiKeysRoute: typeof DocsApiKeysRoute
   DocsConceptsRoute: typeof DocsConceptsRoute
   DocsGettingStartedRoute: typeof DocsGettingStartedRoute
-  DocsIntroductionRoute: typeof DocsIntroductionRoute
   DocsRecipesRoute: typeof DocsRecipesRoute
   DocsThemingRoute: typeof DocsThemingRoute
   DocsComponentsSlugRoute: typeof DocsComponentsSlugRoute
@@ -242,7 +222,6 @@ const DocsRouteChildren: DocsRouteChildren = {
   DocsApiKeysRoute: DocsApiKeysRoute,
   DocsConceptsRoute: DocsConceptsRoute,
   DocsGettingStartedRoute: DocsGettingStartedRoute,
-  DocsIntroductionRoute: DocsIntroductionRoute,
   DocsRecipesRoute: DocsRecipesRoute,
   DocsThemingRoute: DocsThemingRoute,
   DocsComponentsSlugRoute: DocsComponentsSlugRoute,

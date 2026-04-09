@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, Link } from "@tanstack/react-router"
 import { useRef, useState, useCallback } from "react"
+import { TableOfContents } from "@/docs/TableOfContents"
 
 type NavItem =
   | { label: string; to: "/docs/getting-started" }
@@ -210,6 +211,7 @@ export const Route = createFileRoute("/docs")({
       <main className="flex-1 min-w-0 py-10 max-w-3xl">
         <Outlet />
       </main>
+      <TableOfContents />
     </div>
   ),
 })

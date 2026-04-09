@@ -8,7 +8,7 @@ export function Nav() {
         <div className="flex items-center gap-6">
           <NavLogo />
           <Link
-            to="/docs/introduction"
+            to="/docs/getting-started"
             className="hover:underline p-2 ml-2 hover:cursor-pointer"
           >
             Docs

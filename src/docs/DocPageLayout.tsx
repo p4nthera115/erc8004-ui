@@ -157,11 +157,17 @@ export function SectionHeading({ children }: { children: React.ReactNode }) {
 
 export function CodeBlock({ code }: { code: string }) {
   return (
-    <pre className="overflow-x-auto bg-neutral-950 border border-white/10 px-5 py-4 font-mono text-sm leading-relaxed whitespace-pre">
-      <code>
-        <HighlightedCode code={code} />
-      </code>
-    </pre>
+    <>
+      <style>{`
+        .code-block::-webkit-scrollbar { display: none; }
+        .code-block { scrollbar-width: none; }
+      `}</style>
+      <pre className="code-block overflow-x-auto bg-neutral-950 border border-white/10 px-5 py-4 font-mono text-sm leading-relaxed whitespace-pre">
+        <code>
+          <HighlightedCode code={code} />
+        </code>
+      </pre>
+    </>
   )
 }
 

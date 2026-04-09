@@ -2,7 +2,11 @@ import { createFileRoute, Outlet, Link } from "@tanstack/react-router"
 import { useRef, useState, useCallback } from "react"
 
 type NavItem =
-  | { label: string; to: "/docs/introduction" }
+  | { label: string; to: "/docs/getting-started" }
+  | { label: string; to: "/docs/concepts" }
+  | { label: string; to: "/docs/api-keys" }
+  | { label: string; to: "/docs/recipes" }
+  | { label: string; to: "/docs/theming" }
   | { label: string; to: "/docs/components/$slug"; slug: string }
 
 type NavGroup = {
@@ -12,7 +16,11 @@ type NavGroup = {
 
 const NAV: NavGroup[] = [
   {
-    items: [{ label: "Introduction", to: "/docs/introduction" }],
+    items: [
+      { label: "Getting Started", to: "/docs/getting-started" },
+      { label: "Concepts", to: "/docs/concepts" },
+      { label: "API Keys", to: "/docs/api-keys" },
+    ],
   },
   {
     title: "COMPONENTS",
@@ -117,6 +125,13 @@ const NAV: NavGroup[] = [
       },
     ],
   },
+  {
+    title: "GUIDES",
+    items: [
+      { label: "Recipes", to: "/docs/recipes" },
+      { label: "Theming", to: "/docs/theming" },
+    ],
+  },
 ]
 
 function DocsSidebar() {
@@ -159,10 +174,11 @@ function DocsSidebar() {
                 </span>
               )}
               {group.items.map((item) =>
-                item.to === "/docs/introduction" ? (
+                "slug" in item ? (
                   <Link
-                    key={item.label}
+                    key={item.slug}
                     to={item.to}
+                    params={{ slug: item.slug }}
                     className="text-sm text-white py-0.5 hover:bg-white/20 px-2"
                     activeProps={{ className: "text-sm text-text py-0.5" }}
                   >
@@ -170,9 +186,8 @@ function DocsSidebar() {
                   </Link>
                 ) : (
                   <Link
-                    key={item.slug}
+                    key={item.label}
                     to={item.to}
-                    params={{ slug: item.slug }}
                     className="text-sm text-white py-0.5 hover:bg-white/20 px-2"
                     activeProps={{ className: "text-sm text-text py-0.5" }}
                   >

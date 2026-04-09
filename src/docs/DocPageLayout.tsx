@@ -147,15 +147,15 @@ function HighlightedCode({ code }: { code: string }) {
 // Sub-components
 // ---------------------------------------------------------------------------
 
-function SectionHeading({ children }: { children: React.ReactNode }) {
+export function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-[10px] font-mono uppercase tracking-widest text-white/40 mb-4">
+    <h2 className="text-lg font-mono uppercase tracking-widest text-white/80 mb-4">
       {children}
     </h2>
   )
 }
 
-function CodeBlock({ code }: { code: string }) {
+export function CodeBlock({ code }: { code: string }) {
   return (
     <pre className="overflow-x-auto bg-neutral-950 border border-white/10 px-5 py-4 font-mono text-sm leading-relaxed whitespace-pre">
       <code>

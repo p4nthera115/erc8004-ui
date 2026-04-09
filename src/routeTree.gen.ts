@@ -11,7 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DocsThemingRouteImport } from './routes/docs/theming'
+import { Route as DocsRecipesRouteImport } from './routes/docs/recipes'
 import { Route as DocsIntroductionRouteImport } from './routes/docs/introduction'
+import { Route as DocsGettingStartedRouteImport } from './routes/docs/getting-started'
+import { Route as DocsConceptsRouteImport } from './routes/docs/concepts'
+import { Route as DocsApiKeysRouteImport } from './routes/docs/api-keys'
 import { Route as DocsComponentsIndexRouteImport } from './routes/docs/components/index'
 import { Route as DocsComponentsSlugRouteImport } from './routes/docs/components/$slug'
 
@@ -25,9 +30,34 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocsThemingRoute = DocsThemingRouteImport.update({
+  id: '/theming',
+  path: '/theming',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsRecipesRoute = DocsRecipesRouteImport.update({
+  id: '/recipes',
+  path: '/recipes',
+  getParentRoute: () => DocsRoute,
+} as any)
 const DocsIntroductionRoute = DocsIntroductionRouteImport.update({
   id: '/introduction',
   path: '/introduction',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsGettingStartedRoute = DocsGettingStartedRouteImport.update({
+  id: '/getting-started',
+  path: '/getting-started',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsConceptsRoute = DocsConceptsRouteImport.update({
+  id: '/concepts',
+  path: '/concepts',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsApiKeysRoute = DocsApiKeysRouteImport.update({
+  id: '/api-keys',
+  path: '/api-keys',
   getParentRoute: () => DocsRoute,
 } as any)
 const DocsComponentsIndexRoute = DocsComponentsIndexRouteImport.update({
@@ -44,14 +74,24 @@ const DocsComponentsSlugRoute = DocsComponentsSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/docs': typeof DocsRouteWithChildren
+  '/docs/api-keys': typeof DocsApiKeysRoute
+  '/docs/concepts': typeof DocsConceptsRoute
+  '/docs/getting-started': typeof DocsGettingStartedRoute
   '/docs/introduction': typeof DocsIntroductionRoute
+  '/docs/recipes': typeof DocsRecipesRoute
+  '/docs/theming': typeof DocsThemingRoute
   '/docs/components/$slug': typeof DocsComponentsSlugRoute
   '/docs/components/': typeof DocsComponentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/docs': typeof DocsRouteWithChildren
+  '/docs/api-keys': typeof DocsApiKeysRoute
+  '/docs/concepts': typeof DocsConceptsRoute
+  '/docs/getting-started': typeof DocsGettingStartedRoute
   '/docs/introduction': typeof DocsIntroductionRoute
+  '/docs/recipes': typeof DocsRecipesRoute
+  '/docs/theming': typeof DocsThemingRoute
   '/docs/components/$slug': typeof DocsComponentsSlugRoute
   '/docs/components': typeof DocsComponentsIndexRoute
 }
@@ -59,7 +99,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/docs': typeof DocsRouteWithChildren
+  '/docs/api-keys': typeof DocsApiKeysRoute
+  '/docs/concepts': typeof DocsConceptsRoute
+  '/docs/getting-started': typeof DocsGettingStartedRoute
   '/docs/introduction': typeof DocsIntroductionRoute
+  '/docs/recipes': typeof DocsRecipesRoute
+  '/docs/theming': typeof DocsThemingRoute
   '/docs/components/$slug': typeof DocsComponentsSlugRoute
   '/docs/components/': typeof DocsComponentsIndexRoute
 }
@@ -68,21 +113,36 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/docs'
+    | '/docs/api-keys'
+    | '/docs/concepts'
+    | '/docs/getting-started'
     | '/docs/introduction'
+    | '/docs/recipes'
+    | '/docs/theming'
     | '/docs/components/$slug'
     | '/docs/components/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/docs'
+    | '/docs/api-keys'
+    | '/docs/concepts'
+    | '/docs/getting-started'
     | '/docs/introduction'
+    | '/docs/recipes'
+    | '/docs/theming'
     | '/docs/components/$slug'
     | '/docs/components'
   id:
     | '__root__'
     | '/'
     | '/docs'
+    | '/docs/api-keys'
+    | '/docs/concepts'
+    | '/docs/getting-started'
     | '/docs/introduction'
+    | '/docs/recipes'
+    | '/docs/theming'
     | '/docs/components/$slug'
     | '/docs/components/'
   fileRoutesById: FileRoutesById
@@ -108,11 +168,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/docs/theming': {
+      id: '/docs/theming'
+      path: '/theming'
+      fullPath: '/docs/theming'
+      preLoaderRoute: typeof DocsThemingRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/recipes': {
+      id: '/docs/recipes'
+      path: '/recipes'
+      fullPath: '/docs/recipes'
+      preLoaderRoute: typeof DocsRecipesRouteImport
+      parentRoute: typeof DocsRoute
+    }
     '/docs/introduction': {
       id: '/docs/introduction'
       path: '/introduction'
       fullPath: '/docs/introduction'
       preLoaderRoute: typeof DocsIntroductionRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/getting-started': {
+      id: '/docs/getting-started'
+      path: '/getting-started'
+      fullPath: '/docs/getting-started'
+      preLoaderRoute: typeof DocsGettingStartedRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/concepts': {
+      id: '/docs/concepts'
+      path: '/concepts'
+      fullPath: '/docs/concepts'
+      preLoaderRoute: typeof DocsConceptsRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/api-keys': {
+      id: '/docs/api-keys'
+      path: '/api-keys'
+      fullPath: '/docs/api-keys'
+      preLoaderRoute: typeof DocsApiKeysRouteImport
       parentRoute: typeof DocsRoute
     }
     '/docs/components/': {
@@ -133,13 +228,23 @@ declare module '@tanstack/react-router' {
 }
 
 interface DocsRouteChildren {
+  DocsApiKeysRoute: typeof DocsApiKeysRoute
+  DocsConceptsRoute: typeof DocsConceptsRoute
+  DocsGettingStartedRoute: typeof DocsGettingStartedRoute
   DocsIntroductionRoute: typeof DocsIntroductionRoute
+  DocsRecipesRoute: typeof DocsRecipesRoute
+  DocsThemingRoute: typeof DocsThemingRoute
   DocsComponentsSlugRoute: typeof DocsComponentsSlugRoute
   DocsComponentsIndexRoute: typeof DocsComponentsIndexRoute
 }
 
 const DocsRouteChildren: DocsRouteChildren = {
+  DocsApiKeysRoute: DocsApiKeysRoute,
+  DocsConceptsRoute: DocsConceptsRoute,
+  DocsGettingStartedRoute: DocsGettingStartedRoute,
   DocsIntroductionRoute: DocsIntroductionRoute,
+  DocsRecipesRoute: DocsRecipesRoute,
+  DocsThemingRoute: DocsThemingRoute,
   DocsComponentsSlugRoute: DocsComponentsSlugRoute,
   DocsComponentsIndexRoute: DocsComponentsIndexRoute,
 }

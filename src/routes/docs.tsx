@@ -9,7 +9,7 @@ type NavItem =
   | { label: string; to: "/docs/api-keys" }
   | { label: string; to: "/docs/recipes" }
   | { label: string; to: "/docs/theming" }
-  | { label: string; to: "/docs/components/" }
+  | { label: string; to: "/docs/components" }
   | { label: string; to: "/docs/components/$slug"; slug: string }
 
 type NavGroup = {
@@ -24,7 +24,7 @@ const NAV: NavGroup[] = [
       { label: "Installation", to: "/docs/installation" },
       { label: "Concepts", to: "/docs/concepts" },
       { label: "API Keys", to: "/docs/api-keys" },
-      { label: "Components", to: "/docs/components/" },
+      { label: "Components", to: "/docs/components" },
     ],
   },
   {

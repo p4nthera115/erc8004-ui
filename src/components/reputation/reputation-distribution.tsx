@@ -5,6 +5,7 @@ import type { Feedback } from "@/types"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
+import { cn } from "@/lib/cn"
 import * as v from "valibot"
 
 type DistributionResponse = {
@@ -87,11 +88,11 @@ interface Bucket {
 }
 
 const BUCKETS: Bucket[] = [
-  { min: 81, max: 100, label: "81–100", barClass: "bg-emerald-500" },
-  { min: 61, max: 80, label: "61–80", barClass: "bg-emerald-400/80" },
-  { min: 41, max: 60, label: "41–60", barClass: "bg-amber-400" },
-  { min: 21, max: 40, label: "21–40", barClass: "bg-orange-400" },
-  { min: 0, max: 20, label: "0–20", barClass: "bg-red-400" },
+  { min: 81, max: 100, label: "81–100", barClass: "bg-erc8004-positive" },
+  { min: 61, max: 80,  label: "61–80",  barClass: "bg-erc8004-positive/70" },
+  { min: 41, max: 60,  label: "41–60",  barClass: "bg-erc8004-chart-5" },
+  { min: 21, max: 40,  label: "21–40",  barClass: "bg-erc8004-chart-3" },
+  { min: 0,  max: 20,  label: "0–20",   barClass: "bg-erc8004-negative" },
 ]
 
 // ============================================================================
@@ -140,7 +141,11 @@ function bucketFeedback(values: number[]): BucketCount[] {
 // COMPONENT
 // ============================================================================
 
-export function ReputationDistribution(props: AgentIdentityProps) {
+interface ReputationDistributionProps extends AgentIdentityProps {
+  className?: string
+}
+
+export function ReputationDistribution({ className, ...props }: ReputationDistributionProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   // Fetch reputation data. If another reputation component on the page
   // already requested data for the same agent, TanStack Query reuses the
@@ -174,13 +179,17 @@ export function ReputationDistribution(props: AgentIdentityProps) {
   // Shows placeholder "skeleton" bars while data is being fetched.
   if (isLoading) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mb-4 h-4 w-36 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+      <div
+        className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5 animate-pulse", className)}
+        aria-busy="true"
+        aria-live="polite"
+      >
+        <div className="mb-4 h-4 w-36 rounded-erc8004-sm bg-erc8004-muted" />
         <div className="flex flex-col gap-2.5">
           {BUCKETS.map((b) => (
             <div key={b.label} className="flex items-center gap-3">
-              <div className="h-3 w-12 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-              <div className="h-5 flex-1 animate-pulse rounded bg-zinc-100 dark:bg-zinc-900" />
+              <div className="h-3 w-12 rounded-erc8004-sm bg-erc8004-muted" />
+              <div className="h-5 flex-1 rounded-erc8004-sm bg-erc8004-muted/50" />
             </div>
           ))}
         </div>
@@ -191,11 +200,11 @@ export function ReputationDistribution(props: AgentIdentityProps) {
   // --- Error state ---
   if (error) {
     return (
-      <div className="w-full rounded-xl border border-red-200 bg-red-50 p-5 dark:border-red-900/50 dark:bg-red-950/30">
-        <p className="text-sm text-red-600 dark:text-red-400">
-          Failed to load reputation data.
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
+        <p className="text-sm text-erc8004-negative">
+          Failed to load reputation data.{" "}
         </p>
-        <p className="mt-1 text-xs text-red-500/70 dark:text-red-500/50">
+        <p className="mt-1 text-xs text-erc8004-negative/70">
           {error instanceof Error ? error.message : "Unknown error"}
         </p>
       </div>
@@ -205,11 +214,11 @@ export function ReputationDistribution(props: AgentIdentityProps) {
   // --- Empty state ---
   if (!bucketCounts || totalReviews === 0) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-        <h3 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
+        <h3 className="mb-3 text-sm font-semibold text-erc8004-card-fg">
           Score Distribution
         </h3>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-erc8004-muted-fg">
           No feedback yet.
         </p>
       </div>
@@ -218,13 +227,13 @@ export function ReputationDistribution(props: AgentIdentityProps) {
 
   // --- Histogram ---
   return (
-    <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
       {/* Header: title + total review count */}
       <div className="mb-4 flex items-baseline justify-between">
-        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        <h3 className="text-sm font-semibold text-erc8004-card-fg">
           Score Distribution
         </h3>
-        <span className="text-xs text-zinc-500 dark:text-zinc-400">
+        <span className="text-xs text-erc8004-muted-fg">
           {totalReviews} review{totalReviews === 1 ? "" : "s"}
         </span>
       </div>
@@ -237,14 +246,14 @@ export function ReputationDistribution(props: AgentIdentityProps) {
           return (
             <div key={bucket.label} className="flex items-center gap-3">
               {/* Range label — fixed width so bars align vertically */}
-              <span className="w-12 shrink-0 text-right text-xs tabular-nums text-zinc-500 dark:text-zinc-400">
+              <span className="w-12 shrink-0 text-right text-xs tabular-nums text-erc8004-muted-fg">
                 {bucket.label}
               </span>
 
-              {/* Bar track (grey background) with filled portion */}
-              <div className="relative h-5 flex-1 overflow-hidden rounded bg-zinc-100 dark:bg-zinc-900">
+              {/* Bar track with filled portion */}
+              <div className="relative h-5 flex-1 overflow-hidden rounded-erc8004-sm bg-erc8004-muted">
                 <div
-                  className={`absolute inset-y-0 left-0 rounded ${bucket.barClass}`}
+                  className={`absolute inset-y-0 left-0 rounded-erc8004-sm ${bucket.barClass}`}
                   style={{
                     // Inline style because Tailwind can't generate dynamic
                     // percentage classes at build time.
@@ -255,7 +264,7 @@ export function ReputationDistribution(props: AgentIdentityProps) {
               </div>
 
               {/* Count number */}
-              <span className="w-8 shrink-0 text-right text-xs tabular-nums text-zinc-600 dark:text-zinc-300">
+              <span className="w-8 shrink-0 text-right text-xs tabular-nums text-erc8004-muted-fg">
                 {count}
               </span>
             </div>

@@ -15,12 +15,14 @@ export type NavGroup = {
 
 export const NAV: NavGroup[] = [
   {
+    title: "SECTIONS",
     items: [
       { label: "Introduction", to: "/docs/introduction" },
       { label: "Installation", to: "/docs/installation" },
       { label: "Concepts", to: "/docs/concepts" },
       { label: "API Keys", to: "/docs/api-keys" },
       { label: "Components", to: "/docs/components" },
+      { label: "Theming", to: "/docs/theming" },
     ],
   },
   {
@@ -128,10 +130,7 @@ export const NAV: NavGroup[] = [
   },
   {
     title: "GUIDES",
-    items: [
-      { label: "Recipes", to: "/docs/recipes" },
-      { label: "Theming", to: "/docs/theming" },
-    ],
+    items: [{ label: "Recipes", to: "/docs/recipes" }],
   },
 ]
 

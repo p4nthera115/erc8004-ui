@@ -1,3 +1,28 @@
+// === Theming ===
+
+/**
+ * Optional theme overrides passed to ERC8004Provider.
+ * Each color value is a raw OKLCH string: "lightness chroma hue"
+ * Example: { accent: "0.55 0.25 300" } → purple accent
+ */
+export interface ERC8004Theme {
+  bg?: string
+  fg?: string
+  card?: string
+  cardFg?: string
+  muted?: string
+  mutedFg?: string
+  accent?: string
+  accentFg?: string
+  positive?: string
+  positiveFg?: string
+  negative?: string
+  negativeFg?: string
+  border?: string
+  ring?: string
+  radius?: string  // CSS length, e.g. "0.75rem" or "8px"
+}
+
 // === Component Props ===
 
 export interface SharedProps {

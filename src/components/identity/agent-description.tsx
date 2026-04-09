@@ -2,6 +2,7 @@ import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
+import { cn } from "@/lib/cn"
 import { useQuery } from "@tanstack/react-query"
 import * as v from "valibot"
 
@@ -61,17 +62,37 @@ function useAgentDescription(agentRegistry: string, agentId: number) {
   })
 }
 
-export function AgentDescription(props: AgentIdentityProps) {
+interface AgentDescriptionProps extends AgentIdentityProps {
+  className?: string
+}
+
+export function AgentDescription({ className, ...props }: AgentDescriptionProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useAgentDescription(agentRegistry, agentId)
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return (
+      <div
+        className={cn("space-y-2 animate-pulse", className)}
+        aria-busy="true"
+        aria-live="polite"
+      >
+        <div className="h-3 w-full rounded-erc8004-sm bg-erc8004-muted" />
+        <div className="h-3 w-4/5 rounded-erc8004-sm bg-erc8004-muted" />
+      </div>
+    )
   }
 
   if (error) {
-    return <div className="text-red-500">{error.message}</div>
+    return null
   }
 
-  return <div>{data?.agent?.registrationFile?.description ?? ""}</div>
+  const description = data?.agent?.registrationFile?.description
+  if (!description) return null
+
+  return (
+    <p className={cn("text-sm text-erc8004-muted-fg", className)}>
+      {description}
+    </p>
+  )
 }

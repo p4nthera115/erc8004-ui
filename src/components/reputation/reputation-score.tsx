@@ -3,6 +3,7 @@ import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
+import { cn } from "@/lib/cn"
 import type { AgentStats } from "@/types"
 import * as v from "valibot"
 
@@ -63,26 +64,30 @@ function useReputationStats(agentRegistry: string, agentId: number) {
 }
 
 function scoreColor(value: number) {
-  if (value >= 7) return "bg-emerald-500"
-  if (value >= 4) return "bg-amber-400"
-  return "bg-red-500"
+  if (value >= 7) return "bg-erc8004-positive"
+  if (value >= 4) return "bg-erc8004-chart-5"
+  return "bg-erc8004-negative"
 }
 
-export function ReputationScore(props: AgentIdentityProps) {
+interface ReputationScoreProps extends AgentIdentityProps {
+  className?: string
+}
+
+export function ReputationScore({ className, ...props }: ReputationScoreProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useReputationStats(agentRegistry, agentId)
 
   if (isLoading) {
     return (
-      <div className="inline-flex items-center gap-1.5 animate-pulse">
-        <div className="h-1.5 w-1.5 rounded-full bg-white/20" />
-        <div className="h-3 w-8 rounded bg-white/10" />
+      <div className={cn("inline-flex items-center gap-1.5 animate-pulse", className)} aria-busy="true" aria-live="polite">
+        <div className="h-1.5 w-1.5 rounded-full bg-erc8004-muted" />
+        <div className="h-3 w-8 rounded-erc8004-sm bg-erc8004-muted" />
       </div>
     )
   }
 
   if (error || !data?.agentStats) {
-    return <div className="h-1.5 w-1.5 rounded-full bg-white/20" />
+    return <div className={cn("h-1.5 w-1.5 rounded-full bg-erc8004-muted", className)} />
   }
 
   const { averageFeedbackValue, totalFeedback } = data.agentStats
@@ -90,14 +95,14 @@ export function ReputationScore(props: AgentIdentityProps) {
 
   return (
     <div
-      className="group inline-flex items-center gap-3 cursor-default"
+      className={cn("group inline-flex items-center gap-3 cursor-default", className)}
       title={`${totalFeedback} ${totalFeedback === 1 ? "review" : "reviews"}`}
     >
       <div
         className={`h-2 w-2 rounded-full ${scoreColor(averageFeedbackValue)}`}
       />
-      <span className="font-mono text-xl text-white/80">{score}</span>
-      <span className="text-xs text-white/30 opacity-0 group-hover:opacity-100 transition-opacity">
+      <span className="font-mono text-xl text-erc8004-card-fg/80">{score}</span>
+      <span className="text-xs text-erc8004-muted-fg opacity-0 group-hover:opacity-100 transition-opacity">
         ({totalFeedback})
       </span>
     </div>

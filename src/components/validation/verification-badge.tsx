@@ -3,6 +3,7 @@ import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
+import { cn } from "@/lib/cn"
 import type { AgentStats } from "@/types"
 import * as v from "valibot"
 
@@ -72,35 +73,39 @@ function getTier(completedValidations: number, averageScore: number): {
   dotColor: string
 } {
   if (completedValidations === 0) {
-    return { label: "Unverified", color: "text-zinc-400 dark:text-zinc-500", dotColor: "bg-zinc-300 dark:bg-zinc-600" }
+    return { label: "Unverified", color: "text-erc8004-muted-fg", dotColor: "bg-erc8004-muted-fg" }
   }
   if (averageScore >= 80 && completedValidations >= 5) {
-    return { label: "Highly Verified", color: "text-emerald-600 dark:text-emerald-400", dotColor: "bg-emerald-500" }
+    return { label: "Highly Verified", color: "text-erc8004-positive", dotColor: "bg-erc8004-positive" }
   }
   if (averageScore >= 60 && completedValidations >= 3) {
-    return { label: "Verified", color: "text-blue-600 dark:text-blue-400", dotColor: "bg-blue-500" }
+    return { label: "Verified", color: "text-erc8004-accent", dotColor: "bg-erc8004-accent" }
   }
-  return { label: "Partially Verified", color: "text-amber-600 dark:text-amber-400", dotColor: "bg-amber-400" }
+  return { label: "Partially Verified", color: "text-erc8004-chart-5", dotColor: "bg-erc8004-chart-5" }
 }
 
-export function VerificationBadge(props: AgentIdentityProps) {
+interface VerificationBadgeProps extends AgentIdentityProps {
+  className?: string
+}
+
+export function VerificationBadge({ className, ...props }: VerificationBadgeProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useValidationStats(agentRegistry, agentId)
 
   if (isLoading) {
     return (
-      <div className="inline-flex items-center gap-1.5 animate-pulse">
-        <div className="h-2 w-2 rounded-full bg-zinc-200 dark:bg-zinc-700" />
-        <div className="h-3 w-20 rounded bg-zinc-100 dark:bg-zinc-800" />
+      <div className={cn("inline-flex items-center gap-1.5 animate-pulse", className)} aria-busy="true" aria-live="polite">
+        <div className="h-2 w-2 rounded-full bg-erc8004-muted" />
+        <div className="h-3 w-20 rounded-erc8004-sm bg-erc8004-muted" />
       </div>
     )
   }
 
   if (error || !data?.agentStats) {
     return (
-      <div className="inline-flex items-center gap-1.5">
-        <div className="h-2 w-2 rounded-full bg-zinc-300 dark:bg-zinc-600" />
-        <span className="text-xs text-zinc-400 dark:text-zinc-500">Unverified</span>
+      <div className={cn("inline-flex items-center gap-1.5", className)}>
+        <div className="h-2 w-2 rounded-full bg-erc8004-muted" />
+        <span className="text-xs text-erc8004-muted-fg">Unverified</span>
       </div>
     )
   }
@@ -110,7 +115,7 @@ export function VerificationBadge(props: AgentIdentityProps) {
 
   return (
     <div
-      className={`inline-flex items-center gap-1.5 cursor-default ${tier.color}`}
+      className={cn(`inline-flex items-center gap-1.5 cursor-default ${tier.color}`, className)}
       title={`${completedValidations} validation${completedValidations === 1 ? "" : "s"} · avg score ${averageValidationScore.toFixed(0)}/100`}
     >
       <div className={`h-2 w-2 rounded-full ${tier.dotColor}`} />

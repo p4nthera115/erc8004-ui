@@ -5,6 +5,7 @@ import {
   useAgentIdentity,
   type AgentIdentityProps,
 } from "@/lib/useAgentIdentity"
+import { cn } from "@/lib/cn"
 import { useQuery } from "@tanstack/react-query"
 import * as v from "valibot"
 import { FingerprintBadge } from "./FingerprintBadge"
@@ -65,39 +66,48 @@ function useAgentImage(agentRegistry: string, agentId: number) {
   })
 }
 
-export function AgentImage(props: AgentIdentityProps) {
+function resolveImageUrl(uri: string) {
+  if (uri.startsWith("ipfs://")) {
+    return uri.replace("ipfs://", "https://ipfs.io/ipfs/")
+  }
+  return uri
+}
+
+interface AgentImageProps extends AgentIdentityProps {
+  className?: string
+  size?: number
+}
+
+export function AgentImage({ className, size = 64, ...props }: AgentImageProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
-  const { data, isLoading, error } = useAgentImage(agentRegistry, agentId)
+  const { data, isLoading } = useAgentImage(agentRegistry, agentId)
 
   if (isLoading) {
-    return <div>Loading...</div>
-  }
-
-  if (error) {
-    return <div className="text-red-500">{error.message}</div>
+    return (
+      <div
+        className={cn("animate-pulse rounded-full bg-erc8004-muted", className)}
+        style={{ width: size, height: size }}
+        aria-busy="true"
+        aria-live="polite"
+      />
+    )
   }
 
   const imageUrl = data?.agent?.registrationFile?.image
 
-  function resolveImageUrl(uri: string) {
-    if (uri.startsWith("ipfs://")) {
-      return uri.replace("ipfs://", "https://ipfs.io/ipfs/")
-    }
-    return uri
-  }
   return (
-    <div>
+    <div className={cn("overflow-hidden rounded-full", className)} style={{ width: size, height: size }}>
       {imageUrl ? (
         <img
           src={resolveImageUrl(imageUrl)}
-          alt={`Agent Image for ${agentId}`}
-          className="w-32 h-32 rounded-full"
+          alt={`Agent #${agentId}`}
+          className="h-full w-full object-cover"
         />
       ) : (
         <FingerprintBadge
           agentRegistry={agentRegistry}
           agentId={agentId}
-          size={32}
+          size={size}
         />
       )}
     </div>

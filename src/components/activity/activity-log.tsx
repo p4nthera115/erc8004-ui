@@ -5,6 +5,7 @@ import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
 import { truncateAddress, formatRelativeTime } from "@/lib/utils"
+import { cn } from "@/lib/cn"
 import * as v from "valibot"
 
 // ============================================================================
@@ -185,18 +186,18 @@ function FeedbackRow({ event }: { event: FeedbackEvent }) {
   const tags = [event.tag1, event.tag2].filter(Boolean) as string[]
 
   function scoreColor(v: number) {
-    if (v >= 81) return "text-emerald-500"
-    if (v >= 61) return "text-emerald-400"
-    if (v >= 41) return "text-amber-400"
-    if (v >= 21) return "text-orange-400"
-    return "text-red-400"
+    if (v >= 81) return "text-erc8004-positive"
+    if (v >= 61) return "text-erc8004-positive/80"
+    if (v >= 41) return "text-erc8004-chart-5"
+    if (v >= 21) return "text-erc8004-chart-3"
+    return "text-erc8004-negative"
   }
 
   return (
     <div className="flex items-start gap-3">
       {/* Icon */}
-      <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-        <svg className="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 16 16" strokeWidth={1.5} stroke="currentColor">
+      <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-erc8004-muted">
+        <svg className="h-3.5 w-3.5 text-erc8004-muted-fg" fill="none" viewBox="0 0 16 16" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M14 8c0 3.314-2.686 6-6 6a5.98 5.98 0 01-3.5-1.125L2 13.5l.625-2.5A5.98 5.98 0 012 8c0-3.314 2.686-6 6-6s6 2.686 6 6z" />
         </svg>
       </div>
@@ -207,28 +208,28 @@ function FeedbackRow({ event }: { event: FeedbackEvent }) {
           <span className={`font-mono text-sm font-semibold tabular-nums ${scoreColor(event.value)}`}>
             {event.value.toFixed(1)}
           </span>
-          <span className="text-xs text-zinc-500 dark:text-zinc-400">
+          <span className="text-xs text-erc8004-muted-fg">
             feedback from{" "}
-            <span className="font-mono">{truncateAddress(event.clientAddress)}</span>
+            <span className="font-mono" title={event.clientAddress}>{truncateAddress(event.clientAddress)}</span>
           </span>
           {tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+              className="rounded-full bg-erc8004-muted px-2 py-0.5 text-xs text-erc8004-muted-fg"
             >
               {tag}
             </span>
           ))}
         </div>
         {event.text && (
-          <p className="mt-1 line-clamp-2 text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 line-clamp-2 text-xs text-erc8004-muted-fg">
             {event.text}
           </p>
         )}
       </div>
 
       {/* Time */}
-      <span className="shrink-0 text-xs text-zinc-400 dark:text-zinc-500">
+      <span className="shrink-0 text-xs text-erc8004-muted-fg">
         {formatRelativeTime(event.createdAt)}
       </span>
     </div>
@@ -237,23 +238,23 @@ function FeedbackRow({ event }: { event: FeedbackEvent }) {
 
 function ValidationRow({ event }: { event: ValidationEvent }) {
   function statusColor(s: ValidationEvent["status"]) {
-    if (s === "COMPLETED") return "text-emerald-500"
-    if (s === "PENDING") return "text-amber-400"
-    return "text-zinc-400 dark:text-zinc-500"
+    if (s === "COMPLETED") return "text-erc8004-positive"
+    if (s === "PENDING") return "text-erc8004-chart-5"
+    return "text-erc8004-muted-fg"
   }
 
   function scoreColor(v: number) {
-    if (v >= 80) return "text-emerald-500"
-    if (v >= 60) return "text-blue-400"
-    if (v >= 40) return "text-amber-400"
-    return "text-red-400"
+    if (v >= 80) return "text-erc8004-positive"
+    if (v >= 60) return "text-erc8004-accent"
+    if (v >= 40) return "text-erc8004-chart-5"
+    return "text-erc8004-negative"
   }
 
   return (
     <div className="flex items-start gap-3">
       {/* Icon */}
-      <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-        <svg className="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 16 16" strokeWidth={1.5} stroke="currentColor">
+      <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-erc8004-muted">
+        <svg className="h-3.5 w-3.5 text-erc8004-muted-fg" fill="none" viewBox="0 0 16 16" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M13 5l-6 6-3-3" />
         </svg>
       </div>
@@ -264,18 +265,18 @@ function ValidationRow({ event }: { event: ValidationEvent }) {
           {event.response !== null ? (
             <span className={`font-mono text-sm font-semibold tabular-nums ${scoreColor(event.response)}`}>
               {event.response}
-              <span className="text-xs font-normal text-zinc-400 dark:text-zinc-500">/100</span>
+              <span className="text-xs font-normal text-erc8004-muted-fg">/100</span>
             </span>
           ) : null}
           <span className={`text-xs font-medium ${statusColor(event.status)}`}>
             {event.status.charAt(0) + event.status.slice(1).toLowerCase()}
           </span>
-          <span className="text-xs text-zinc-500 dark:text-zinc-400">
+          <span className="text-xs text-erc8004-muted-fg">
             validation by{" "}
-            <span className="font-mono">{truncateAddress(event.validatorAddress)}</span>
+            <span className="font-mono" title={event.validatorAddress}>{truncateAddress(event.validatorAddress)}</span>
           </span>
           {event.tag && (
-            <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+            <span className="rounded-full bg-erc8004-muted px-2 py-0.5 text-xs text-erc8004-muted-fg">
               {event.tag}
             </span>
           )}
@@ -283,7 +284,7 @@ function ValidationRow({ event }: { event: ValidationEvent }) {
       </div>
 
       {/* Time */}
-      <span className="shrink-0 text-xs text-zinc-400 dark:text-zinc-500">
+      <span className="shrink-0 text-xs text-erc8004-muted-fg">
         {formatRelativeTime(event.createdAt)}
       </span>
     </div>
@@ -294,23 +295,31 @@ function ValidationRow({ event }: { event: ValidationEvent }) {
 // COMPONENT
 // ============================================================================
 
-export function ActivityLog(props: AgentIdentityProps) {
+interface ActivityLogProps extends AgentIdentityProps {
+  className?: string
+}
+
+export function ActivityLog({ className, ...props }: ActivityLogProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { events, isLoading, error } = useActivityLog(agentRegistry, agentId)
 
   if (isLoading) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
-          <div className="h-4 w-20 animate-pulse rounded bg-zinc-100 dark:bg-zinc-800" />
+      <div
+        className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card", className)}
+        aria-busy="true"
+        aria-live="polite"
+      >
+        <div className="border-b border-erc8004-border px-5 py-4">
+          <div className="h-4 w-20 animate-pulse rounded-erc8004-sm bg-erc8004-muted" />
         </div>
         <div className="space-y-4 p-5">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="flex items-start gap-3">
-              <div className="h-7 w-7 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800" />
+              <div className="h-7 w-7 animate-pulse rounded-full bg-erc8004-muted" />
               <div className="flex-1 space-y-1.5">
-                <div className="h-3 w-48 animate-pulse rounded bg-zinc-100 dark:bg-zinc-800" />
-                <div className="h-3 w-32 animate-pulse rounded bg-zinc-100 dark:bg-zinc-800" />
+                <div className="h-3 w-48 animate-pulse rounded-erc8004-sm bg-erc8004-muted" />
+                <div className="h-3 w-32 animate-pulse rounded-erc8004-sm bg-erc8004-muted/50" />
               </div>
             </div>
           ))}
@@ -321,9 +330,9 @@ export function ActivityLog(props: AgentIdentityProps) {
 
   if (error) {
     return (
-      <div className="w-full rounded-xl border border-red-200 bg-red-50 p-5 dark:border-red-900/50 dark:bg-red-950/30">
-        <p className="text-sm text-red-600 dark:text-red-400">Failed to load activity log.</p>
-        <p className="mt-1 text-xs text-red-500/70 dark:text-red-500/50">
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
+        <p className="text-sm text-erc8004-negative">Failed to load activity log.</p>
+        <p className="mt-1 text-xs text-erc8004-negative/70">
           {error instanceof Error ? error.message : "Unknown error"}
         </p>
       </div>
@@ -332,21 +341,21 @@ export function ActivityLog(props: AgentIdentityProps) {
 
   if (events.length === 0) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">No activity yet.</p>
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
+        <p className="text-sm text-erc8004-muted-fg">No activity yet.</p>
       </div>
     )
   }
 
   return (
-    <div className="w-full rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
+    <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card", className)}>
+      <div className="border-b border-erc8004-border px-5 py-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Activity</h3>
-          <span className="text-xs text-zinc-400 dark:text-zinc-500">{events.length} events</span>
+          <h3 className="text-sm font-semibold text-erc8004-card-fg">Activity</h3>
+          <span className="text-xs text-erc8004-muted-fg">{events.length} events</span>
         </div>
       </div>
-      <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+      <div className="divide-y divide-erc8004-border">
         {events.map((event) => (
           <div key={event.id} className="px-5 py-3.5">
             {event.kind === "feedback" ? (

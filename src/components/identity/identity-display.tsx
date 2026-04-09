@@ -7,6 +7,7 @@ import {
   useAgentIdentity,
   type AgentIdentityProps,
 } from "@/lib/useAgentIdentity"
+import { cn } from "@/lib/cn"
 import * as v from "valibot"
 import { FingerprintBadge } from "./FingerprintBadge"
 
@@ -121,62 +122,42 @@ function truncateUrl(url: string, maxLen = 38): string {
 }
 
 const ENDPOINT_DEFS = [
-  {
-    key: "mcpEndpoint" as const,
-    versionKey: "mcpVersion" as const,
-    label: "MCP",
-    isEmail: false,
-  },
-  {
-    key: "a2aEndpoint" as const,
-    versionKey: "a2aVersion" as const,
-    label: "A2A",
-    isEmail: false,
-  },
-  {
-    key: "oasfEndpoint" as const,
-    versionKey: "oasfVersion" as const,
-    label: "OASF",
-    isEmail: false,
-  },
-  {
-    key: "webEndpoint" as const,
-    versionKey: null,
-    label: "Web",
-    isEmail: false,
-  },
-  {
-    key: "emailEndpoint" as const,
-    versionKey: null,
-    label: "Email",
-    isEmail: true,
-  },
+  { key: "mcpEndpoint" as const,   versionKey: "mcpVersion" as const,  label: "MCP",   isEmail: false },
+  { key: "a2aEndpoint" as const,   versionKey: "a2aVersion" as const,  label: "A2A",   isEmail: false },
+  { key: "oasfEndpoint" as const,  versionKey: "oasfVersion" as const, label: "OASF",  isEmail: false },
+  { key: "webEndpoint" as const,   versionKey: null,                    label: "Web",   isEmail: false },
+  { key: "emailEndpoint" as const, versionKey: null,                    label: "Email", isEmail: true  },
 ]
 
-interface Props extends AgentIdentityProps {
+interface IdentityDisplayProps extends AgentIdentityProps {
   showHealthChecks?: boolean
+  className?: string
 }
 
-export function IdentityDisplay(props: Props) {
+export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useIdentityDisplay(agentRegistry, agentId)
 
   if (isLoading) {
     return (
-      <div className="w-full overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 animate-pulse">
+      <div
+        className={cn("w-full overflow-hidden rounded-erc8004-xl border border-erc8004-border bg-erc8004-card animate-pulse", className)}
+        aria-busy="true"
+        aria-live="polite"
+      >
         <div className="flex gap-4 p-5">
-          <div className="h-16 w-16 shrink-0 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+          <div className="h-16 w-16 shrink-0 rounded-full bg-erc8004-muted" />
           <div className="flex-1 space-y-2 pt-1">
-            <div className="h-4 w-36 rounded bg-zinc-200 dark:bg-zinc-800" />
-            <div className="h-3 w-full rounded bg-zinc-100 dark:bg-zinc-900" />
-            <div className="h-3 w-2/3 rounded bg-zinc-100 dark:bg-zinc-900" />
+            <div className="h-4 w-36 rounded-erc8004-sm bg-erc8004-muted" />
+            <div className="h-3 w-full rounded-erc8004-sm bg-erc8004-muted/50" />
+            <div className="h-3 w-2/3 rounded-erc8004-sm bg-erc8004-muted/50" />
           </div>
         </div>
-        <div className="border-t border-zinc-100 p-5 space-y-2.5 dark:border-zinc-800/60">
+        <div className="border-t border-erc8004-border p-5 space-y-2.5">
           {[1, 2].map((i) => (
             <div key={i} className="flex items-center gap-3">
-              <div className="h-5 w-12 rounded-full bg-zinc-100 dark:bg-zinc-900" />
-              <div className="h-3 flex-1 rounded bg-zinc-100 dark:bg-zinc-900" />
+              <div className="h-5 w-12 rounded-full bg-erc8004-muted" />
+              <div className="h-3 flex-1 rounded-erc8004-sm bg-erc8004-muted/50" />
             </div>
           ))}
         </div>
@@ -186,11 +167,11 @@ export function IdentityDisplay(props: Props) {
 
   if (error) {
     return (
-      <div className="w-full rounded-xl border border-red-200 bg-red-50 p-5 dark:border-red-900/50 dark:bg-red-950/30">
-        <p className="text-sm text-red-600 dark:text-red-400">
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
+        <p className="text-sm text-erc8004-negative">
           Failed to load agent identity.
         </p>
-        <p className="mt-1 text-xs text-red-500/70 dark:text-red-500/50">
+        <p className="mt-1 text-xs text-erc8004-negative/70">
           {error instanceof Error ? error.message : "Unknown error"}
         </p>
       </div>
@@ -199,8 +180,8 @@ export function IdentityDisplay(props: Props) {
 
   if (!data?.agent) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
+        <p className="text-sm text-erc8004-muted-fg">
           Agent not found.
         </p>
       </div>
@@ -222,7 +203,7 @@ export function IdentityDisplay(props: Props) {
     : []
 
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+    <div className={cn("w-full overflow-hidden rounded-erc8004-xl border border-erc8004-border bg-erc8004-card", className)}>
       {/* Identity header */}
       <div className="flex gap-4 p-5">
         <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full">
@@ -242,16 +223,16 @@ export function IdentityDisplay(props: Props) {
         </div>
 
         <div className="min-w-0 flex-1">
-          <h2 className="truncate text-base font-semibold text-zinc-900 dark:text-zinc-100">
+          <h2 className="truncate text-base font-semibold text-erc8004-card-fg">
             {name}
           </h2>
           {description && (
-            <p className="mt-1 line-clamp-2 text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 line-clamp-2 text-sm text-erc8004-muted-fg">
               {description}
             </p>
           )}
           <p
-            className="mt-2 font-mono text-xs text-zinc-400 dark:text-zinc-500"
+            className="mt-2 font-mono text-xs text-erc8004-muted-fg"
             title={owner}
           >
             {truncateAddress(owner)}
@@ -261,21 +242,21 @@ export function IdentityDisplay(props: Props) {
 
       {/* Endpoints */}
       {endpoints.length > 0 && (
-        <div className="border-t border-zinc-100 px-5 py-4 dark:border-zinc-800/60">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+        <div className="border-t border-erc8004-border px-5 py-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-erc8004-muted-fg">
             Endpoints
           </p>
           <div className="flex flex-col gap-2">
             {endpoints.map(({ label, url, version, isEmail }) => (
               <div key={label} className="flex items-center gap-3">
-                <span className="w-14 shrink-0 rounded-full bg-zinc-100 px-2 py-0.5 text-center text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                <span className="w-14 shrink-0 rounded-full bg-erc8004-muted px-2 py-0.5 text-center text-xs font-medium text-erc8004-muted-fg">
                   {label}
                 </span>
 
                 {isEmail ? (
                   <a
                     href={`mailto:${url}`}
-                    className="min-w-0 flex-1 truncate text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                    className="min-w-0 flex-1 truncate text-sm text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
                     title={url}
                   >
                     {url}
@@ -285,7 +266,7 @@ export function IdentityDisplay(props: Props) {
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="min-w-0 flex-1 truncate text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                    className="min-w-0 flex-1 truncate text-sm text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
                     title={url}
                   >
                     {truncateUrl(url)}
@@ -293,7 +274,7 @@ export function IdentityDisplay(props: Props) {
                 )}
 
                 {version && (
-                  <span className="shrink-0 text-xs tabular-nums text-zinc-400 dark:text-zinc-500">
+                  <span className="shrink-0 text-xs tabular-nums text-erc8004-muted-fg">
                     v{version}
                   </span>
                 )}

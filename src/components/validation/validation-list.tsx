@@ -5,6 +5,7 @@ import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
 import { truncateAddress, formatRelativeTime } from "@/lib/utils"
+import { cn } from "@/lib/cn"
 import type { Validation } from "@/types"
 import * as v from "valibot"
 
@@ -101,33 +102,33 @@ function useValidationList(agentRegistry: string, agentId: number, page: number)
 function statusBadge(status: Validation["status"]) {
   switch (status) {
     case "COMPLETED":
-      return "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+      return "bg-erc8004-positive/20 text-erc8004-positive"
     case "PENDING":
-      return "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+      return "bg-erc8004-chart-5/20 text-erc8004-chart-5"
     case "EXPIRED":
-      return "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+      return "bg-erc8004-muted text-erc8004-muted-fg"
   }
 }
 
 function scoreColor(score: number) {
-  if (score >= 80) return "text-emerald-500"
-  if (score >= 60) return "text-blue-400"
-  if (score >= 40) return "text-amber-400"
-  return "text-red-400"
+  if (score >= 80) return "text-erc8004-positive"
+  if (score >= 60) return "text-erc8004-accent"
+  if (score >= 40) return "text-erc8004-chart-5"
+  return "text-erc8004-negative"
 }
 
 function ValidationCard({ item }: { item: ValidationItem }) {
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className="rounded-erc8004-lg border border-erc8004-border bg-erc8004-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0">
           {item.response !== null ? (
             <span className={`font-mono text-lg font-semibold tabular-nums ${scoreColor(item.response)}`}>
               {item.response}
-              <span className="text-xs font-normal text-zinc-400 dark:text-zinc-500">/100</span>
+              <span className="text-xs font-normal text-erc8004-muted-fg">/100</span>
             </span>
           ) : (
-            <span className="font-mono text-lg font-semibold text-zinc-300 dark:text-zinc-600">—</span>
+            <span className="font-mono text-lg font-semibold text-erc8004-muted-fg">—</span>
           )}
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusBadge(item.status)}`}
@@ -135,16 +136,16 @@ function ValidationCard({ item }: { item: ValidationItem }) {
             {item.status.charAt(0) + item.status.slice(1).toLowerCase()}
           </span>
           {item.tag && (
-            <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+            <span className="rounded-full bg-erc8004-muted px-2 py-0.5 text-xs text-erc8004-muted-fg">
               {item.tag}
             </span>
           )}
         </div>
         <div className="shrink-0 text-right">
-          <div className="font-mono text-xs text-zinc-500 dark:text-zinc-400">
+          <div className="font-mono text-xs text-erc8004-muted-fg" title={item.validatorAddress}>
             {truncateAddress(item.validatorAddress)}
           </div>
-          <div className="text-xs text-zinc-400 dark:text-zinc-500">
+          <div className="text-xs text-erc8004-muted-fg">
             {formatRelativeTime(item.createdAt)}
           </div>
         </div>
@@ -153,22 +154,30 @@ function ValidationCard({ item }: { item: ValidationItem }) {
   )
 }
 
-export function ValidationList(props: AgentIdentityProps) {
+interface ValidationListProps extends AgentIdentityProps {
+  className?: string
+}
+
+export function ValidationList({ className, ...props }: ValidationListProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const [page, setPage] = useState(0)
   const { data, isLoading, error } = useValidationList(agentRegistry, agentId, page)
 
   if (isLoading) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
-          <div className="h-4 w-20 animate-pulse rounded bg-zinc-100 dark:bg-zinc-800" />
+      <div
+        className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card", className)}
+        aria-busy="true"
+        aria-live="polite"
+      >
+        <div className="border-b border-erc8004-border px-5 py-4">
+          <div className="h-4 w-20 animate-pulse rounded-erc8004-sm bg-erc8004-muted" />
         </div>
         <div className="space-y-3 p-5">
           {Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
-              className="h-16 animate-pulse rounded-lg border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900"
+              className="h-16 animate-pulse rounded-erc8004-lg border border-erc8004-border bg-erc8004-muted"
             />
           ))}
         </div>
@@ -178,9 +187,9 @@ export function ValidationList(props: AgentIdentityProps) {
 
   if (error) {
     return (
-      <div className="w-full rounded-xl border border-red-200 bg-red-50 p-5 dark:border-red-900/50 dark:bg-red-950/30">
-        <p className="text-sm text-red-600 dark:text-red-400">Failed to load validations.</p>
-        <p className="mt-1 text-xs text-red-500/70 dark:text-red-500/50">
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
+        <p className="text-sm text-erc8004-negative">Failed to load validations.</p>
+        <p className="mt-1 text-xs text-erc8004-negative/70">
           {error instanceof Error ? error.message : "Unknown error"}
         </p>
       </div>
@@ -189,8 +198,8 @@ export function ValidationList(props: AgentIdentityProps) {
 
   if (!data?.validations.length && page === 0) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">No validations yet.</p>
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
+        <p className="text-sm text-erc8004-muted-fg">No validations yet.</p>
       </div>
     )
   }
@@ -200,29 +209,35 @@ export function ValidationList(props: AgentIdentityProps) {
   const hasPrev = page > 0
 
   return (
-    <div className="w-full rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
-        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Validations</h3>
+    <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card", className)}>
+      <div className="border-b border-erc8004-border px-5 py-4">
+        <h3 className="text-sm font-semibold text-erc8004-card-fg">Validations</h3>
       </div>
       <div className="space-y-3 p-5">
-        {validations.map((item) => (
-          <ValidationCard key={item.id} item={item} />
-        ))}
+        <ul role="list" className="space-y-3">
+          {validations.map((item) => (
+            <li key={item.id}>
+              <ValidationCard item={item} />
+            </li>
+          ))}
+        </ul>
 
         {(hasPrev || hasNext) && (
           <div className="flex items-center justify-between pt-1">
             <button
               onClick={() => setPage((p) => p - 1)}
               disabled={!hasPrev}
-              className="rounded-md px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-900 disabled:opacity-30 disabled:cursor-not-allowed dark:text-zinc-400 dark:hover:text-zinc-100"
+              aria-label="Previous page"
+              className="rounded-erc8004-md px-3 py-1.5 text-xs text-erc8004-muted-fg hover:text-erc8004-card-fg disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring focus-visible:ring-offset-2"
             >
               ← Previous
             </button>
-            <span className="text-xs text-zinc-400 dark:text-zinc-500">Page {page + 1}</span>
+            <span className="text-xs text-erc8004-muted-fg">Page {page + 1}</span>
             <button
               onClick={() => setPage((p) => p + 1)}
               disabled={!hasNext}
-              className="rounded-md px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-900 disabled:opacity-30 disabled:cursor-not-allowed dark:text-zinc-400 dark:hover:text-zinc-100"
+              aria-label="Next page"
+              className="rounded-erc8004-md px-3 py-1.5 text-xs text-erc8004-muted-fg hover:text-erc8004-card-fg disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring focus-visible:ring-offset-2"
             >
               Next →
             </button>

@@ -4,6 +4,7 @@ import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentit
 import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
+import { cn } from "@/lib/cn"
 import * as v from "valibot"
 
 // ============================================================================
@@ -112,21 +113,25 @@ function computeTagFrequency(
 function pillClasses(weight: number): string {
   if (weight >= 0.66) {
     // Top tier — largest, boldest, full opacity
-    return "text-sm font-semibold text-zinc-800 bg-zinc-100 dark:text-zinc-100 dark:bg-zinc-800 px-3 py-1"
+    return "text-sm font-semibold text-erc8004-card-fg bg-erc8004-muted px-3 py-1"
   }
   if (weight >= 0.33) {
     // Mid tier
-    return "text-xs font-medium text-zinc-600 bg-zinc-100 dark:text-zinc-300 dark:bg-zinc-800/70 px-2.5 py-1"
+    return "text-xs font-medium text-erc8004-muted-fg bg-erc8004-muted px-2.5 py-1"
   }
   // Bottom tier — smallest, lightest
-  return "text-xs font-normal text-zinc-400 bg-zinc-50 dark:text-zinc-500 dark:bg-zinc-900 px-2 py-0.5"
+  return "text-xs font-normal text-erc8004-muted-fg/60 bg-erc8004-muted/50 px-2 py-0.5"
 }
 
 // ============================================================================
 // COMPONENT
 // ============================================================================
 
-export function TagCloud(props: AgentIdentityProps) {
+interface TagCloudProps extends AgentIdentityProps {
+  className?: string
+}
+
+export function TagCloud({ className, ...props }: TagCloudProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useTagCloud(agentRegistry, agentId)
 
@@ -137,13 +142,17 @@ export function TagCloud(props: AgentIdentityProps) {
 
   if (isLoading) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mb-4 h-4 w-24 animate-pulse rounded bg-zinc-100 dark:bg-zinc-800" />
+      <div
+        className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5 animate-pulse", className)}
+        aria-busy="true"
+        aria-live="polite"
+      >
+        <div className="mb-4 h-4 w-24 rounded-erc8004-sm bg-erc8004-muted" />
         <div className="flex flex-wrap gap-2">
           {[80, 56, 96, 64, 48, 72, 40, 88].map((w) => (
             <div
               key={w}
-              className="h-6 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-800"
+              className="h-6 rounded-full bg-erc8004-muted"
               style={{ width: w }}
             />
           ))}
@@ -154,9 +163,9 @@ export function TagCloud(props: AgentIdentityProps) {
 
   if (error) {
     return (
-      <div className="w-full rounded-xl border border-red-200 bg-red-50 p-5 dark:border-red-900/50 dark:bg-red-950/30">
-        <p className="text-sm text-red-600 dark:text-red-400">Failed to load tags.</p>
-        <p className="mt-1 text-xs text-red-500/70 dark:text-red-500/50">
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
+        <p className="text-sm text-erc8004-negative">Failed to load tags.</p>
+        <p className="mt-1 text-xs text-erc8004-negative/70">
           {error instanceof Error ? error.message : "Unknown error"}
         </p>
       </div>
@@ -165,18 +174,18 @@ export function TagCloud(props: AgentIdentityProps) {
 
   if (tags.length === 0) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-        <h3 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">Specialisations</h3>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">No tags yet.</p>
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
+        <h3 className="mb-3 text-sm font-semibold text-erc8004-card-fg">Specialisations</h3>
+        <p className="text-sm text-erc8004-muted-fg">No tags yet.</p>
       </div>
     )
   }
 
   return (
-    <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
       <div className="mb-4 flex items-baseline justify-between">
-        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Specialisations</h3>
-        <span className="text-xs text-zinc-400 dark:text-zinc-500">
+        <h3 className="text-sm font-semibold text-erc8004-card-fg">Specialisations</h3>
+        <span className="text-xs text-erc8004-muted-fg">
           {tags.length} tag{tags.length === 1 ? "" : "s"}
         </span>
       </div>

@@ -157,7 +157,7 @@ export function InlineCode({ children }: { children: React.ReactNode }) {
 
 export function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-lg font-mono uppercase tracking-widest text-white/80 mb-4">
+    <h2 className="text-lg font-mono uppercase tracking-widest text-white/80 mb-4 underline underline-offset-4">
       {children}
     </h2>
   )

@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { CodeBlock, InlineCode, SectionHeading } from "@/docs/DocPageLayout"
+import {
+  CodeBlock,
+  InlineCode,
+  SectionHeading,
+} from "@/components/docs/DocPageLayout"
 
 export const Route = createFileRoute("/docs/recipes")({
   component: Recipes,

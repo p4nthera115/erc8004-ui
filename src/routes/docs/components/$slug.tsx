@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router"
-import { COMPONENT_REGISTRY } from "@/docs/registry"
-import { DocPageLayout } from "@/docs/DocPageLayout"
+import { COMPONENT_REGISTRY } from "@/components/docs/registry"
+import { DocPageLayout } from "@/components/docs/DocPageLayout"
 
 export const Route = createFileRoute("/docs/components/$slug")({
   loader: ({ params }) => {

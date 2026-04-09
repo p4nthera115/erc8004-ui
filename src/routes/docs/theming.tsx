@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { InlineCode, SectionHeading } from "@/docs/DocPageLayout"
+import { InlineCode, SectionHeading } from "@/components/docs/DocPageLayout"
 
 export const Route = createFileRoute("/docs/theming")({
   component: Theming,

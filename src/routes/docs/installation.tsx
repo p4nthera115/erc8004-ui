@@ -1,21 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { CodeBlock, InlineCode, SectionHeading } from "@/docs/DocPageLayout"
+import {
+  CodeBlock,
+  InlineCode,
+  SectionHeading,
+} from "@/components/docs/DocPageLayout"
 
-export const Route = createFileRoute("/docs/getting-started")({
-  component: GettingStarted,
+export const Route = createFileRoute("/docs/installation")({
+  component: Installation,
 })
 
-function GettingStarted() {
+function Installation() {
   return (
     <div className="flex flex-col gap-14">
       {/* Header */}
       <div className="flex flex-col gap-3">
         <h1 className="font-mono text-3xl font-bold text-white">
-          Getting Started
+          Installation
         </h1>
         <p className="text-base text-white/60 leading-relaxed max-w-prose">
-          Drop-in React components that fetch and render AI agent data from the
-          ERC-8004 standard. Pass an agent's on-chain ID, get a trustless UI.
+          Install the package, add peer dependencies, and configure your Graph
+          API key — then drop any component into your app with a single import.
         </p>
       </div>
 

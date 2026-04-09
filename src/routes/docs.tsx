@@ -1,13 +1,15 @@
 import { createFileRoute, Outlet, Link } from "@tanstack/react-router"
 import { useRef, useState, useCallback } from "react"
-import { TableOfContents } from "@/docs/TableOfContents"
+import { TableOfContents } from "@/components/docs/TableOfContents"
 
 type NavItem =
-  | { label: string; to: "/docs/getting-started" }
+  | { label: string; to: "/docs/introduction" }
+  | { label: string; to: "/docs/installation" }
   | { label: string; to: "/docs/concepts" }
   | { label: string; to: "/docs/api-keys" }
   | { label: string; to: "/docs/recipes" }
   | { label: string; to: "/docs/theming" }
+  | { label: string; to: "/docs/components/" }
   | { label: string; to: "/docs/components/$slug"; slug: string }
 
 type NavGroup = {
@@ -18,9 +20,11 @@ type NavGroup = {
 const NAV: NavGroup[] = [
   {
     items: [
-      { label: "Getting Started", to: "/docs/getting-started" },
+      { label: "Introduction", to: "/docs/introduction" },
+      { label: "Installation", to: "/docs/installation" },
       { label: "Concepts", to: "/docs/concepts" },
       { label: "API Keys", to: "/docs/api-keys" },
+      { label: "Components", to: "/docs/components/" },
     ],
   },
   {

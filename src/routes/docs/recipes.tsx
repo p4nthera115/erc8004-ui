@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { CodeBlock, SectionHeading } from "@/docs/DocPageLayout"
+import { CodeBlock, InlineCode, SectionHeading } from "@/docs/DocPageLayout"
 
 export const Route = createFileRoute("/docs/recipes")({
   component: Recipes,
@@ -22,9 +22,9 @@ function Recipes() {
         <SectionHeading>Agent Profile Page</SectionHeading>
         <p className="text-sm text-white/60 leading-relaxed max-w-prose">
           A full profile layout covering identity, reputation, and validation.{" "}
-          <code className="font-mono text-white/80 bg-white/5 px-1.5 py-0.5 rounded text-[0.85em]">
+          <InlineCode>
             AgentProvider
-          </code>{" "}
+          </InlineCode>{" "}
           eliminates prop repetition — every child component inherits the same
           agent identity.
         </p>
@@ -108,9 +108,9 @@ function AgentRow({ registry, agentId }: { registry: string; agentId: number }) 
         <SectionHeading>Agent Comparison</SectionHeading>
         <p className="text-sm text-white/60 leading-relaxed max-w-prose">
           Side-by-side comparison of multiple agents. Each{" "}
-          <code className="font-mono text-white/80 bg-white/5 px-1.5 py-0.5 rounded text-[0.85em]">
+          <InlineCode>
             AgentProvider
-          </code>{" "}
+          </InlineCode>{" "}
           scopes its context independently — components inside one provider
           won't bleed into another.
         </p>

@@ -1,17 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { SectionHeading } from "@/docs/DocPageLayout"
+import { InlineCode, SectionHeading } from "@/docs/DocPageLayout"
 
 export const Route = createFileRoute("/docs/concepts")({
   component: Concepts,
 })
-
-function InlineCode({ children }: { children: React.ReactNode }) {
-  return (
-    <code className="font-mono text-white/80 bg-white/5 px-1.5 py-0.5 rounded text-[0.85em]">
-      {children}
-    </code>
-  )
-}
 
 function Concepts() {
   return (

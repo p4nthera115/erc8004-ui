@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { CodeBlock, SectionHeading } from "@/docs/DocPageLayout"
+import { CodeBlock, InlineCode, SectionHeading } from "@/docs/DocPageLayout"
 
 export const Route = createFileRoute("/docs/getting-started")({
   component: GettingStarted,
@@ -36,7 +36,7 @@ function GettingStarted() {
         <CodeBlock code={`npm install react react-dom @tanstack/react-query`} />
         <p className="text-sm text-white/60 leading-relaxed max-w-prose">
           If you already have React in your project, you only need to add{" "}
-          <code className="font-mono text-white/80">@tanstack/react-query</code>
+          <InlineCode>@tanstack/react-query</InlineCode>
           . TanStack Query handles caching and deduplication so multiple
           components on the same page don't make redundant network requests.
         </p>
@@ -93,7 +93,7 @@ function App() {
         />
         <p className="text-sm text-white/60 leading-relaxed max-w-prose">
           The component handles all data fetching internally.{" "}
-          <code className="font-mono text-white/80">ERC8004Provider</code>{" "}
+          <InlineCode>ERC8004Provider</InlineCode>{" "}
           auto-creates a TanStack Query client if you haven't set one up.
         </p>
       </section>
@@ -103,8 +103,8 @@ function App() {
         <SectionHeading>If You Already Use TanStack Query</SectionHeading>
         <p className="text-sm text-white/60 leading-relaxed max-w-prose">
           Wrap with your own{" "}
-          <code className="font-mono text-white/80">QueryClientProvider</code>.{" "}
-          <code className="font-mono text-white/80">ERC8004Provider</code>{" "}
+          <InlineCode>QueryClientProvider</InlineCode>.{" "}
+          <InlineCode>ERC8004Provider</InlineCode>{" "}
           detects an existing QueryClient and shares it — no duplicate clients,
           no wasted cache.
         </p>
@@ -134,10 +134,9 @@ function App() {
         <SectionHeading>Using AgentProvider for Profile Pages</SectionHeading>
         <p className="text-sm text-white/60 leading-relaxed max-w-prose">
           When rendering multiple components for the same agent, use{" "}
-          <code className="font-mono text-white/80">AgentProvider</code> to
-          avoid repeating{" "}
-          <code className="font-mono text-white/80">agentRegistry</code> and{" "}
-          <code className="font-mono text-white/80">agentId</code> on every
+          <InlineCode>AgentProvider</InlineCode> to avoid repeating{" "}
+          <InlineCode>agentRegistry</InlineCode> and{" "}
+          <InlineCode>agentId</InlineCode> on every
           component. Individual components can still override with their own
           props.
         </p>

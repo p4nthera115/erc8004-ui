@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { SectionHeading } from "@/docs/DocPageLayout"
+import { InlineCode, SectionHeading } from "@/docs/DocPageLayout"
 
 export const Route = createFileRoute("/docs/theming")({
   component: Theming,
@@ -24,9 +24,9 @@ function Theming() {
         <p className="text-sm text-white/60 leading-relaxed max-w-prose">
           Components currently ship with a fixed visual design. They do not
           accept a{" "}
-          <code className="font-mono text-white/80 bg-white/5 px-1.5 py-0.5 rounded text-[0.85em]">
+          <InlineCode>
             className
-          </code>{" "}
+          </InlineCode>{" "}
           prop and do not expose CSS variables for colour or spacing overrides.
         </p>
         <p className="text-sm text-white/60 leading-relaxed max-w-prose">
@@ -55,17 +55,17 @@ function Theming() {
             <p className="text-sm text-white/60 leading-relaxed">
               Mix and match atomic components instead of using composed ones.
               For example, use{" "}
-              <code className="font-mono text-white/80 bg-white/5 px-1.5 py-0.5 rounded text-[0.85em]">
+              <InlineCode>
                 AgentName
-              </code>{" "}
+              </InlineCode>{" "}
               +{" "}
-              <code className="font-mono text-white/80 bg-white/5 px-1.5 py-0.5 rounded text-[0.85em]">
+              <InlineCode>
                 ReputationScore
-              </code>{" "}
+              </InlineCode>{" "}
               without the full{" "}
-              <code className="font-mono text-white/80 bg-white/5 px-1.5 py-0.5 rounded text-[0.85em]">
+              <InlineCode>
                 AgentCard
-              </code>
+              </InlineCode>
               .
             </p>
           </div>
@@ -74,13 +74,13 @@ function Theming() {
               FingerprintBadge size
             </span>
             <p className="text-sm text-white/60 leading-relaxed">
-              <code className="font-mono text-white/80 bg-white/5 px-1.5 py-0.5 rounded text-[0.85em]">
+              <InlineCode>
                 FingerprintBadge
-              </code>{" "}
+              </InlineCode>{" "}
               accepts a{" "}
-              <code className="font-mono text-white/80 bg-white/5 px-1.5 py-0.5 rounded text-[0.85em]">
+              <InlineCode>
                 size
-              </code>{" "}
+              </InlineCode>{" "}
               prop to control its rendered dimensions.
             </p>
           </div>
@@ -92,9 +92,9 @@ function Theming() {
         <SectionHeading>Planned</SectionHeading>
         <p className="text-sm text-white/60 leading-relaxed max-w-prose">
           More customisation options are on the roadmap, including{" "}
-          <code className="font-mono text-white/80 bg-white/5 px-1.5 py-0.5 rounded text-[0.85em]">
+          <InlineCode>
             className
-          </code>{" "}
+          </InlineCode>{" "}
           passthrough on wrapper elements and CSS variable overrides for
           colour tokens. These will be additive — existing components will
           continue to work without changes.

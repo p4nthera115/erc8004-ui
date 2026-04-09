@@ -147,6 +147,14 @@ function HighlightedCode({ code }: { code: string }) {
 // Sub-components
 // ---------------------------------------------------------------------------
 
+export function InlineCode({ children }: { children: React.ReactNode }) {
+  return (
+    <code className="font-mono text-white/80 bg-white/5 px-1.5 py-0.5 rounded text-[0.85em]">
+      {children}
+    </code>
+  )
+}
+
 export function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
     <h2 className="text-lg font-mono uppercase tracking-widest text-white/80 mb-4">

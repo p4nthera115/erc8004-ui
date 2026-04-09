@@ -31,8 +31,8 @@ function ApiKeys() {
                 className="text-white/80 underline underline-offset-2 hover:text-white transition-colors"
               >
                 thegraph.com/studio
-              </a>
-              {" "}and create an account
+              </a>{" "}
+              and create an account
             </>,
             "Create an API key in the dashboard",
             "Copy the key",
@@ -47,9 +47,7 @@ function ApiKeys() {
               <span className="font-mono text-xs text-white/30 mt-0.5 shrink-0 w-4">
                 {i + 1}.
               </span>
-              <span className="text-sm text-white/60 leading-relaxed">
-                {step}
-              </span>
+              <span className="text-sm text-white leading-relaxed">{step}</span>
             </li>
           ))}
         </ol>
@@ -63,7 +61,7 @@ function ApiKeys() {
       {/* Is it safe */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Is It Safe to Use in Frontend Code?</SectionHeading>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           Yes. Graph API keys are read-only query keys. They exist for usage
           tracking and rate limiting, not access control. They cannot modify any
           data. This is the same pattern used by every dApp that queries The
@@ -74,7 +72,7 @@ function ApiKeys() {
       {/* Free tier */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Free Tier</SectionHeading>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           The Graph offers a free tier that's sufficient for development and
           moderate production use. Check{" "}
           <a
@@ -92,7 +90,7 @@ function ApiKeys() {
       {/* Custom subgraph */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Custom Subgraph Endpoint</SectionHeading>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           If you run your own Subgraph or use a different indexer, use the{" "}
           <code className="font-mono text-white/80 bg-white/5 px-1.5 py-0.5 rounded text-[0.85em]">
             subgraphOverrides
@@ -112,7 +110,7 @@ function ApiKeys() {
   }}
 >`}
         />
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           Keys are chain IDs. Overrides apply per-chain — chains not listed fall
           back to the default Graph endpoints.
         </p>

@@ -20,13 +20,10 @@ function Recipes() {
       {/* Agent Profile Page */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Agent Profile Page</SectionHeading>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           A full profile layout covering identity, reputation, and validation.{" "}
-          <InlineCode>
-            AgentProvider
-          </InlineCode>{" "}
-          eliminates prop repetition — every child component inherits the same
-          agent identity.
+          <InlineCode>AgentProvider</InlineCode> eliminates prop repetition —
+          every child component inherits the same agent identity.
         </p>
         <CodeBlock
           code={`import {
@@ -73,7 +70,7 @@ function AgentProfile({ registry, agentId }: { registry: string; agentId: number
       {/* Marketplace Listing Row */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Marketplace Listing Row</SectionHeading>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           Compact row for search results or directory listings. Renders fast —
           each component fetches only the fields it needs.
         </p>
@@ -106,13 +103,11 @@ function AgentRow({ registry, agentId }: { registry: string; agentId: number }) 
       {/* Agent Comparison */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Agent Comparison</SectionHeading>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           Side-by-side comparison of multiple agents. Each{" "}
-          <InlineCode>
-            AgentProvider
-          </InlineCode>{" "}
-          scopes its context independently — components inside one provider
-          won't bleed into another.
+          <InlineCode>AgentProvider</InlineCode> scopes its context
+          independently — components inside one provider won't bleed into
+          another.
         </p>
         <CodeBlock
           code={`import { AgentProvider, AgentCard, ReputationScore, TagCloud } from "@erc8004/ui"
@@ -146,7 +141,7 @@ function CompareAgents({ agents }: { agents: { registry: string; id: number }[] 
       {/* Minimal Embed */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Minimal Embed</SectionHeading>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           A small inline trust signal for chat interfaces, sidebars, or
           tooltips.
         </p>

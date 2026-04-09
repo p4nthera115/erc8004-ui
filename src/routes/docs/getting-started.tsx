@@ -30,22 +30,22 @@ function GettingStarted() {
       {/* Peer deps */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Peer Dependencies</SectionHeading>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           The library requires React and TanStack Query as peer dependencies:
         </p>
         <CodeBlock code={`npm install react react-dom @tanstack/react-query`} />
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           If you already have React in your project, you only need to add{" "}
-          <InlineCode>@tanstack/react-query</InlineCode>
-          . TanStack Query handles caching and deduplication so multiple
-          components on the same page don't make redundant network requests.
+          <InlineCode>@tanstack/react-query</InlineCode>. TanStack Query handles
+          caching and deduplication so multiple components on the same page
+          don't make redundant network requests.
         </p>
       </section>
 
       {/* API key */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Get a Graph API Key</SectionHeading>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           Components fetch agent data from{" "}
           <a
             href="https://thegraph.com/studio/"
@@ -67,7 +67,7 @@ function GettingStarted() {
           to get a free API key. There is a generous free tier — no credit card
           required for development.
         </p>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           This is a <span className="text-white/80">read-only query key</span>{" "}
           for usage tracking — it's safe to use in frontend code. It does not
           grant write access to anything.
@@ -91,22 +91,20 @@ function App() {
   )
 }`}
         />
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           The component handles all data fetching internally.{" "}
-          <InlineCode>ERC8004Provider</InlineCode>{" "}
-          auto-creates a TanStack Query client if you haven't set one up.
+          <InlineCode>ERC8004Provider</InlineCode> auto-creates a TanStack Query
+          client if you haven't set one up.
         </p>
       </section>
 
       {/* Existing TanStack Query */}
       <section className="flex flex-col gap-4">
         <SectionHeading>If You Already Use TanStack Query</SectionHeading>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
-          Wrap with your own{" "}
-          <InlineCode>QueryClientProvider</InlineCode>.{" "}
-          <InlineCode>ERC8004Provider</InlineCode>{" "}
-          detects an existing QueryClient and shares it — no duplicate clients,
-          no wasted cache.
+        <p className="text-sm text-white leading-relaxed max-w-prose">
+          Wrap with your own <InlineCode>QueryClientProvider</InlineCode>.{" "}
+          <InlineCode>ERC8004Provider</InlineCode> detects an existing
+          QueryClient and shares it — no duplicate clients, no wasted cache.
         </p>
         <CodeBlock
           code={`import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
@@ -132,13 +130,12 @@ function App() {
       {/* AgentProvider */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Using AgentProvider for Profile Pages</SectionHeading>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           When rendering multiple components for the same agent, use{" "}
           <InlineCode>AgentProvider</InlineCode> to avoid repeating{" "}
           <InlineCode>agentRegistry</InlineCode> and{" "}
-          <InlineCode>agentId</InlineCode> on every
-          component. Individual components can still override with their own
-          props.
+          <InlineCode>agentId</InlineCode> on every component. Individual
+          components can still override with their own props.
         </p>
         <CodeBlock
           code={`import { AgentProvider, AgentCard, ReputationScore, FeedbackList } from "@erc8004/ui"
@@ -158,7 +155,7 @@ function App() {
           <li>
             <Link
               to="/docs/concepts"
-              className="text-sm text-white/60 hover:text-white transition-colors underline underline-offset-2"
+              className="text-sm text-white hover:text-white transition-colors underline underline-offset-2"
             >
               Concepts
             </Link>
@@ -170,7 +167,7 @@ function App() {
           <li>
             <Link
               to="/docs/components"
-              className="text-sm text-white/60 hover:text-white transition-colors underline underline-offset-2"
+              className="text-sm text-white hover:text-white transition-colors underline underline-offset-2"
             >
               Components
             </Link>
@@ -182,7 +179,7 @@ function App() {
           <li>
             <Link
               to="/docs/recipes"
-              className="text-sm text-white/60 hover:text-white transition-colors underline underline-offset-2"
+              className="text-sm text-white hover:text-white transition-colors underline underline-offset-2"
             >
               Recipes
             </Link>

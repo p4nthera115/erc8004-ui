@@ -12,15 +12,15 @@ function Concepts() {
       <div className="flex flex-col gap-3">
         <h1 className="font-mono text-3xl font-bold text-white">Concepts</h1>
         <p className="text-base text-white/60 leading-relaxed max-w-prose">
-          What you need to know about ERC-8004 to use this library — no
-          protocol deep-dive required.
+          What you need to know about ERC-8004 to use this library — no protocol
+          deep-dive required.
         </p>
       </div>
 
       {/* What is ERC-8004 */}
       <section className="flex flex-col gap-4">
         <SectionHeading>What is ERC-8004?</SectionHeading>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           ERC-8004 is an Ethereum standard for on-chain AI agent identity. It
           lets agents register themselves on the blockchain with a name,
           description, image, and service endpoints — and lets users leave
@@ -36,11 +36,11 @@ function Concepts() {
 
         <div className="flex flex-col gap-1">
           <h3 className="font-mono text-sm text-white/90">Identity Registry</h3>
-          <p className="text-sm text-white/60 leading-relaxed max-w-prose">
-            Like a business registration. Each agent gets an NFT (ERC-721
-            token) with a registration file containing its name, description,
-            image, and service endpoints. This is where "who is this agent?"
-            data lives.
+          <p className="text-sm text-white leading-relaxed max-w-prose">
+            Like a business registration. Each agent gets an NFT (ERC-721 token)
+            with a registration file containing its name, description, image,
+            and service endpoints. This is where "who is this agent?" data
+            lives.
           </p>
           <p className="text-xs text-white/30 mt-1 font-mono">
             Components: AgentName, AgentImage, AgentDescription, AgentCard,
@@ -52,7 +52,7 @@ function Concepts() {
           <h3 className="font-mono text-sm text-white/90">
             Reputation Registry
           </h3>
-          <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+          <p className="text-sm text-white leading-relaxed max-w-prose">
             Like a review system. Users who interact with an agent can leave
             feedback — a score, tags describing what the agent does well, and
             optional written reviews. This is where "is this agent any good?"
@@ -68,7 +68,7 @@ function Concepts() {
           <h3 className="font-mono text-sm text-white/90">
             Validation Registry
           </h3>
-          <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+          <p className="text-sm text-white leading-relaxed max-w-prose">
             Like a certification body. Independent third-party verifiers can
             assess an agent and record a score (0–100). This is where "has this
             agent been independently verified?" data lives.
@@ -83,7 +83,7 @@ function Concepts() {
       {/* Agent identity */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Agent Identity: agentRegistry + agentId</SectionHeading>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           Every component takes two props that together uniquely identify an
           agent across any chain:
         </p>
@@ -93,7 +93,7 @@ function Concepts() {
             <span className="font-mono text-sm text-white/90">
               agentRegistry
             </span>
-            <p className="text-sm text-white/60 leading-relaxed">
+            <p className="text-sm text-white leading-relaxed">
               A string in the format{" "}
               <InlineCode>
                 eip155:{"{chainId}"}:{"{contractAddress}"}
@@ -117,14 +117,14 @@ function Concepts() {
           </div>
           <div className="px-5 py-4 flex flex-col gap-1">
             <span className="font-mono text-sm text-white/90">agentId</span>
-            <p className="text-sm text-white/60 leading-relaxed">
+            <p className="text-sm text-white leading-relaxed">
               The ERC-721 token ID — the unique number assigned to this agent
               when it registered.
             </p>
           </div>
         </div>
 
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           Example:{" "}
           <InlineCode>
             agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
@@ -137,7 +137,7 @@ function Concepts() {
       {/* Trustless data */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Trustless Data</SectionHeading>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           Components never accept display data as props. You only pass
           identifiers — the component fetches verified data from the blockchain
           internally. This means the data you see is guaranteed to be real
@@ -180,7 +180,7 @@ function Concepts() {
       {/* Where data comes from */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Where the Data Comes From</SectionHeading>
-        <p className="text-sm text-white/60 leading-relaxed max-w-prose">
+        <p className="text-sm text-white leading-relaxed max-w-prose">
           All data is fetched from{" "}
           <a
             href="https://thegraph.com"

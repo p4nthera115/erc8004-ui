@@ -31,5 +31,4 @@ export type {
   ReputationData,
   Feedback,
   FeedbackFile,
-  ERC8004Theme,
 } from "./types"

@@ -62,6 +62,13 @@ const AGENT_IDENTITY_PROPS: PropDef[] = [
     description:
       "ERC-721 token ID of the agent. Required unless inside an <AgentProvider>.",
   },
+  {
+    name: "className",
+    type: "string",
+    required: false,
+    description:
+      "Optional CSS classes merged onto the component root for layout, spacing, or custom styling (e.g. Tailwind).",
+  },
 ]
 
 function withAgent(children: React.ReactNode): React.ReactNode {
@@ -125,6 +132,13 @@ function App() {
         required: false,
         description:
           "Optional map of chainId → custom Subgraph URL. Overrides the default endpoint for that chain.",
+      },
+      {
+        name: "className",
+        type: "string",
+        required: false,
+        description:
+          "Optional CSS classes merged onto the `.erc8004` wrapper. Use for scoping dark mode (`dark`) or custom layout.",
       },
       {
         name: "children",
@@ -479,6 +493,5 @@ function App() {
 // Lookup map
 // ---------------------------------------------------------------------------
 
-export const COMPONENT_REGISTRY: Record<string, ComponentDoc> = Object.fromEntries(
-  DOCS.map((doc) => [doc.slug, doc])
-)
+export const COMPONENT_REGISTRY: Record<string, ComponentDoc> =
+  Object.fromEntries(DOCS.map((doc) => [doc.slug, doc]))

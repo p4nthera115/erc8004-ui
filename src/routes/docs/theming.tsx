@@ -108,32 +108,34 @@ function Theming() {
           />
         </div>
 
-        {/* theme Prop */}
+        {/* className on Provider */}
         <div className="flex flex-col gap-3 mt-2">
           <p className="font-mono text-base text-neutral-800 dark:text-white/90">
-            3. <InlineCode>theme</InlineCode> Prop on Provider (retheme via
-            JavaScript)
+            3. <InlineCode>className</InlineCode> on Provider (scope a class)
           </p>
           <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
-            If you'd rather not write CSS, pass a <InlineCode>theme</InlineCode>{" "}
-            object to the provider. It sets the same CSS variables under the
-            hood.
+            The provider accepts a <InlineCode>className</InlineCode> prop that
+            gets merged onto the <InlineCode>.erc8004</InlineCode> wrapper. This
+            is useful for scoping dark mode or applying a custom theme class.
           </p>
           <CodeBlock
-            code={`<ERC8004Provider
-  apiKey="your-graph-api-key"
-  theme={{
-    accent: "0.55 0.25 300",
-    radius: "0.75rem",
-  }}
->
-  {/* all components inside use the purple accent */}
+            code={`<ERC8004Provider apiKey="your-graph-api-key" className="dark">
+  {/* dark theme active for all components inside */}
 </ERC8004Provider>`}
           />
-          <p className="text-sm text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
-            This produces the same result as the CSS approach. Use whichever
-            feels more natural for your setup.
-          </p>
+          <CodeBlock
+            language="css"
+            code={`/* Define a custom theme class */
+.erc8004.my-brand {
+  --erc8004-accent: 0.55 0.25 300;
+  --erc8004-radius: 0.75rem;
+}`}
+          />
+          <CodeBlock
+            code={`<ERC8004Provider apiKey="your-graph-api-key" className="my-brand">
+  {/* all components inside use the custom theme */}
+</ERC8004Provider>`}
+          />
         </div>
       </section>
 
@@ -515,54 +517,45 @@ function Theming() {
         />
 
         <p className="font-mono text-base text-neutral-800 dark:text-white/90 mt-2">
-          Full custom theme via provider
+          Full custom theme via CSS class
         </p>
         <CodeBlock
-          code={`<ERC8004Provider
-  apiKey="your-graph-api-key"
-  theme={{
-    accent: "0.6 0.22 160",       // teal
-    positive: "0.6 0.22 160",     // match accent for positive
-    negative: "0.55 0.2 0",       // warm red
-    border: "0.88 0.01 160",      // subtle teal borders
-    radius: "1rem",               // very rounded
-  }}
->`}
+          language="css"
+          code={`/* teal-brand.css */
+.erc8004.teal-brand {
+  --erc8004-accent: 0.6 0.22 160;       /* teal */
+  --erc8004-positive: 0.6 0.22 160;     /* match accent for positive */
+  --erc8004-negative: 0.55 0.2 0;       /* warm red */
+  --erc8004-border: 0.88 0.01 160;      /* subtle teal borders */
+  --erc8004-radius: 1rem;               /* very rounded */
+}`}
+        />
+        <CodeBlock
+          code={`<ERC8004Provider apiKey="your-graph-api-key" className="teal-brand">
+  {/* all components use the teal theme */}
+</ERC8004Provider>`}
         />
       </section>
 
-      {/* theme Prop Reference */}
+      {/* Provider Props Reference */}
       <section className="flex flex-col gap-4">
-        <SectionHeading>theme Prop Reference</SectionHeading>
+        <SectionHeading>Provider Props</SectionHeading>
         <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
-          The <InlineCode>theme</InlineCode> prop on{" "}
-          <InlineCode>ERC8004Provider</InlineCode> accepts any combination of
-          these keys. All color values are raw OKLCH strings (
-          <InlineCode>"lightness chroma hue"</InlineCode>). Radius is a CSS
-          length.
+          <InlineCode>ERC8004Provider</InlineCode> accepts the following props:
         </p>
         <CodeBlock
-          code={`interface ERC8004Theme {
-  bg?: string
-  fg?: string
-  card?: string
-  cardFg?: string
-  muted?: string
-  mutedFg?: string
-  accent?: string
-  accentFg?: string
-  positive?: string
-  positiveFg?: string
-  negative?: string
-  negativeFg?: string
-  border?: string
-  ring?: string
-  radius?: string       // CSS length, e.g. "0.75rem"
-}`}
+          code={`<ERC8004Provider
+  apiKey="your-graph-api-key"     // required — The Graph API key
+  subgraphOverrides={{ 1: "..." }} // optional — custom Subgraph URLs per chain
+  className="dark my-theme"        // optional — classes for the .erc8004 wrapper
+>
+  {children}
+</ERC8004Provider>`}
         />
         <p className="text-sm text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
-          Only include the tokens you want to override. Everything else falls
-          back to the defaults.
+          To customize the look of the library, override CSS variables on{" "}
+          <InlineCode>.erc8004</InlineCode> in your stylesheet — see the token
+          reference above.
         </p>
       </section>
 

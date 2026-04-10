@@ -1,8 +1,6 @@
 import type { ComponentDoc } from "./registry"
 import { CodeBlock, InlineCode } from "./CodeBlock"
 
-export { CodeBlock, InlineCode }
-
 // ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
@@ -19,10 +17,10 @@ function PropRow({ prop }: { prop: ComponentDoc["props"][number] }) {
   return (
     <tr className="border-t border-black/60 dark:border-white/10">
       <td className="py-3 pr-6 font-mono text-sm text-neutral-800 dark:text-white/90 whitespace-nowrap">
-        {prop.name}
+        <InlineCode>{prop.name}</InlineCode>
       </td>
       <td className="py-3 pr-6 font-mono text-sm text-neutral-500 dark:text-white/50 whitespace-nowrap">
-        {prop.type}
+        <InlineCode>{prop.type}</InlineCode>
       </td>
       <td className="py-3 pr-6 text-sm text-neutral-500 dark:text-white/50 whitespace-nowrap">
         {prop.required ? (
@@ -101,7 +99,7 @@ export function DocPageLayout({ doc }: { doc: ComponentDoc }) {
             </thead>
             <tbody>
               {doc.props.map((prop) => (
-                <PropRow key={prop.name} prop={prop} />
+                <PropRow key={prop.name as string} prop={prop} />
               ))}
             </tbody>
           </table>

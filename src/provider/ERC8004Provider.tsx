@@ -4,7 +4,7 @@ import {
   QueryClientProvider,
   useQueryClient,
 } from "@tanstack/react-query"
-import type { ERC8004Theme } from "../types"
+import { cn } from "../lib/cn"
 
 // ─── Config Context ──────────────────────────────────────────────
 // This is the "config bag" that every hook in the library reads from.
@@ -34,48 +34,6 @@ export function useERC8004Config(): ERC8004Config {
     )
   }
   return ctx
-}
-
-// ─── Theme Utilities ─────────────────────────────────────────────
-
-/**
- * Maps camelCase theme keys to their CSS custom property names.
- * Example: { accent: "0.55 0.2 300" } → { "--erc8004-accent": "0.55 0.2 300" }
- */
-const THEME_KEY_MAP: Record<keyof ERC8004Theme, string> = {
-  bg:         "--erc8004-bg",
-  fg:         "--erc8004-fg",
-  card:       "--erc8004-card",
-  cardFg:     "--erc8004-card-fg",
-  muted:      "--erc8004-muted",
-  mutedFg:    "--erc8004-muted-fg",
-  accent:     "--erc8004-accent",
-  accentFg:   "--erc8004-accent-fg",
-  positive:   "--erc8004-positive",
-  positiveFg: "--erc8004-positive-fg",
-  negative:   "--erc8004-negative",
-  negativeFg: "--erc8004-negative-fg",
-  border:     "--erc8004-border",
-  ring:       "--erc8004-ring",
-  radius:     "--erc8004-radius",
-}
-
-function themeToStyleOverrides(
-  theme: ERC8004Theme | undefined
-): React.CSSProperties | undefined {
-  if (!theme) return undefined
-
-  const styles: Record<string, string> = {}
-  for (const [key, value] of Object.entries(theme)) {
-    if (value !== undefined) {
-      const cssVar = THEME_KEY_MAP[key as keyof ERC8004Theme]
-      if (cssVar) styles[cssVar] = value
-    }
-  }
-
-  return Object.keys(styles).length > 0
-    ? (styles as unknown as React.CSSProperties)
-    : undefined
 }
 
 // ─── QueryClient Auto-Detection ──────────────────────────────────
@@ -173,10 +131,9 @@ interface ERC8004ProviderProps {
    *  Value is the full Subgraph URL including your API key. */
   subgraphOverrides?: Record<number, string>
 
-  /** Optional: JavaScript-based theme overrides. Sets CSS variables via inline
-   *  styles on the .erc8004 wrapper. Equivalent to overriding variables in CSS.
-   *  Each color value is a raw OKLCH string: "lightness chroma hue" */
-  theme?: ERC8004Theme
+  /** Optional: additional CSS classes for the .erc8004 wrapper div.
+   *  Useful for scoping dark mode (className="dark") or adding custom classes. */
+  className?: string
 
   children: ReactNode
 }
@@ -188,18 +145,11 @@ interface ERC8004ProviderProps {
  *   1. Storing the Graph API key so every hook can access it
  *   2. Auto-detecting TanStack Query (creates a QueryClient if needed)
  *   3. Wrapping children in the .erc8004 CSS scope for design tokens
- *   4. Applying optional theme overrides via inline CSS variables
+ *   4. Forwarding an optional className to the wrapper (e.g. "dark")
  *
- * Usage (minimal — no TanStack Query knowledge needed):
+ * Usage:
  * ```tsx
  * <ERC8004Provider apiKey="your-graph-api-key">
- *   <ReputationScore agentRegistry="eip155:1:0x742..." agentId={374} />
- * </ERC8004Provider>
- * ```
- *
- * Usage (with theme overrides):
- * ```tsx
- * <ERC8004Provider apiKey="your-graph-api-key" theme={{ accent: "0.55 0.25 300" }}>
  *   <ReputationScore agentRegistry="eip155:1:0x742..." agentId={374} />
  * </ERC8004Provider>
  * ```
@@ -207,7 +157,7 @@ interface ERC8004ProviderProps {
 export function ERC8004Provider({
   apiKey,
   subgraphOverrides,
-  theme,
+  className,
   children,
 }: ERC8004ProviderProps) {
   const config = useMemo(
@@ -215,15 +165,10 @@ export function ERC8004Provider({
     [apiKey, subgraphOverrides]
   )
 
-  const styleOverrides = useMemo(
-    () => themeToStyleOverrides(theme),
-    [theme]
-  )
-
   return (
     <ERC8004Context.Provider value={config}>
       <QueryClientGate>
-        <div className="erc8004" style={styleOverrides}>
+        <div className={cn("erc8004", className)}>
           {children}
         </div>
       </QueryClientGate>

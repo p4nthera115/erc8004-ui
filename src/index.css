@@ -23,7 +23,7 @@
 }
 
 html.dark {
-  --color-surface: #181818;
+  --color-surface: #000000;
   --color-surface-raised: #121212;
   --color-surface-overlay: #1a1a1a;
   --color-border-subtle: #1e1e1e;

@@ -1,4 +1,3 @@
-
 // ---------------------------------------------------------------------------
 // Syntax highlighting
 // ---------------------------------------------------------------------------
@@ -108,7 +107,9 @@ function tokenizeCss(code: string): Token[] {
     }
 
     // Numbers with optional units
-    if ((m = s.match(/^(\d+\.?\d*(?:px|em|rem|%|vh|vw|dvh|dvw|s|ms|deg|ch|ex)?)/))) {
+    if (
+      (m = s.match(/^(\d+\.?\d*(?:px|em|rem|%|vh|vw|dvh|dvw|s|ms|deg|ch|ex)?)/))
+    ) {
       tokens.push({ type: "number", text: m[1] })
       s = s.slice(m[1].length)
       continue
@@ -270,7 +271,13 @@ function tokenize(code: string): Token[] {
   return tokens
 }
 
-function HighlightedCode({ code, language }: { code: string; language: string }) {
+function HighlightedCode({
+  code,
+  language,
+}: {
+  code: string
+  language: string
+}) {
   const tokens = language === "css" ? tokenizeCss(code) : tokenize(code)
   return (
     <>
@@ -289,13 +296,19 @@ function HighlightedCode({ code, language }: { code: string; language: string })
 
 export function InlineCode({ children }: { children: React.ReactNode }) {
   return (
-    <code className="font-mono text-neutral-700 dark:text-white/80 bg-neutral-200 dark:bg-white/5 px-1.5 py-0.5 rounded text-[0.85em]">
+    <code className="font-mono text-neutral-700 dark:text-white/80 bg-neutral-200 dark:bg-white/15 px-1.5 py-0.5 rounded text-[0.85em]">
       {children}
     </code>
   )
 }
 
-export function CodeBlock({ code, language = "tsx" }: { code: string; language?: string }) {
+export function CodeBlock({
+  code,
+  language = "tsx",
+}: {
+  code: string
+  language?: string
+}) {
   return (
     <>
       <style>{`
@@ -303,7 +316,7 @@ export function CodeBlock({ code, language = "tsx" }: { code: string; language?:
         .code-block { scrollbar-width: none; }
         ${TOKEN_CSS}
       `}</style>
-      <pre className="code-block overflow-x-auto bg-neutral-200 dark:bg-neutral-950 border border-black/20 dark:border-white/10 px-5 py-4 font-mono text-sm leading-relaxed whitespace-pre">
+      <pre className="code-block overflow-x-auto bg-neutral-200 dark:bg-neutral-900 border border-black/10 dark:border-white/10 px-5 py-4 font-mono text-sm leading-relaxed whitespace-pre">
         <code>
           <HighlightedCode code={code} language={language} />
         </code>

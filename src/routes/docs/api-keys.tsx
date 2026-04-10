@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { CodeBlock, SectionHeading } from "@/components/docs/DocPageLayout"
+import { SectionHeading } from "@/components/docs/DocPageLayout"
+import { CodeBlock } from "@/components/docs/CodeBlock"
 
 export const Route = createFileRoute("/docs/api-keys")({
   component: ApiKeys,

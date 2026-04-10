@@ -1,117 +1,55 @@
-# erc8004-ui
+# @erc8004/ui
 
-> React component library for ERC-8004 AI agent identity. Self-contained, trustless components that fetch on-chain data internally. Styled with Tailwind CSS v4. Distributed shadcn-style (copy components into your project).
+> Drop-in React components for displaying verified ERC-8004 AI agent identity, reputation, and validation data. Self-contained, trustless, and designed to be consumed by AI coding agents.
 
-## Quick Start
-
-Components only need two props: `agentRegistry` (the chain+contract identifier) and `agentId` (the ERC-721 token ID).
-
-```tsx
-<FingerprintBadge
-  agentRegistry="eip155:1:0x742d35Cc6634C0532925a3b844Bc9e7595f2bD68"
-  agentId={22}
-/>
-```
+**NOTE — provisional package name.** This library is not yet published to npm. `@erc8004/ui` is a placeholder used in code examples — the final package name has not been chosen and will likely differ. Until publication, install directly from GitHub: https://github.com/p4nthera115/erc8004-ui. Once published, this notice will disappear and all code examples will reflect the real package name.
 
 ## Setup
 
-Install dependencies and wrap your app root:
-
-```bash
-pnpm add @tanstack/react-query
-```
-
-```tsx
-// src/main.tsx (or app/layout.tsx for Next.js)
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5,
-      gcTime: 1000 * 60 * 30,
-      retry: 2,
-    },
-  },
-})
-
-// Wrap your app:
-// <QueryClientProvider client={queryClient}><App /></QueryClientProvider>
-```
-
-`QueryClientProvider` is caching infrastructure (deduplication, stale-while-revalidate) — not a data provider. It holds no ERC-8004 state.
+- [Introduction](https://erc8004-ui.vercel.app/llms/_guides/introduction.md): Why this library exists and what problems it solves.
+- [Installation](https://erc8004-ui.vercel.app/llms/_guides/installation.md): Install the package, set up the provider, write your first component.
+- [Concepts](https://erc8004-ui.vercel.app/llms/_guides/concepts.md): Core concepts: registries, agentRegistry/agentId, trustless data, supported chains.
+- [API Keys](https://erc8004-ui.vercel.app/llms/_guides/api-keys.md): How to get a Graph API key and why it's safe to use in frontend code.
+- [Theming](https://erc8004-ui.vercel.app/llms/_guides/theming.md): Styling, dark mode, and customisation patterns.
+- [Recipes](https://erc8004-ui.vercel.app/llms/_guides/recipes.md): Complete page-level compositions: profile pages, marketplace rows, comparisons.
 
 ## Components
 
-### FingerprintBadge (stable)
-Deterministic SVG visual identity badge. Each agent gets a unique, unreplicable fingerprint pattern generated from its on-chain identifier.
-- Props: `agentRegistry: string`, `agentId: number`, `size?: number`, `className?: string`
-- Dependencies: none
-- Category: identity
+### Providers
 
-### AgentCard (planned)
-Complete agent identity card with fingerprint, name, description, services, and reputation summary.
-- Props: `agentRegistry: string`, `agentId: number`, `className?: string`
-- Dependencies: FingerprintBadge, types, utils
-- Category: identity
+- [ERC8004Provider](https://erc8004-ui.vercel.app/llms/erc8004-provider.md): Root context provider that holds infrastructure config — your Graph API key and optional subgraph URL overrides.
+- [AgentProvider](https://erc8004-ui.vercel.app/llms/agent-provider.md): Optional convenience wrapper that sets a default agentRegistry and agentId for all child components.
 
-### ReputationDisplay (planned)
-Aggregate reputation score and individual feedback entries with tag-aware rendering.
-- Props: `agentRegistry: string`, `agentId: number`, `className?: string`
-- Dependencies: types, utils
-- Category: reputation
+### Identity
 
-### EndpointStatus (planned)
-Service endpoints with live health check status indicators.
-- Props: `agentRegistry: string`, `agentId: number`, `className?: string`
-- Dependencies: types, utils
-- Category: status
+- [AgentName](https://erc8004-ui.vercel.app/llms/agent-name.md): Fetches and renders the agent's registered name from the identity registry.
+- [AgentImage](https://erc8004-ui.vercel.app/llms/agent-image.md): Renders the agent's registered image.
+- [AgentDescription](https://erc8004-ui.vercel.app/llms/agent-description.md): Renders the agent's registered description text from the identity registry.
+- [AgentCard](https://erc8004-ui.vercel.app/llms/agent-card.md): Composed identity card combining avatar, name, description, owner address, and active protocol badges in a single component.
+- [EndpointStatus](https://erc8004-ui.vercel.app/llms/endpoint-status.md): Lists all registered service endpoints (MCP, A2A, OASF, web, email) with protocol labels.
 
-### ActivityLog (planned)
-Chronological feed of on-chain events: registration, updates, feedback, endpoint calls, deregistration.
-- Props: `agentRegistry: string`, `agentId: number`, `limit?: number`, `className?: string`
-- Dependencies: types, utils
-- Category: activity
+### Reputation
 
-## MCP Server
+- [ReputationScore](https://erc8004-ui.vercel.app/llms/reputation-score.md): Compact inline badge showing the agent's average feedback score and total review count.
+- [ReputationTimeline](https://erc8004-ui.vercel.app/llms/reputation-timeline.md): Sparkline chart showing how the agent's average feedback score has trended over time.
+- [ReputationDistribution](https://erc8004-ui.vercel.app/llms/reputation-distribution.md): Score distribution histogram showing the spread of feedback values across 5 ranges.
+- [FeedbackList](https://erc8004-ui.vercel.app/llms/feedback-list.md): Paginated list of individual feedback entries with score, tag pills, reviewer address, timestamp, and optional written review text.
+- [TagCloud](https://erc8004-ui.vercel.app/llms/tag-cloud.md): Weighted tag pills showing the agent's most frequent feedback tags.
 
-AI coding tools (Claude Code, Cursor, etc.) can connect to the ERC-8004 UI MCP server for direct component access.
+### Validation
 
-Configure in your MCP settings:
-```json
-{
-  "erc8004-ui": {
-    "command": "node",
-    "args": ["./packages/mcp-server/dist/index.js"]
-  }
-}
-```
+- [VerificationBadge](https://erc8004-ui.vercel.app/llms/verification-badge.md): Compact inline badge showing the agent's verification tier derived from completed validations and average validation score.
+- [ValidationScore](https://erc8004-ui.vercel.app/llms/validation-score.md): Average validation score (0–100) with a fill bar and completed/pending counts.
+- [ValidationList](https://erc8004-ui.vercel.app/llms/validation-list.md): Paginated list of individual validation entries with score, status, tag, validator address, and timestamp.
+- [ValidationDisplay](https://erc8004-ui.vercel.app/llms/validation-display.md): Composed view combining VerificationBadge, ValidationScore, and ValidationList into a single unified validation panel.
 
-Available tools:
-- `list_components` — catalog of all components
-- `get_component` — full source code + deps + usage for a specific component
-- `get_setup_guide` — framework-specific setup instructions (vite, nextjs)
-- `get_types` — TypeScript type definitions
-- `get_hooks` — shared hooks and fetcher functions
+### Activity
 
-## Architecture
+- [LastActivity](https://erc8004-ui.vercel.app/llms/last-activity.md): Cross-registry relative timestamp showing when the agent was last active (e.g.
+- [ActivityLog](https://erc8004-ui.vercel.app/llms/activity-log.md): Chronological feed of all on-chain events across all registries — feedback and validations merged and sorted by time.
 
-- Self-contained: every component fetches its own data from on-chain sources
-- Trustless: components never accept display data as props, only identifiers
-- No domain-layer providers or context wrappers
-- Caching via `@tanstack/react-query` — deduplication, stale-while-revalidate, background refetch
-- React 19 + TypeScript strict + Tailwind CSS v4 + SVG fingerprints
+## Optional
 
-## ERC-8004 Data Model
-
-Each agent is identified by:
-- `agentRegistry`: `{namespace}:{chainId}:{identityRegistryAddress}` (e.g. `eip155:1:0x742...`)
-- `agentId`: ERC-721 token ID
-
-Data comes from The Graph subgraph (primary) and Agent0 SDK (secondary).
-
-## Links
-
-- ERC-8004 Spec: https://eips.ethereum.org/EIPS/eip-8004
-- Agent0 SDK: https://docs.sdk.ag0.xyz/
-- Agent0 TypeScript SDK: https://github.com/agent0lab/agent0-ts
+- [Full bundle](https://erc8004-ui.vercel.app/llms-full.txt): All components and guides concatenated into a single file for one-shot context loading.
+- [GitHub repository](https://github.com/p4nthera115/erc8004-ui): Source code, issues, and discussions.
+- [ERC-8004 specification](https://eips.ethereum.org/EIPS/eip-8004): The Ethereum standard this library implements.

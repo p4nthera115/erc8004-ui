@@ -23,6 +23,10 @@ dist-ssr
 *.sln
 *.sw?
 
+# Generated llms docs (rebuilt by prebuild script)
+public/llms/
+public/llms-full.txt
+
 # Environment variables
 .env
 .env.*

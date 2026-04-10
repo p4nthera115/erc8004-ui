@@ -69,7 +69,7 @@ export function TableOfContents() {
         const first = headings.find((h) => visibleIds.current.has(h.id))
         if (first) setActiveId(first.id)
       },
-      { rootMargin: "-80px 0px -60% 0px", threshold: 0 },
+      { rootMargin: "-80px 0px -60% 0px", threshold: 0 }
     )
 
     headings.forEach(({ id }) => {
@@ -100,11 +100,11 @@ export function TableOfContents() {
 
   return (
     <aside className="hidden xl:block w-52 shrink-0 sticky top-[81px] h-[calc(100svh-81px)] overflow-y-auto py-8 pl-6">
-      <p className="font-mono text-[10px] uppercase tracking-widest text-white/30 mb-4 select-none">
+      <p className="font-mono text-[10px] uppercase tracking-widest text-neutral-400 dark:text-white/30 mb-4 select-none">
         On This Page
       </p>
       <nav>
-        <ul className="flex flex-col border-l border-white/10">
+        <ul className="flex flex-col border-l border-black/20 dark:border-white/10">
           {headings.map((h) => (
             <li key={h.id}>
               <a
@@ -126,12 +126,10 @@ export function TableOfContents() {
                 }}
                 className={[
                   "block py-1 text-xs leading-relaxed transition-colors duration-150",
-                  h.level === 3
-                    ? "pl-5 text-[11px]"
-                    : "pl-3",
+                  h.level === 3 ? "pl-5 text-[11px]" : "pl-3",
                   activeId === h.id
-                    ? "text-white font-medium border-l border-white -ml-px"
-                    : "text-white/40 hover:text-white/70",
+                    ? "text-neutral-900 dark:text-white font-medium border-l border-black dark:border-white -ml-px"
+                    : "text-neutral-400 dark:text-white/40 hover:text-neutral-600 dark:hover:text-white/70",
                 ].join(" ")}
               >
                 {h.text}

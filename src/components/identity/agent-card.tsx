@@ -7,6 +7,7 @@ import {
   useAgentIdentity,
   type AgentIdentityProps,
 } from "@/lib/useAgentIdentity"
+import { cn } from "@/lib/cn"
 import * as v from "valibot"
 import { FingerprintBadge } from "./FingerprintBadge"
 
@@ -117,19 +118,27 @@ const PROTOCOL_LABELS: Array<{
   { key: "emailEndpoint", label: "Email" },
 ]
 
-export function AgentCard(props: AgentIdentityProps) {
+interface AgentCardProps extends AgentIdentityProps {
+  className?: string
+}
+
+export function AgentCard({ className, ...props }: AgentCardProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useAgentCard(agentRegistry, agentId)
 
   if (isLoading) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950 animate-pulse">
+      <div
+        className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5 animate-pulse", className)}
+        aria-busy="true"
+        aria-live="polite"
+      >
         <div className="flex gap-4">
-          <div className="h-16 w-16 shrink-0 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+          <div className="h-16 w-16 shrink-0 rounded-full bg-erc8004-muted" />
           <div className="flex-1 space-y-2 pt-1">
-            <div className="h-4 w-32 rounded bg-zinc-200 dark:bg-zinc-800" />
-            <div className="h-3 w-full rounded bg-zinc-100 dark:bg-zinc-900" />
-            <div className="h-3 w-3/4 rounded bg-zinc-100 dark:bg-zinc-900" />
+            <div className="h-4 w-32 rounded-erc8004-sm bg-erc8004-muted" />
+            <div className="h-3 w-full rounded-erc8004-sm bg-erc8004-muted/50" />
+            <div className="h-3 w-3/4 rounded-erc8004-sm bg-erc8004-muted/50" />
           </div>
         </div>
       </div>
@@ -138,11 +147,11 @@ export function AgentCard(props: AgentIdentityProps) {
 
   if (error) {
     return (
-      <div className="w-full rounded-xl border border-red-200 bg-red-50 p-5 dark:border-red-900/50 dark:bg-red-950/30">
-        <p className="text-sm text-red-600 dark:text-red-400">
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
+        <p className="text-sm text-erc8004-negative">
           Failed to load agent data.
         </p>
-        <p className="mt-1 text-xs text-red-500/70 dark:text-red-500/50">
+        <p className="mt-1 text-xs text-erc8004-negative/70">
           {error instanceof Error ? error.message : "Unknown error"}
         </p>
       </div>
@@ -151,8 +160,8 @@ export function AgentCard(props: AgentIdentityProps) {
 
   if (!data?.agent) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
+        <p className="text-sm text-erc8004-muted-fg">
           Agent not found.
         </p>
       </div>
@@ -167,7 +176,7 @@ export function AgentCard(props: AgentIdentityProps) {
   const activeProtocols = PROTOCOL_LABELS.filter(({ key }) => rf?.[key] != null)
 
   return (
-    <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
       <div className="flex gap-4">
         {/* Avatar */}
         <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full">
@@ -189,13 +198,13 @@ export function AgentCard(props: AgentIdentityProps) {
         {/* Body */}
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
-            <h2 className="truncate text-base font-semibold text-zinc-900 dark:text-zinc-100">
+            <h2 className="truncate text-base font-semibold text-erc8004-card-fg">
               {name}
             </h2>
           </div>
 
           {description && (
-            <p className="mt-1 line-clamp-2 text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 line-clamp-2 text-sm text-erc8004-muted-fg">
               {description}
             </p>
           )}
@@ -203,7 +212,7 @@ export function AgentCard(props: AgentIdentityProps) {
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {/* Owner address */}
             <span
-              className="font-mono text-xs text-zinc-400 dark:text-zinc-500"
+              className="font-mono text-xs text-erc8004-muted-fg"
               title={owner}
             >
               {truncateAddress(owner)}
@@ -211,11 +220,11 @@ export function AgentCard(props: AgentIdentityProps) {
 
             {activeProtocols.length > 0 && (
               <>
-                <span className="text-zinc-300 dark:text-zinc-700">·</span>
+                <span className="text-erc8004-border">·</span>
                 {activeProtocols.map(({ key, label }) => (
                   <span
                     key={key}
-                    className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                    className="rounded-full bg-erc8004-muted px-2 py-0.5 text-xs font-medium text-erc8004-muted-fg"
                   >
                     {label}
                   </span>

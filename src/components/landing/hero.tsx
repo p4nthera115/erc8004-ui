@@ -7,8 +7,8 @@ export function HeroSection() {
   const [hoveredElement, setHoveredElement] = useState<string | null>(null)
   const [codeBlockHeight, setCodeBlockHeight] = useState(0)
   return (
-    <div className="h-[calc(100svh-80px)] border-b border-white/25 grid grid-cols-2 font-mono overflow-x-hidden">
-      <div className="col-span-1 flex flex-col py-14 px-14 gap-10 border-r border-white/25">
+    <div className="h-[calc(100svh-81px)] border-b border-black/60 dark:border-white/25 grid grid-cols-2 font-mono overflow-x-hidden">
+      <div className="col-span-1 flex flex-col py-14 px-14 gap-10 border-r border-black/60 dark:border-white/25">
         <h1 className="text-4xl">
           The component library for rendering on-chain agent identity and
           reputation data.
@@ -28,7 +28,7 @@ export function HeroSection() {
           </button>
           <Link
             to="/docs/components"
-            className="bg-white text-surface-overlay py-4 w-full justify-center items-center flex hover:bg-white/80"
+            className="bg-border-default text-surface py-4 w-full justify-center items-center flex hover:opacity-80"
           >
             View Components
           </Link>
@@ -151,13 +151,15 @@ function MockAgentCard({
         isMouseInCard.current = false
         setHighlightBox(null)
       }}
-      className={`relative rounded-xl shadow-xl shadow-black/30 bg-surface border border-white/25 flex flex-col p-8 h-fit ${
-        !active ? "cursor-pointer hover:border-white/75" : "cursor-pointer"
+      className={`relative rounded-xl shadow-xl shadow-black/30 bg-surface border border-black/60 dark:border-white/25 flex flex-col p-8 h-fit ${
+        !active
+          ? "cursor-pointer hover:border-black/60 dark:hover:border-white/75"
+          : "cursor-pointer"
       }`}
     >
       {active && highlightBox && (
         <div
-          className="absolute border border-white/30 pointer-events-none transition-all duration-150 ease-out"
+          className="absolute border border-black/60 dark:border-white/30 pointer-events-none transition-all duration-150 ease-out"
           style={{
             top: highlightBox.top,
             left: highlightBox.left,
@@ -173,7 +175,7 @@ function MockAgentCard({
           <div
             ref={agentImageRef}
             aria-label="agent-image"
-            className="bg-surface border border-white/25 flex rounded-lg size-16"
+            className="bg-surface border border-black/60 dark:border-white/25 flex rounded-lg size-16"
             {...hoverProps("agent-image", agentImageRef)}
           ></div>
           {/* name and address */}
@@ -206,7 +208,7 @@ function MockAgentCard({
           </div>
         </div>
       </div>
-      <hr className="my-6 border-white/25" />
+      <hr className="my-6 border-black/60 dark:border-white/25" />
       {/* bottom row */}
       <div className="flex flex-row justify-between gap-20">
         <p
@@ -226,7 +228,7 @@ function MockAgentCard({
 function LineNum({ n }: { n: number }) {
   return (
     <span
-      className={`text-text-muted/30 select-none pl-1 ${
+      className={`text-[#868e96] dark:text-[#60666b] select-none pl-1 ${
         n < 10 ? "mr-6" : "mr-4"
       }`}
     >
@@ -235,32 +237,33 @@ function LineNum({ n }: { n: number }) {
   )
 }
 
+/** Token colors mirror `TOKEN_CSS` in `src/components/docs/CodeBlock.tsx` */
 function Tag({ children }: { children: string }) {
-  return <span style={{ color: "#79B8FF" }}>{children}</span>
+  return <span className="text-[#1864ab] dark:text-[#79B8FF]">{children}</span>
 }
 
 function Attr({ children }: { children: string }) {
-  return <span style={{ color: "#b392f0" }}>{children}</span>
+  return <span className="text-[#6741d9] dark:text-[#b392f0]">{children}</span>
 }
 
 function Str({ children }: { children: string }) {
-  return <span style={{ color: "#9ECBFF" }}>{children}</span>
+  return <span className="text-[#2f9e44] dark:text-[#9ECBFF]">{children}</span>
 }
 
 function Num({ children }: { children: number }) {
-  return <span style={{ color: "#79B8FF" }}>{children}</span>
+  return <span className="text-[#1971c2] dark:text-[#79B8FF]">{children}</span>
 }
 
 function Punct({ children }: { children: string }) {
-  return <span style={{ color: "#ffffff" }}>{children}</span>
+  return <span className="text-[#343a40] dark:text-[#ffffff]">{children}</span>
 }
 
 function Operator({ children }: { children: string }) {
-  return <span style={{ color: "#F97583" }}>{children}</span>
+  return <span className="text-[#d6336c] dark:text-[#F97583]">{children}</span>
 }
 
 function Brace({ children }: { children: string }) {
-  return <span style={{ color: "#facc15" }}>{children}</span>
+  return <span className="text-[#d08700] dark:text-[#facc15]">{children}</span>
 }
 
 function Line({
@@ -280,7 +283,7 @@ function Line({
 }) {
   return (
     <span
-      className={`block ${highlighted ? "bg-white/8" : ""} ${
+      className={`block ${highlighted ? "bg-black/6 dark:bg-white/8" : ""} ${
         onMouseEnter ? "cursor-default" : ""
       }`}
       onMouseEnter={onMouseEnter}
@@ -341,7 +344,7 @@ function CodeBlock({
       <motion.div
         ref={blockRef}
         layout
-        className="bg-neutral-950 border-t border-white/15 flex absolute w-1/2 right-0 bottom-0 overflow-hidden"
+        className="bg-neutral-200 dark:bg-black border-t border-black/10 dark:border-white/10 flex absolute w-1/2 right-0 bottom-0 overflow-hidden"
       >
         <pre className="px-6 py-8 pt-4 text-sm overflow-hidden w-full">
           <code className="font-mono pl-2">
@@ -442,7 +445,7 @@ function CodeBlock({
           </code>
         </pre>
       </motion.div>
-      <div className=" absolute w-1/2 bottom-0 h-12.5 z-100 bg-neutral-950 text-sm px-6">
+      <div className="absolute w-1/2 bottom-0 h-12.5 z-100 bg-neutral-200 dark:bg-black border-black/10 text-sm px-6">
         <Line n={active ? 9 : 6}>
           <Punct>{"</"}</Punct>
           <Tag>AgentProvider</Tag>

@@ -15,8 +15,12 @@ export const Route = createFileRoute("/docs/components/$slug")({
   },
   notFoundComponent: () => (
     <div className="flex flex-col gap-3">
-      <h1 className="font-mono text-3xl font-bold text-white">Not Found</h1>
-      <p className="text-white/60">No docs page found for this path.</p>
+      <h1 className="font-mono text-3xl font-bold text-neutral-900 dark:text-white">
+        Not Found
+      </h1>
+      <p className="text-neutral-700 dark:text-white/60">
+        No docs page found for this path.
+      </p>
     </div>
   ),
 })

@@ -3,6 +3,7 @@ import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
+import { cn } from "@/lib/cn"
 import * as v from "valibot"
 
 type EndpointStatusResponse = {
@@ -100,40 +101,15 @@ function buildEndpoints(
 ): EndpointRow[] {
   const rows: EndpointRow[] = []
   if (rf.mcpEndpoint)
-    rows.push({
-      protocol: "MCP",
-      url: rf.mcpEndpoint,
-      version: rf.mcpVersion,
-      isEmail: false,
-    })
+    rows.push({ protocol: "MCP", url: rf.mcpEndpoint, version: rf.mcpVersion, isEmail: false })
   if (rf.a2aEndpoint)
-    rows.push({
-      protocol: "A2A",
-      url: rf.a2aEndpoint,
-      version: rf.a2aVersion,
-      isEmail: false,
-    })
+    rows.push({ protocol: "A2A", url: rf.a2aEndpoint, version: rf.a2aVersion, isEmail: false })
   if (rf.oasfEndpoint)
-    rows.push({
-      protocol: "OASF",
-      url: rf.oasfEndpoint,
-      version: rf.oasfVersion,
-      isEmail: false,
-    })
+    rows.push({ protocol: "OASF", url: rf.oasfEndpoint, version: rf.oasfVersion, isEmail: false })
   if (rf.webEndpoint)
-    rows.push({
-      protocol: "Web",
-      url: rf.webEndpoint,
-      version: null,
-      isEmail: false,
-    })
+    rows.push({ protocol: "Web", url: rf.webEndpoint, version: null, isEmail: false })
   if (rf.emailEndpoint)
-    rows.push({
-      protocol: "Email",
-      url: rf.emailEndpoint,
-      version: null,
-      isEmail: true,
-    })
+    rows.push({ protocol: "Email", url: rf.emailEndpoint, version: null, isEmail: true })
   return rows
 }
 
@@ -147,7 +123,6 @@ function truncateUrl(url: string, maxLen = 40): string {
   }
 }
 
-// HealthIndicator pings the endpoint and shows a dot (green/red/pending)
 function HealthIndicator({ url }: { url: string }) {
   const { data: ok, isLoading } = useQuery({
     queryKey: ["health", url],
@@ -168,38 +143,41 @@ function HealthIndicator({ url }: { url: string }) {
 
   if (isLoading) {
     return (
-      <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-zinc-300 dark:bg-zinc-600" />
+      <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-erc8004-muted" />
     )
   }
 
   return (
     <span
-      className={`inline-block h-2 w-2 rounded-full ${
-        ok ? "bg-emerald-500" : "bg-red-400"
-      }`}
+      className={`inline-block h-2 w-2 rounded-full ${ok ? "bg-erc8004-positive" : "bg-erc8004-negative"}`}
       title={ok ? "Reachable" : "Unreachable"}
     />
   )
 }
 
-interface Props extends AgentIdentityProps {
+interface EndpointStatusProps extends AgentIdentityProps {
   /** Show live HTTP health check dots. Default: false */
   showHealthChecks?: boolean
+  className?: string
 }
 
-export function EndpointStatus({ showHealthChecks = false, ...agentProps }: Props) {
+export function EndpointStatus({ showHealthChecks = false, className, ...agentProps }: EndpointStatusProps) {
   const { agentRegistry, agentId } = useAgentIdentity(agentProps)
   const { data, isLoading, error } = useEndpointStatus(agentRegistry, agentId)
 
   if (isLoading) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950 animate-pulse">
-        <div className="mb-4 h-4 w-24 rounded bg-zinc-200 dark:bg-zinc-800" />
+      <div
+        className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5 animate-pulse", className)}
+        aria-busy="true"
+        aria-live="polite"
+      >
+        <div className="mb-4 h-4 w-24 rounded-erc8004-sm bg-erc8004-muted" />
         <div className="space-y-2.5">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex items-center gap-3">
-              <div className="h-3 w-12 rounded bg-zinc-100 dark:bg-zinc-900" />
-              <div className="h-3 flex-1 rounded bg-zinc-100 dark:bg-zinc-900" />
+              <div className="h-3 w-12 rounded-erc8004-sm bg-erc8004-muted/50" />
+              <div className="h-3 flex-1 rounded-erc8004-sm bg-erc8004-muted/50" />
             </div>
           ))}
         </div>
@@ -209,11 +187,11 @@ export function EndpointStatus({ showHealthChecks = false, ...agentProps }: Prop
 
   if (error) {
     return (
-      <div className="w-full rounded-xl border border-red-200 bg-red-50 p-5 dark:border-red-900/50 dark:bg-red-950/30">
-        <p className="text-sm text-red-600 dark:text-red-400">
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
+        <p className="text-sm text-erc8004-negative">
           Failed to load endpoints.
         </p>
-        <p className="mt-1 text-xs text-red-500/70 dark:text-red-500/50">
+        <p className="mt-1 text-xs text-erc8004-negative/70">
           {error instanceof Error ? error.message : "Unknown error"}
         </p>
       </div>
@@ -225,11 +203,11 @@ export function EndpointStatus({ showHealthChecks = false, ...agentProps }: Prop
 
   if (endpoints.length === 0) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-        <h3 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
+        <h3 className="mb-3 text-sm font-semibold text-erc8004-card-fg">
           Endpoints
         </h3>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-erc8004-muted-fg">
           No endpoints registered.
         </p>
       </div>
@@ -237,8 +215,8 @@ export function EndpointStatus({ showHealthChecks = false, ...agentProps }: Prop
   }
 
   return (
-    <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-      <h3 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+    <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
+      <h3 className="mb-4 text-sm font-semibold text-erc8004-card-fg">
         Endpoints
       </h3>
 
@@ -246,7 +224,7 @@ export function EndpointStatus({ showHealthChecks = false, ...agentProps }: Prop
         {endpoints.map(({ protocol, url, version, isEmail }) => (
           <div key={protocol} className="flex items-center gap-3">
             {/* Protocol badge */}
-            <span className="w-14 shrink-0 rounded-full bg-zinc-100 px-2 py-0.5 text-center text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+            <span className="w-14 shrink-0 rounded-full bg-erc8004-muted px-2 py-0.5 text-center text-xs font-medium text-erc8004-muted-fg">
               {protocol}
             </span>
 
@@ -254,7 +232,7 @@ export function EndpointStatus({ showHealthChecks = false, ...agentProps }: Prop
             {isEmail ? (
               <a
                 href={`mailto:${url}`}
-                className="min-w-0 flex-1 truncate text-sm text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
+                className="min-w-0 flex-1 truncate text-sm text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
                 title={url}
               >
                 {url}
@@ -264,7 +242,7 @@ export function EndpointStatus({ showHealthChecks = false, ...agentProps }: Prop
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="min-w-0 flex-1 truncate text-sm text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
+                className="min-w-0 flex-1 truncate text-sm text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
                 title={url}
               >
                 {truncateUrl(url)}
@@ -273,7 +251,7 @@ export function EndpointStatus({ showHealthChecks = false, ...agentProps }: Prop
 
             {/* Version tag */}
             {version && (
-              <span className="shrink-0 text-xs tabular-nums text-zinc-400 dark:text-zinc-500">
+              <span className="shrink-0 text-xs tabular-nums text-erc8004-muted-fg">
                 v{version}
               </span>
             )}

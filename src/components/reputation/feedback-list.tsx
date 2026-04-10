@@ -6,6 +6,7 @@ import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { truncateAddress, formatRelativeTime } from "@/lib/utils"
+import { cn } from "@/lib/cn"
 import * as v from "valibot"
 
 const PAGE_SIZE = 10
@@ -136,18 +137,18 @@ function useFeedbackList(
 }
 
 function scoreColor(value: number) {
-  if (value >= 81) return "text-emerald-500"
-  if (value >= 61) return "text-emerald-400"
-  if (value >= 41) return "text-amber-400"
-  if (value >= 21) return "text-orange-400"
-  return "text-red-400"
+  if (value >= 81) return "text-erc8004-positive"
+  if (value >= 61) return "text-erc8004-positive/80"
+  if (value >= 41) return "text-erc8004-chart-5"
+  if (value >= 21) return "text-erc8004-chart-3"
+  return "text-erc8004-negative"
 }
 
 function FeedbackCard({ item }: { item: FeedbackItem }) {
   const tags = [item.tag1, item.tag2].filter(Boolean) as string[]
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className="rounded-erc8004-lg border border-erc8004-border bg-erc8004-card p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0">
           <span className={`font-mono text-lg font-semibold tabular-nums ${scoreColor(item.value)}`}>
@@ -158,7 +159,7 @@ function FeedbackCard({ item }: { item: FeedbackItem }) {
               {tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                  className="rounded-full bg-erc8004-muted px-2 py-0.5 text-xs text-erc8004-muted-fg"
                 >
                   {tag}
                 </span>
@@ -167,30 +168,30 @@ function FeedbackCard({ item }: { item: FeedbackItem }) {
           )}
         </div>
         <div className="shrink-0 text-right">
-          <div className="font-mono text-xs text-zinc-500 dark:text-zinc-400">
+          <div className="font-mono text-xs text-erc8004-muted-fg" title={item.clientAddress}>
             {truncateAddress(item.clientAddress)}
           </div>
-          <div className="text-xs text-zinc-400 dark:text-zinc-500">
+          <div className="text-xs text-erc8004-muted-fg">
             {formatRelativeTime(item.createdAt)}
           </div>
         </div>
       </div>
 
       {item.feedbackFile?.text && (
-        <p className="mt-3 text-sm text-zinc-700 dark:text-zinc-300 line-clamp-3">
+        <p className="mt-3 text-sm text-erc8004-card-fg line-clamp-3">
           {item.feedbackFile.text}
         </p>
       )}
 
       {item.responses.length > 0 && (
-        <div className="mt-3 space-y-2 border-l-2 border-zinc-200 pl-3 dark:border-zinc-700">
+        <div className="mt-3 space-y-2 border-l-2 border-erc8004-border pl-3">
           {item.responses.map((response) => (
-            <div key={response.id} className="text-xs text-zinc-500 dark:text-zinc-400">
+            <div key={response.id} className="text-xs text-erc8004-muted-fg">
               <span className="font-mono">{truncateAddress(response.responder)}</span>
               {" · "}
               <span>{formatRelativeTime(response.createdAt)}</span>
               {response.responseUri && (
-                <span className="ml-1 text-zinc-400 dark:text-zinc-500 truncate">
+                <span className="ml-1 text-erc8004-muted-fg/70 truncate">
                   {response.responseUri}
                 </span>
               )}
@@ -202,28 +203,36 @@ function FeedbackCard({ item }: { item: FeedbackItem }) {
   )
 }
 
-export function FeedbackList(props: AgentIdentityProps) {
+interface FeedbackListProps extends AgentIdentityProps {
+  className?: string
+}
+
+export function FeedbackList({ className, ...props }: FeedbackListProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const [page, setPage] = useState(0)
   const { data, isLoading, error } = useFeedbackList(agentRegistry, agentId, page)
 
   if (isLoading) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
-          <div className="h-4 w-16 animate-pulse rounded bg-zinc-100 dark:bg-zinc-800" />
+      <div
+        className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card", className)}
+        aria-busy="true"
+        aria-live="polite"
+      >
+        <div className="border-b border-erc8004-border px-5 py-4">
+          <div className="h-4 w-16 animate-pulse rounded-erc8004-sm bg-erc8004-muted" />
         </div>
         <div className="space-y-3 p-5">
           {Array.from({ length: PAGE_SIZE }).map((_, i) => (
             <div
               key={i}
-              className="h-20 animate-pulse rounded-lg border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900"
+              className="h-20 animate-pulse rounded-erc8004-lg border border-erc8004-border bg-erc8004-muted"
             />
           ))}
           <div className="flex items-center justify-between pt-1">
-            <div className="h-7 w-20 animate-pulse rounded-md bg-zinc-100 dark:bg-zinc-800" />
-            <div className="h-4 w-12 animate-pulse rounded bg-zinc-100 dark:bg-zinc-800" />
-            <div className="h-7 w-14 animate-pulse rounded-md bg-zinc-100 dark:bg-zinc-800" />
+            <div className="h-7 w-20 animate-pulse rounded-erc8004-md bg-erc8004-muted" />
+            <div className="h-4 w-12 animate-pulse rounded-erc8004-sm bg-erc8004-muted" />
+            <div className="h-7 w-14 animate-pulse rounded-erc8004-md bg-erc8004-muted" />
           </div>
         </div>
       </div>
@@ -232,11 +241,11 @@ export function FeedbackList(props: AgentIdentityProps) {
 
   if (error) {
     return (
-      <div className="w-full rounded-xl border border-red-200 bg-red-50 p-5 dark:border-red-900/50 dark:bg-red-950/30">
-        <p className="text-sm text-red-600 dark:text-red-400">
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
+        <p className="text-sm text-erc8004-negative">
           Failed to load feedback.
         </p>
-        <p className="mt-1 text-xs text-red-500/70 dark:text-red-500/50">
+        <p className="mt-1 text-xs text-erc8004-negative/70">
           {error instanceof Error ? error.message : "Unknown error"}
         </p>
       </div>
@@ -245,8 +254,8 @@ export function FeedbackList(props: AgentIdentityProps) {
 
   if (!data?.feedbacks.length && page === 0) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">No feedback yet.</p>
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
+        <p className="text-sm text-erc8004-muted-fg">No feedback yet.</p>
       </div>
     )
   }
@@ -256,31 +265,37 @@ export function FeedbackList(props: AgentIdentityProps) {
   const hasPrev = page > 0
 
   return (
-    <div className="w-full rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
-        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Feedback</h3>
+    <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card", className)}>
+      <div className="border-b border-erc8004-border px-5 py-4">
+        <h3 className="text-sm font-semibold text-erc8004-card-fg">Feedback</h3>
       </div>
       <div className="space-y-3 p-5">
-        {feedbacks.map((item) => (
-          <FeedbackCard key={item.id} item={item} />
-        ))}
+        <ul role="list" className="space-y-3">
+          {feedbacks.map((item) => (
+            <li key={item.id}>
+              <FeedbackCard item={item} />
+            </li>
+          ))}
+        </ul>
 
         {(hasPrev || hasNext) && (
           <div className="flex items-center justify-between pt-1">
             <button
               onClick={() => setPage((p) => p - 1)}
               disabled={!hasPrev}
-              className="rounded-md px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-900 disabled:opacity-30 disabled:cursor-not-allowed dark:text-zinc-400 dark:hover:text-zinc-100"
+              aria-label="Previous page"
+              className="rounded-erc8004-md px-3 py-1.5 text-xs text-erc8004-muted-fg hover:text-erc8004-card-fg disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring focus-visible:ring-offset-2"
             >
               ← Previous
             </button>
-            <span className="text-xs text-zinc-400 dark:text-zinc-500">
+            <span className="text-xs text-erc8004-muted-fg">
               Page {page + 1}
             </span>
             <button
               onClick={() => setPage((p) => p + 1)}
               disabled={!hasNext}
-              className="rounded-md px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-900 disabled:opacity-30 disabled:cursor-not-allowed dark:text-zinc-400 dark:hover:text-zinc-100"
+              aria-label="Next page"
+              className="rounded-erc8004-md px-3 py-1.5 text-xs text-erc8004-muted-fg hover:text-erc8004-card-fg disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring focus-visible:ring-offset-2"
             >
               Next →
             </button>

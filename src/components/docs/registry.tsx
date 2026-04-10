@@ -35,6 +35,7 @@ export type ComponentDoc = {
   description: string
   preview: React.ReactNode
   importLine: string
+  previewCode?: string
   usage: string
   props: PropDef[]
 }
@@ -61,6 +62,13 @@ const AGENT_IDENTITY_PROPS: PropDef[] = [
     required: false,
     description:
       "ERC-721 token ID of the agent. Required unless inside an <AgentProvider>.",
+  },
+  {
+    name: "className",
+    type: "string",
+    required: false,
+    description:
+      "Optional CSS classes merged onto the component root for layout, spacing, or custom styling (e.g. Tailwind).",
   },
 ]
 
@@ -127,6 +135,13 @@ function App() {
           "Optional map of chainId → custom Subgraph URL. Overrides the default endpoint for that chain.",
       },
       {
+        name: "className",
+        type: "string",
+        required: false,
+        description:
+          "Optional CSS classes merged onto the `.erc8004` wrapper. Use for scoping dark mode (`dark`) or custom layout.",
+      },
+      {
         name: "children",
         type: "ReactNode",
         required: true,
@@ -185,6 +200,13 @@ function App() {
     description:
       "Fetches and renders the agent's registered name from the identity registry. Falls back to a truncated agent ID if no name is registered.",
     preview: withAgent(<AgentName />),
+    previewCode: `
+export function AgentName() {
+  return (
+    <AgentName agentRegistry="eip155:1:0x742..." agentId={374} />
+  )
+}
+`,
     importLine: `import { AgentName } from "@erc8004/ui"`,
     usage: `import { AgentName } from "@erc8004/ui"
 
@@ -479,6 +501,5 @@ function App() {
 // Lookup map
 // ---------------------------------------------------------------------------
 
-export const COMPONENT_REGISTRY: Record<string, ComponentDoc> = Object.fromEntries(
-  DOCS.map((doc) => [doc.slug, doc])
-)
+export const COMPONENT_REGISTRY: Record<string, ComponentDoc> =
+  Object.fromEntries(DOCS.map((doc) => [doc.slug, doc]))

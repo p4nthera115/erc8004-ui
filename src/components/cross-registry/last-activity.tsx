@@ -6,6 +6,7 @@ import {
   useAgentIdentity,
   type AgentIdentityProps,
 } from "@/lib/useAgentIdentity"
+import { cn } from "@/lib/cn"
 import type { AgentStats } from "@/types"
 import * as v from "valibot"
 import { formatRelativeTime } from "@/lib/utils"
@@ -65,17 +66,31 @@ function useLastActivity(agentRegistry: string, agentId: number) {
   })
 }
 
-export function LastActivity(props: AgentIdentityProps) {
+interface LastActivityProps extends AgentIdentityProps {
+  className?: string
+}
+
+export function LastActivity({ className, ...props }: LastActivityProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useLastActivity(agentRegistry, agentId)
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return (
+      <div
+        className={cn("h-3 w-24 animate-pulse rounded-erc8004-sm bg-erc8004-muted", className)}
+        aria-busy="true"
+        aria-live="polite"
+      />
+    )
   }
 
   if (error) {
-    return <div className="text-red-500">{error.message}</div>
+    return null
   }
 
-  return <div>{formatRelativeTime(data?.agentStats?.lastActivity ?? 0)}</div>
+  return (
+    <span className={cn("text-sm text-erc8004-muted-fg", className)}>
+      {formatRelativeTime(data?.agentStats?.lastActivity ?? 0)}
+    </span>
+  )
 }

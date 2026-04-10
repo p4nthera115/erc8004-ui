@@ -5,6 +5,7 @@ import type { Feedback } from "@/types"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
+import { cn } from "@/lib/cn"
 import * as v from "valibot"
 
 type TimelineResponse = {
@@ -189,28 +190,26 @@ function formatFullDate(timestamp: number): string {
 }
 
 /**
- * Returns a hex color for a dot based on its score value.
- * These match the bucket colors used in ReputationDistribution
- * so both components feel visually connected:
- *   - 81–100: emerald (green — excellent)
- *   - 61–80:  lighter emerald (good)
- *   - 41–60:  amber (average)
- *   - 21–40:  orange (poor)
- *   - 0–20:   red (very poor)
+ * Returns a CSS variable reference for a dot based on its score value.
+ * Used as an inline style fill so the dots follow the theme tokens.
  */
-function dotColor(score: number): string {
-  if (score >= 81) return "#10b981"
-  if (score >= 61) return "#34d399"
-  if (score >= 41) return "#fbbf24"
-  if (score >= 21) return "#fb923c"
-  return "#f87171"
+function dotFillVar(score: number): string {
+  if (score >= 81) return "var(--color-erc8004-positive)"
+  if (score >= 61) return "oklch(from var(--color-erc8004-positive) calc(l + 0.05) c h)"
+  if (score >= 41) return "var(--color-erc8004-chart-5)"
+  if (score >= 21) return "var(--color-erc8004-chart-3)"
+  return "var(--color-erc8004-negative)"
 }
 
 // ============================================================================
 // COMPONENT
 // ============================================================================
 
-export function ReputationTimeline(props: AgentIdentityProps) {
+interface ReputationTimelineProps extends AgentIdentityProps {
+  className?: string
+}
+
+export function ReputationTimeline({ className, ...props }: ReputationTimelineProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -318,9 +317,13 @@ export function ReputationTimeline(props: AgentIdentityProps) {
   // --- Loading state ---
   if (isLoading) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mb-4 h-4 w-32 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-        <div className="h-[200px] animate-pulse rounded bg-zinc-100 dark:bg-zinc-900" />
+      <div
+        className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5 animate-pulse", className)}
+        aria-busy="true"
+        aria-live="polite"
+      >
+        <div className="mb-4 h-4 w-32 rounded-erc8004-sm bg-erc8004-muted" />
+        <div className="h-[200px] rounded-erc8004-md bg-erc8004-muted/50" />
       </div>
     )
   }
@@ -328,11 +331,11 @@ export function ReputationTimeline(props: AgentIdentityProps) {
   // --- Error state ---
   if (error) {
     return (
-      <div className="w-full rounded-xl border border-red-200 bg-red-50 p-5 dark:border-red-900/50 dark:bg-red-950/30">
-        <p className="text-sm text-red-600 dark:text-red-400">
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
+        <p className="text-sm text-erc8004-negative">
           Failed to load reputation data.
         </p>
-        <p className="mt-1 text-xs text-red-500/70 dark:text-red-500/50">
+        <p className="mt-1 text-xs text-erc8004-negative/70">
           {error instanceof Error ? error.message : "Unknown error"}
         </p>
       </div>
@@ -342,11 +345,11 @@ export function ReputationTimeline(props: AgentIdentityProps) {
   // --- Empty state ---
   if (sorted.length === 0) {
     return (
-      <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-        <h3 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
+        <h3 className="mb-3 text-sm font-semibold text-erc8004-card-fg">
           Score Timeline
         </h3>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-erc8004-muted-fg">
           No feedback yet.
         </p>
       </div>
@@ -355,13 +358,13 @@ export function ReputationTimeline(props: AgentIdentityProps) {
 
   // --- Timeline chart ---
   return (
-    <div className="w-full rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
       {/* Header */}
       <div className="mb-4 flex items-baseline justify-between">
-        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        <h3 className="text-sm font-semibold text-erc8004-card-fg">
           Score Timeline
         </h3>
-        <span className="text-xs text-zinc-500 dark:text-zinc-400">
+        <span className="text-xs text-erc8004-muted-fg">
           {sorted.length} review{sorted.length === 1 ? "" : "s"}
         </span>
       </div>
@@ -385,7 +388,7 @@ export function ReputationTimeline(props: AgentIdentityProps) {
                 x2={plot.x + plot.width}
                 y2={y}
                 stroke="currentColor"
-                className="text-zinc-200 dark:text-zinc-800"
+                className="text-erc8004-border"
                 strokeDasharray="3 3"
                 strokeWidth={0.5}
               />
@@ -394,7 +397,7 @@ export function ReputationTimeline(props: AgentIdentityProps) {
                 x={plot.x - 6}
                 y={y + 3}
                 textAnchor="end"
-                className="fill-zinc-400 text-[10px] dark:fill-zinc-500"
+                className="fill-erc8004-muted-fg text-[10px]"
               >
                 {tick}
               </text>
@@ -409,7 +412,7 @@ export function ReputationTimeline(props: AgentIdentityProps) {
             x={label.x}
             y={LAYOUT.height - 4}
             textAnchor="middle"
-            className="fill-zinc-400 text-[10px] dark:fill-zinc-500"
+            className="fill-erc8004-muted-fg text-[10px]"
           >
             {formatShortDate(label.timestamp)}
           </text>
@@ -421,7 +424,7 @@ export function ReputationTimeline(props: AgentIdentityProps) {
             points={polylinePoints}
             fill="none"
             stroke="currentColor"
-            className="text-zinc-300 dark:text-zinc-700"
+            className="text-erc8004-border"
             strokeWidth={1.5}
             strokeLinejoin="round"
             strokeLinecap="round"
@@ -435,17 +438,16 @@ export function ReputationTimeline(props: AgentIdentityProps) {
             cx={pt.x}
             cy={pt.y}
             r={hoveredIndex === i ? 5 : 3.5}
-            fill={dotColor(pt.value)}
-            stroke="white"
-            strokeWidth={1.5}
             style={{
+              fill: dotFillVar(pt.value),
+              stroke: "var(--color-erc8004-card)",
               transition: "r 150ms ease-out",
               filter:
                 hoveredIndex === i
                   ? "drop-shadow(0 0 3px rgba(0,0,0,0.15))"
                   : "none",
             }}
-            className="dark:stroke-zinc-950"
+            strokeWidth={1.5}
           />
         ))}
 
@@ -477,7 +479,7 @@ export function ReputationTimeline(props: AgentIdentityProps) {
                   x2={pt.x}
                   y2={plot.y + plot.height}
                   stroke="currentColor"
-                  className="text-zinc-300 dark:text-zinc-600"
+                  className="text-erc8004-border"
                   strokeWidth={0.75}
                   strokeDasharray="2 2"
                 />
@@ -488,7 +490,7 @@ export function ReputationTimeline(props: AgentIdentityProps) {
                   width={136}
                   height={18}
                   rx={4}
-                  className="fill-zinc-800 dark:fill-zinc-200"
+                  className="fill-erc8004-fg"
                   opacity={0.9}
                 />
                 {/* Tooltip text */}
@@ -496,7 +498,7 @@ export function ReputationTimeline(props: AgentIdentityProps) {
                   x={tooltipX}
                   y={tooltipY + 2}
                   textAnchor="middle"
-                  className="fill-white text-[10px] font-medium dark:fill-zinc-900"
+                  className="fill-erc8004-bg text-[10px] font-medium"
                 >
                   {label}
                 </text>

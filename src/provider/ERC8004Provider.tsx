@@ -1,9 +1,10 @@
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useState, useMemo, type ReactNode } from "react"
 import {
   QueryClient,
   QueryClientProvider,
   useQueryClient,
 } from "@tanstack/react-query"
+import { cn } from "../lib/cn"
 
 // ─── Config Context ──────────────────────────────────────────────
 // This is the "config bag" that every hook in the library reads from.
@@ -130,6 +131,10 @@ interface ERC8004ProviderProps {
    *  Value is the full Subgraph URL including your API key. */
   subgraphOverrides?: Record<number, string>
 
+  /** Optional: additional CSS classes for the .erc8004 wrapper div.
+   *  Useful for scoping dark mode (className="dark") or adding custom classes. */
+  className?: string
+
   children: ReactNode
 }
 
@@ -139,31 +144,34 @@ interface ERC8004ProviderProps {
  * This is the only setup the developer needs. It handles:
  *   1. Storing the Graph API key so every hook can access it
  *   2. Auto-detecting TanStack Query (creates a QueryClient if needed)
+ *   3. Wrapping children in the .erc8004 CSS scope for design tokens
+ *   4. Forwarding an optional className to the wrapper (e.g. "dark")
  *
- * Usage (minimal — no TanStack Query knowledge needed):
+ * Usage:
  * ```tsx
  * <ERC8004Provider apiKey="your-graph-api-key">
  *   <ReputationScore agentRegistry="eip155:1:0x742..." agentId={374} />
  * </ERC8004Provider>
  * ```
- *
- * Usage (with existing TanStack Query setup — works seamlessly):
- * ```tsx
- * <QueryClientProvider client={yourQueryClient}>
- *   <ERC8004Provider apiKey="your-graph-api-key">
- *     <ReputationScore agentRegistry="eip155:1:0x742..." agentId={374} />
- *   </ERC8004Provider>
- * </QueryClientProvider>
- * ```
  */
 export function ERC8004Provider({
   apiKey,
   subgraphOverrides,
+  className,
   children,
 }: ERC8004ProviderProps) {
+  const config = useMemo(
+    () => ({ apiKey, subgraphOverrides }),
+    [apiKey, subgraphOverrides]
+  )
+
   return (
-    <ERC8004Context.Provider value={{ apiKey, subgraphOverrides }}>
-      <QueryClientGate>{children}</QueryClientGate>
+    <ERC8004Context.Provider value={config}>
+      <QueryClientGate>
+        <div className={cn("erc8004", className)}>
+          {children}
+        </div>
+      </QueryClientGate>
     </ERC8004Context.Provider>
   )
 }

@@ -5,6 +5,7 @@ import {
   useAgentIdentity,
   type AgentIdentityProps,
 } from "@/lib/useAgentIdentity"
+import { cn } from "@/lib/cn"
 import type { AgentRegistrationFile } from "@/types"
 import { useQuery } from "@tanstack/react-query"
 import * as v from "valibot"
@@ -65,17 +66,35 @@ function useAgentName(agentRegistry: string, agentId: number) {
   })
 }
 
-export function AgentName(props: AgentIdentityProps) {
+interface AgentNameProps extends AgentIdentityProps {
+  className?: string
+}
+
+export function AgentName({ className, ...props }: AgentNameProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useAgentName(agentRegistry, agentId)
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return (
+      <div
+        className={cn("h-4 w-32 animate-pulse rounded-erc8004-sm bg-erc8004-muted", className)}
+        aria-busy="true"
+        aria-live="polite"
+      />
+    )
   }
 
   if (error) {
-    return <div className="text-red-500">{error.message}</div>
+    return (
+      <span className={cn("text-erc8004-negative text-sm", className)}>
+        Agent #{agentId}
+      </span>
+    )
   }
 
-  return <div>{data?.agent?.registrationFile?.name ?? agentId}</div>
+  return (
+    <span className={cn("text-erc8004-card-fg", className)}>
+      {data?.agent?.registrationFile?.name ?? `Agent #${agentId}`}
+    </span>
+  )
 }

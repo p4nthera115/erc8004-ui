@@ -1,9 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
-import {
-  CodeBlock,
-  InlineCode,
-  SectionHeading,
-} from "@/components/docs/DocPageLayout"
+import { SectionHeading } from "@/components/docs/DocPageLayout"
+import { CodeBlock, InlineCode } from "@/components/docs/CodeBlock"
 
 export const Route = createFileRoute("/docs/installation")({
   component: Installation,
@@ -14,10 +11,10 @@ function Installation() {
     <div className="flex flex-col gap-14">
       {/* Header */}
       <div className="flex flex-col gap-3">
-        <h1 className="font-mono text-3xl font-bold text-white">
+        <h1 className="font-mono text-3xl font-bold text-neutral-900 dark:text-white">
           Installation
         </h1>
-        <p className="text-base text-white/60 leading-relaxed max-w-prose">
+        <p className="text-base text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
           Install the package, add peer dependencies, and configure your Graph
           API key — then drop any component into your app with a single import.
         </p>
@@ -27,18 +24,20 @@ function Installation() {
       <section className="flex flex-col gap-4">
         <SectionHeading>Install</SectionHeading>
         <CodeBlock code={`npm install @erc8004/ui`} />
-        <p className="text-sm text-white/40 font-mono">or</p>
+        <p className="text-sm text-neutral-400 dark:text-white/40 font-mono">
+          or
+        </p>
         <CodeBlock code={`pnpm add @erc8004/ui\nyarn add @erc8004/ui`} />
       </section>
 
       {/* Peer deps */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Peer Dependencies</SectionHeading>
-        <p className="text-sm text-white leading-relaxed max-w-prose">
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
           The library requires React and TanStack Query as peer dependencies:
         </p>
         <CodeBlock code={`npm install react react-dom @tanstack/react-query`} />
-        <p className="text-sm text-white leading-relaxed max-w-prose">
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
           If you already have React in your project, you only need to add{" "}
           <InlineCode>@tanstack/react-query</InlineCode>. TanStack Query handles
           caching and deduplication so multiple components on the same page
@@ -49,13 +48,13 @@ function Installation() {
       {/* API key */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Get a Graph API Key</SectionHeading>
-        <p className="text-sm text-white leading-relaxed max-w-prose">
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
           Components fetch agent data from{" "}
           <a
             href="https://thegraph.com/studio/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white/80 underline underline-offset-2 hover:text-white transition-colors"
+            className="text-neutral-600 dark:text-white/80 underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white transition-colors"
           >
             The Graph
           </a>
@@ -64,15 +63,18 @@ function Installation() {
             href="https://thegraph.com/studio/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white/80 underline underline-offset-2 hover:text-white transition-colors"
+            className="text-neutral-600 dark:text-white/80 underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white transition-colors"
           >
             thegraph.com/studio
           </a>{" "}
           to get a free API key. There is a generous free tier — no credit card
           required for development.
         </p>
-        <p className="text-sm text-white leading-relaxed max-w-prose">
-          This is a <span className="text-white/80">read-only query key</span>{" "}
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          This is a{" "}
+          <span className="text-neutral-600 dark:text-white/80">
+            read-only query key
+          </span>{" "}
           for usage tracking — it's safe to use in frontend code. It does not
           grant write access to anything.
         </p>
@@ -95,7 +97,7 @@ function App() {
   )
 }`}
         />
-        <p className="text-sm text-white leading-relaxed max-w-prose">
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
           The component handles all data fetching internally.{" "}
           <InlineCode>ERC8004Provider</InlineCode> auto-creates a TanStack Query
           client if you haven't set one up.
@@ -105,7 +107,7 @@ function App() {
       {/* Existing TanStack Query */}
       <section className="flex flex-col gap-4">
         <SectionHeading>If You Already Use TanStack Query</SectionHeading>
-        <p className="text-sm text-white leading-relaxed max-w-prose">
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
           Wrap with your own <InlineCode>QueryClientProvider</InlineCode>.{" "}
           <InlineCode>ERC8004Provider</InlineCode> detects an existing
           QueryClient and shares it — no duplicate clients, no wasted cache.
@@ -134,7 +136,7 @@ function App() {
       {/* AgentProvider */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Using AgentProvider for Profile Pages</SectionHeading>
-        <p className="text-sm text-white leading-relaxed max-w-prose">
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
           When rendering multiple components for the same agent, use{" "}
           <InlineCode>AgentProvider</InlineCode> to avoid repeating{" "}
           <InlineCode>agentRegistry</InlineCode> and{" "}
@@ -159,11 +161,11 @@ function App() {
           <li>
             <Link
               to="/docs/concepts"
-              className="text-sm text-white hover:text-white transition-colors underline underline-offset-2"
+              className="text-sm text-neutral-900 dark:text-white hover:text-neutral-700 dark:hover:text-white transition-colors underline underline-offset-2"
             >
               Concepts
             </Link>
-            <span className="text-sm text-white/40">
+            <span className="text-sm text-neutral-400 dark:text-white/40">
               {" "}
               — understand what agentRegistry and agentId mean
             </span>
@@ -171,11 +173,11 @@ function App() {
           <li>
             <Link
               to="/docs/components"
-              className="text-sm text-white hover:text-white transition-colors underline underline-offset-2"
+              className="text-sm text-neutral-900 dark:text-white hover:text-neutral-700 dark:hover:text-white transition-colors underline underline-offset-2"
             >
               Components
             </Link>
-            <span className="text-sm text-white/40">
+            <span className="text-sm text-neutral-400 dark:text-white/40">
               {" "}
               — browse all available components with live previews
             </span>
@@ -183,11 +185,11 @@ function App() {
           <li>
             <Link
               to="/docs/recipes"
-              className="text-sm text-white hover:text-white transition-colors underline underline-offset-2"
+              className="text-sm text-neutral-900 dark:text-white hover:text-neutral-700 dark:hover:text-white transition-colors underline underline-offset-2"
             >
               Recipes
             </Link>
-            <span className="text-sm text-white/40">
+            <span className="text-sm text-neutral-400 dark:text-white/40">
               {" "}
               — see full page-level examples ready to copy
             </span>

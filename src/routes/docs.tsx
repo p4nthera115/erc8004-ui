@@ -21,17 +21,18 @@ function DocsSidebar() {
         .docs-sidebar::-webkit-scrollbar { width: 4px; }
         .docs-sidebar::-webkit-scrollbar-track { background: transparent; }
         .docs-sidebar::-webkit-scrollbar-thumb { background: transparent; border-radius: 0px; transition: background 0.3s; }
-        .docs-sidebar[data-scrolling="true"]::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 0px; }
+        html.dark .docs-sidebar[data-scrolling="true"]::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 0px; }
+        html:not(.dark) .docs-sidebar[data-scrolling="true"]::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 0px; }
       `}</style>
 
       <aside
         ref={ref}
         onScroll={handleScroll}
         data-scrolling={scrolling}
-        className="docs-sidebar min-h-full w-60 shrink-0 sticky top-[81px] h-[calc(100svh-81px)] overflow-y-auto py-8 pr-4 border-r border-white/25 font-mono"
+        className="docs-sidebar min-h-full w-60 shrink-0 sticky top-[81px] h-[calc(100svh-81px)] overflow-y-auto py-8 pr-4 border-r border-black/60 dark:border-white/25 font-mono"
         style={{
           scrollbarColor: scrolling
-            ? "rgba(255,255,255,0.25) transparent"
+            ? "rgba(128,128,128,0.25) transparent"
             : "transparent transparent",
         }}
       >
@@ -49,7 +50,7 @@ function DocsSidebar() {
                     key={item.slug}
                     to={item.to}
                     params={{ slug: item.slug }}
-                    className="text-sm text-white py-0.5 hover:bg-white/20 px-2"
+                    className="text-sm text-neutral-950 dark:text-white py-0.5 hover:bg-black/10 dark:hover:bg-white/20 px-2"
                     activeProps={{ className: "text-sm text-text py-0.5" }}
                   >
                     {item.label}
@@ -58,7 +59,7 @@ function DocsSidebar() {
                   <Link
                     key={item.label}
                     to={item.to}
-                    className="text-sm text-white py-0.5 hover:bg-white/20 px-2"
+                    className="text-sm text-neutral-950 dark:text-white py-0.5 hover:bg-black/5 dark:hover:bg-white/20 px-2"
                     activeProps={{ className: "text-sm text-text py-0.5" }}
                   >
                     {item.label}

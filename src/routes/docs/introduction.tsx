@@ -32,7 +32,7 @@ function Introduction() {
           in any training data.
         </p>
 
-        <div className="border border-black/60 dark:border-white/25 bg-neutral-50 dark:bg-black/10 p-5">
+        <div className="">
           <ul className="flex flex-col gap-3 list-disc list-inside marker:text-neutral-300 dark:marker:text-white/20">
             {[
               {
@@ -81,11 +81,14 @@ function Introduction() {
                   "Every component needs loading, error, empty, and not-found states handled — not just the happy path.",
               },
             ].map((item) => (
-              <li key={item.label} className="flex flex-col gap-0.5">
-                <span className="text-sm text-neutral-900 dark:text-white">
+              <li
+                key={item.label}
+                className="flex flex-col gap-0.5 border border-black/20 dark:border-white/15 bg-neutral-100 dark:bg-neutral-900 p-5"
+              >
+                <span className="text-sm text-black dark:text-white">
                   {item.label}
                 </span>
-                <span className="text-sm text-neutral-500 dark:text-white/50 leading-relaxed">
+                <span className="text-sm text-neutral-600 dark:text-white/50 leading-relaxed">
                   {item.detail}
                 </span>
               </li>

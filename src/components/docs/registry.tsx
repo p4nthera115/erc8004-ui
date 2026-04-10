@@ -35,6 +35,7 @@ export type ComponentDoc = {
   description: string
   preview: React.ReactNode
   importLine: string
+  previewCode?: string
   usage: string
   props: PropDef[]
 }
@@ -199,6 +200,13 @@ function App() {
     description:
       "Fetches and renders the agent's registered name from the identity registry. Falls back to a truncated agent ID if no name is registered.",
     preview: withAgent(<AgentName />),
+    previewCode: `
+export function AgentName() {
+  return (
+    <AgentName agentRegistry="eip155:1:0x742..." agentId={374} />
+  )
+}
+`,
     importLine: `import { AgentName } from "@erc8004/ui"`,
     usage: `import { AgentName } from "@erc8004/ui"
 

@@ -63,6 +63,9 @@ export function DocPageLayout({ doc }: { doc: ComponentDoc }) {
           <div className="rounded border border-black/60 dark:border-white/10 bg-neutral-50 dark:bg-white/2 p-8 flex items-center justify-center min-h-32">
             {doc.preview}
           </div>
+          {doc.previewCode && (
+            <CodeBlock code={doc.importLine + "\n" + doc.previewCode} />
+          )}
         </section>
       )}
 

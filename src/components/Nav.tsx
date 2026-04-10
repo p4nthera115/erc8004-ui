@@ -44,7 +44,7 @@ export function Nav({ isDark, onToggle }: NavProps) {
           <button
             onClick={onToggle}
             aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-            className="hover:scale-110 transition hover:cursor-pointer p-1"
+            className="hover:scale-110 transition hover:cursor-pointer p-1 mr-1"
           >
             {isDark ? <BsSun size={22} /> : <BsMoon size={22} />}
           </button>

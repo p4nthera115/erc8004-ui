@@ -50,7 +50,7 @@ function DocsSidebar() {
                     key={item.slug}
                     to={item.to}
                     params={{ slug: item.slug }}
-                    className="text-sm text-neutral-950 dark:text-white py-0.5 hover:bg-black/5 dark:hover:bg-white/20 px-2"
+                    className="text-sm text-neutral-950 dark:text-white py-0.5 hover:bg-black/10 dark:hover:bg-white/20 px-2"
                     activeProps={{ className: "text-sm text-text py-0.5" }}
                   >
                     {item.label}

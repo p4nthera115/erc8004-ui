@@ -10,10 +10,10 @@ function Introduction() {
     <div className="flex flex-col gap-14">
       {/* Header */}
       <div className="flex flex-col gap-3">
-        <h1 className="font-mono text-3xl font-bold text-white">
+        <h1 className="font-mono text-3xl font-bold text-neutral-900 dark:text-white">
           Introduction
         </h1>
-        <p className="text-base text-white/60 leading-relaxed max-w-prose">
+        <p className="text-base text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
           Drop-in React components for displaying verified AI agent data from
           the ERC-8004 standard — built for developers who don't want to become
           Subgraph experts.
@@ -23,7 +23,7 @@ function Introduction() {
       {/* Why use a library */}
       <section className="flex flex-col gap-6">
         <SectionHeading>Why use this library?</SectionHeading>
-        <p className="text-sm text-white leading-relaxed max-w-prose">
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
           Displaying ERC-8004 agent data looks straightforward — fetch some
           fields, render them. In practice, the Subgraph has enough quirks that
           AI-generated components will silently get things wrong. Not because
@@ -31,8 +31,8 @@ function Introduction() {
           in any training data.
         </p>
 
-        <div className="border border-white/25 bg-black/10 p-5">
-          <ul className="flex flex-col gap-3 list-disc list-inside marker:text-white/20">
+        <div className="border border-black/60 dark:border-white/25 bg-neutral-50 dark:bg-black/10 p-5">
+          <ul className="flex flex-col gap-3 list-disc list-inside marker:text-neutral-300 dark:marker:text-white/20">
             {[
               {
                 label: "Feedback value has no universal scale",
@@ -81,8 +81,10 @@ function Introduction() {
               },
             ].map((item) => (
               <li key={item.label} className="flex flex-col gap-0.5">
-                <span className="text-sm text-white">{item.label}</span>
-                <span className="text-sm text-white/50 leading-relaxed">
+                <span className="text-sm text-neutral-900 dark:text-white">
+                  {item.label}
+                </span>
+                <span className="text-sm text-neutral-500 dark:text-white/50 leading-relaxed">
                   {item.detail}
                 </span>
               </li>
@@ -90,7 +92,7 @@ function Introduction() {
           </ul>
         </div>
 
-        <p className="text-sm text-white leading-relaxed max-w-prose">
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
           Every component in this library handles all of this internally. You
           pass two identifiers and get a working UI backed by verified on-chain
           data. Queries are minimal per-component —{" "}

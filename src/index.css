@@ -1,15 +1,17 @@
 @import "tailwindcss";
 @import "./styles/tokens.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  --color-surface: #181818;
-  --color-surface-raised: #12121a;
-  --color-surface-overlay: #1a1a25;
-  --color-border-subtle: #1e1e2e;
-  --color-border-default: #fff;
-  --color-text-primary: #f0f0f5;
-  --color-text-secondary: #8888a0;
-  --color-text-muted: #555555;
+  --color-surface: #f8f8f8;
+  --color-surface-raised: #f0f0f8;
+  --color-surface-overlay: #eaeaea;
+  --color-border-subtle: #e0e0f0;
+  --color-border-default: #1a1a1a;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #666666;
+  --color-text-muted: #999999;
   --color-accent: #a855f7;
   --color-accent-dim: #7c3aed;
   --color-accent-glow: rgba(168, 85, 247, 0.15);
@@ -18,6 +20,17 @@
   --color-red: #ef4444;
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+html.dark {
+  --color-surface: #181818;
+  --color-surface-raised: #121212;
+  --color-surface-overlay: #1a1a1a;
+  --color-border-subtle: #1e1e1e;
+  --color-border-default: #fff;
+  --color-text-primary: #f0f0f0;
+  --color-text-secondary: #888888;
+  --color-text-muted: #555555;
 }
 
 html {
@@ -46,6 +59,18 @@ body {
 }
 
 .diagonal-lines {
+  background-color: #f8f8f8;
+  opacity: 1;
+  background-size: 10px 10px;
+  background-image: repeating-linear-gradient(
+    45deg,
+    #666666 0,
+    #666666 0.7000000000000001px,
+    #f8f8f8 0,
+    #f8f8f8 50%
+  );
+}
+.dark .diagonal-lines {
   background-color: #181818;
   opacity: 1;
   background-size: 10px 10px;

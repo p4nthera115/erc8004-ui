@@ -1,9 +1,15 @@
 import { Link } from "@tanstack/react-router"
 import { FaGithub } from "react-icons/fa"
+import { BsSun, BsMoon } from "react-icons/bs"
 
-export function Nav() {
+interface NavProps {
+  isDark: boolean
+  onToggle: () => void
+}
+
+export function Nav({ isDark, onToggle }: NavProps) {
   return (
-    <header className="sticky top-0 z-50 p-4 px-8 border-b border-white/25 bg-surface">
+    <header className="sticky top-0 z-50 p-4 px-8 border-b border-black/60 dark:border-white/25 bg-surface">
       <div className="flex items-center justify-between font-mono">
         <div className="flex items-center gap-6">
           <NavLogo />
@@ -35,12 +41,19 @@ export function Nav() {
           >
             Agent0 SDK
           </a>
+          <button
+            onClick={onToggle}
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            className="hover:scale-110 transition hover:cursor-pointer p-1"
+          >
+            {isDark ? <BsSun size={22} /> : <BsMoon size={22} />}
+          </button>
           <a
             href="https://github.com/p4nthera115/erc8004-ui"
             target="_blank"
             className="hover:scale-110 transition hover:cursor-pointer"
           >
-            <FaGithub color="white" size={30} />
+            <FaGithub size={30} />
           </a>
         </div>
       </div>
@@ -52,18 +65,18 @@ function NavLogo() {
   return (
     <Link to="/">
       <div className="group grid gap-0.5 grid-cols-4 grid-rows-4 w-12 h-12 hover:cursor-pointer">
-        <div className="bg-white rounded-xs col-span-2 row-span-1 group-hover:translate-x-[12.5px] transition group-hover:delay-150 active:scale-85 hover:delay-0" />
-        <div className="bg-white rounded-xs col-span-1 row-span-1 group-hover:translate-x-[12.5px] transition group-hover:delay-100 active:scale-85 hover:delay-0" />
-        <div className="bg-white rounded-xs col-span-1 row-span-1 group-hover:translate-y-[12.5px] transition active:scale-85" />
+        <div className="bg-current rounded-xs col-span-2 row-span-1 group-hover:translate-x-[12.5px] transition group-hover:delay-150 active:scale-85 hover:delay-0" />
+        <div className="bg-current rounded-xs col-span-1 row-span-1 group-hover:translate-x-[12.5px] transition group-hover:delay-100 active:scale-85 hover:delay-0" />
+        <div className="bg-current rounded-xs col-span-1 row-span-1 group-hover:translate-y-[12.5px] transition active:scale-85" />
 
-        <div className="bg-white rounded-xs col-span-1 row-span-1 active:scale-85 transition" />
-        <div className="bg-white rounded-xs col-span-2 row-span-2 active:scale-90 transition" />
+        <div className="bg-current rounded-xs col-span-1 row-span-1 active:scale-85 transition" />
+        <div className="bg-current rounded-xs col-span-2 row-span-2 active:scale-90 transition" />
         <div className="rounded-xs col-span-1 row-span-1 active:scale-85 transition" />
-        <div className="bg-white rounded-xs col-span-1 row-span-2 active:scale-85 transition" />
-        <div className="bg-white rounded-xs col-span-1 row-span-1 active:scale-85 transition" />
+        <div className="bg-current rounded-xs col-span-1 row-span-2 active:scale-85 transition" />
+        <div className="bg-current rounded-xs col-span-1 row-span-1 active:scale-85 transition" />
 
         <div className="rounded-xs col-span-1 row-span-1 active:scale-85 transition" />
-        <div className="bg-white rounded-xs col-span-2 row-span-1 group-hover:translate-x-[-12.5px] transition active:scale-85" />
+        <div className="bg-current rounded-xs col-span-2 row-span-1 group-hover:translate-x-[-12.5px] transition active:scale-85" />
       </div>
     </Link>
   )

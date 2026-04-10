@@ -54,8 +54,8 @@ function ComponentsIndex() {
   return (
     <div className="flex flex-col gap-14">
       <div className="flex flex-col gap-3">
-        <h1 className="font-mono text-3xl font-bold text-white">Components</h1>
-        <p className="text-base text-white/60 leading-relaxed max-w-prose">
+        <h1 className="font-mono text-3xl font-bold text-neutral-900 dark:text-white">Components</h1>
+        <p className="text-base text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
           All components in the library, grouped by registry. Each component
           fetches its own data — pass two identifiers and it works.
         </p>
@@ -63,7 +63,7 @@ function ComponentsIndex() {
 
       {COMPONENT_GROUPS.map((group) => (
         <section key={group.title} className="flex flex-col gap-4">
-          <h2 className="text-[10px] font-mono uppercase tracking-widest text-white/40">
+          <h2 className="text-[10px] font-mono uppercase tracking-widest text-neutral-400 dark:text-white/40">
             {group.title}
           </h2>
           <div className="flex flex-col">
@@ -72,12 +72,12 @@ function ComponentsIndex() {
                 key={item.slug}
                 to="/docs/components/$slug"
                 params={{ slug: item.slug }}
-                className="flex items-baseline gap-6 border-t border-white/10 py-3 px-2 hover:bg-white/5 group"
+                className="flex items-baseline gap-6 border-t border-black/60 dark:border-white/10 py-3 px-2 hover:bg-neutral-50 dark:hover:bg-white/5 group"
               >
-                <span className="font-mono text-sm text-white w-52 shrink-0 group-hover:underline">
+                <span className="font-mono text-sm text-neutral-900 dark:text-white w-52 shrink-0 group-hover:underline">
                   {item.name}
                 </span>
-                <span className="text-sm text-white/50">
+                <span className="text-sm text-neutral-500 dark:text-white/50">
                   {item.description}
                 </span>
               </Link>

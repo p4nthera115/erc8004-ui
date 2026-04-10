@@ -14,13 +14,13 @@ export function DocsPagination() {
     currentIndex < FLAT_NAV.length - 1 ? FLAT_NAV[currentIndex + 1] : null
 
   return (
-    <div className="mt-16 pt-8 border-t border-white/10 flex items-center justify-between gap-4 font-mono">
+    <div className="mt-16 pt-8 border-t border-black/60 dark:border-white/10 flex items-center justify-between gap-4 font-mono">
       {prev ? (
         prev.slug ? (
           <Link
             to="/docs/components/$slug"
             params={{ slug: prev.slug }}
-            className="group px-4 min-w-0 max-w-[45%] text-white/70 hover:text-white"
+            className="group px-4 min-w-0 max-w-[45%] text-neutral-500 dark:text-white/70 hover:text-neutral-900 dark:hover:text-white"
           >
             <span className="text-xl inline-block mr-2">←</span>
             <span className="text-sm transition-colors truncate">
@@ -30,7 +30,7 @@ export function DocsPagination() {
         ) : (
           <Link
             to={prev.to as "/docs/introduction" | "/docs/installation" | "/docs/concepts" | "/docs/api-keys" | "/docs/components" | "/docs/recipes" | "/docs/theming"}
-            className="group px-4 min-w-0 max-w-[45%] text-white/70 hover:text-white"
+            className="group px-4 min-w-0 max-w-[45%] text-neutral-500 dark:text-white/70 hover:text-neutral-900 dark:hover:text-white"
           >
             <span className="text-xl inline-block mr-2">←</span>
             <span className="text-sm transition-colors truncate">
@@ -47,7 +47,7 @@ export function DocsPagination() {
           <Link
             to="/docs/components/$slug"
             params={{ slug: next.slug }}
-            className="group px-4 min-w-0 max-w-[45%] text-white/70 hover:text-white"
+            className="group px-4 min-w-0 max-w-[45%] text-neutral-500 dark:text-white/70 hover:text-neutral-900 dark:hover:text-white"
           >
             <span className="text-sm transition-colors truncate">
               {next.label}
@@ -57,7 +57,7 @@ export function DocsPagination() {
         ) : (
           <Link
             to={next.to as "/docs/introduction" | "/docs/installation" | "/docs/concepts" | "/docs/api-keys" | "/docs/components" | "/docs/recipes" | "/docs/theming"}
-            className="group px-4 min-w-0 max-w-[45%] text-white/70 hover:text-white"
+            className="group px-4 min-w-0 max-w-[45%] text-neutral-500 dark:text-white/70 hover:text-neutral-900 dark:hover:text-white"
           >
             <span className="text-sm transition-colors truncate">
               {next.label}

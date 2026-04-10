@@ -14,8 +14,10 @@ function Recipes() {
     <div className="flex flex-col gap-14">
       {/* Header */}
       <div className="flex flex-col gap-3">
-        <h1 className="font-mono text-3xl font-bold text-white">Recipes</h1>
-        <p className="text-base text-white/60 leading-relaxed max-w-prose">
+        <h1 className="font-mono text-3xl font-bold text-neutral-900 dark:text-white">
+          Recipes
+        </h1>
+        <p className="text-base text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
           Complete page-level compositions ready to copy. Each example is
           self-contained and uses the same demo agent used throughout the docs.
         </p>
@@ -24,7 +26,7 @@ function Recipes() {
       {/* Agent Profile Page */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Agent Profile Page</SectionHeading>
-        <p className="text-sm text-white leading-relaxed max-w-prose">
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
           A full profile layout covering identity, reputation, and validation.{" "}
           <InlineCode>AgentProvider</InlineCode> eliminates prop repetition —
           every child component inherits the same agent identity.
@@ -74,7 +76,7 @@ function AgentProfile({ registry, agentId }: { registry: string; agentId: number
       {/* Marketplace Listing Row */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Marketplace Listing Row</SectionHeading>
-        <p className="text-sm text-white leading-relaxed max-w-prose">
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
           Compact row for search results or directory listings. Renders fast —
           each component fetches only the fields it needs.
         </p>
@@ -107,7 +109,7 @@ function AgentRow({ registry, agentId }: { registry: string; agentId: number }) 
       {/* Agent Comparison */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Agent Comparison</SectionHeading>
-        <p className="text-sm text-white leading-relaxed max-w-prose">
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
           Side-by-side comparison of multiple agents. Each{" "}
           <InlineCode>AgentProvider</InlineCode> scopes its context
           independently — components inside one provider won't bleed into
@@ -145,7 +147,7 @@ function CompareAgents({ agents }: { agents: { registry: string; id: number }[] 
       {/* Minimal Embed */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Minimal Embed</SectionHeading>
-        <p className="text-sm text-white leading-relaxed max-w-prose">
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
           A small inline trust signal for chat interfaces, sidebars, or
           tooltips.
         </p>
@@ -167,9 +169,11 @@ function AgentTrustBadge({ registry, agentId }: { registry: string; agentId: num
       </section>
 
       {/* Cache note */}
-      <section className="border border-white/10 bg-white/2 px-5 py-4">
-        <p className="text-sm text-white/50 leading-relaxed">
-          <span className="text-white/70 font-mono">Cache efficiency</span>
+      <section className="border border-black/60 dark:border-white/10 bg-neutral-50 dark:bg-white/2 px-5 py-4">
+        <p className="text-sm text-neutral-500 dark:text-white/50 leading-relaxed">
+          <span className="text-neutral-600 dark:text-white/70 font-mono">
+            Cache efficiency
+          </span>
           {" — "}
           When multiple components target the same agent on the same page,
           TanStack Query deduplicates the Subgraph requests automatically. Only

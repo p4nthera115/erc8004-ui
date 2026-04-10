@@ -9,6 +9,7 @@
 import { useState } from "react"
 import { FingerprintBadge } from "@/components/identity/FingerprintBadge"
 import { cn } from "@/lib/cn"
+import { CodeBlock } from "./CodeBlock"
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Preset definitions
@@ -105,8 +106,8 @@ const PRESETS: Preset[] = [
 function getPresetCss(preset: Preset): string {
   if (Object.keys(preset.vars).length === 0) {
     return (
-      `/* Default — no overrides needed.\n` +
-      `   Import the stylesheet and you're done: */\n\n` +
+      `// Default — no overrides needed.\n` +
+      `// Import the stylesheet and you're done:\n\n` +
       `import "@erc8004/ui/styles.css"`
     )
   }
@@ -114,108 +115,6 @@ function getPresetCss(preset: Preset): string {
     .map(([k, v]) => `  ${k}: ${v};`)
     .join("\n")
   return `.erc8004 {\n${lines}\n}`
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CSS syntax highlighter (targeted at our preset output format)
-// ─────────────────────────────────────────────────────────────────────────────
-
-const C = {
-  comment: "#60666b",
-  selector: "#79B8FF",
-  brace: "#facc15",
-  prop: "#b392f0",
-  value: "#9ECBFF",
-  plain: "#e1e4e8",
-  keyword: "#F97583",
-  string: "#9ECBFF",
-}
-
-function CssCodeLine({ line }: { line: string }) {
-  // import statement
-  if (line.trimStart().startsWith("import")) {
-    const quoteStart = line.indexOf('"')
-    if (quoteStart !== -1) {
-      return (
-        <>
-          <span style={{ color: C.keyword }}>{line.slice(0, quoteStart)}</span>
-          <span style={{ color: C.string }}>{line.slice(quoteStart)}</span>
-        </>
-      )
-    }
-    return <span style={{ color: C.plain }}>{line}</span>
-  }
-
-  // comment line
-  if (
-    line.trim().startsWith("/*") ||
-    line.trim().startsWith("*") ||
-    line.trim().startsWith("//")
-  ) {
-    return <span style={{ color: C.comment }}>{line}</span>
-  }
-
-  // selector: .erc8004 {
-  const selectorMatch = line.match(/^(\s*)([^\s{]+\s*)\{(\s*)$/)
-  if (selectorMatch) {
-    return (
-      <>
-        <span style={{ color: C.plain }}>{selectorMatch[1]}</span>
-        <span style={{ color: C.selector }}>{selectorMatch[2]}</span>
-        <span style={{ color: C.brace }}>{"{"}</span>
-        <span style={{ color: C.plain }}>{selectorMatch[3]}</span>
-      </>
-    )
-  }
-
-  // closing brace }
-  if (line.trim() === "}") {
-    return (
-      <>
-        <span style={{ color: C.plain }}>
-          {line.slice(0, line.indexOf("}"))}
-        </span>
-        <span style={{ color: C.brace }}>{"}"}</span>
-      </>
-    )
-  }
-
-  // CSS property: --erc8004-xxx: value;
-  const propMatch = line.match(
-    /^(\s*)(--erc8004-[a-z0-9-]+)(\s*:\s*)([^;]+)(;?)$/
-  )
-  if (propMatch) {
-    return (
-      <>
-        <span style={{ color: C.plain }}>{propMatch[1]}</span>
-        <span style={{ color: C.prop }}>{propMatch[2]}</span>
-        <span style={{ color: C.plain }}>{propMatch[3]}</span>
-        <span style={{ color: C.value }}>{propMatch[4]}</span>
-        <span style={{ color: C.plain }}>{propMatch[5]}</span>
-      </>
-    )
-  }
-
-  // blank line or fallback
-  return <span style={{ color: C.plain }}>{line}</span>
-}
-
-function CssCodeBlock({ code }: { code: string }) {
-  return (
-    <>
-      <style>{`.pg-code::-webkit-scrollbar{display:none}.pg-code{scrollbar-width:none}`}</style>
-      <pre className="pg-code overflow-x-auto bg-neutral-950 border border-white/10 px-5 py-4 font-mono text-sm leading-relaxed whitespace-pre">
-        <code>
-          {code.split("\n").map((line, i) => (
-            <span key={i}>
-              {i > 0 && "\n"}
-              <CssCodeLine line={line} />
-            </span>
-          ))}
-        </code>
-      </pre>
-    </>
-  )
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -336,86 +235,6 @@ function MockAgentCard() {
   )
 }
 
-interface MockFeedbackItem {
-  id: string
-  address: string
-  value: number
-  tags: string[]
-  text: string
-  time: string
-}
-
-const MOCK_FEEDBACKS: MockFeedbackItem[] = [
-  {
-    id: "1",
-    address: "0x742d…beb7",
-    value: 87.5,
-    tags: ["reliability", "speed"],
-    text: "Outstanding performance on the data pipeline task. Completed in half the estimated time with zero errors.",
-    time: "2 days ago",
-  },
-  {
-    id: "2",
-    address: "0xAbC3…cDe4",
-    value: 23.0,
-    tags: ["accuracy"],
-    text: "Struggled with domain-specific terminology. Needed multiple correction rounds before reaching acceptable output.",
-    time: "5 days ago",
-  },
-  {
-    id: "3",
-    address: "0x1234…5678",
-    value: 91.0,
-    tags: ["code quality", "documentation"],
-    text: "Exceptional code review with actionable suggestions. Will definitely use again.",
-    time: "1 week ago",
-  },
-]
-
-function feedbackScoreColor(value: number) {
-  if (value >= 81) return "text-erc8004-positive"
-  if (value >= 61) return "text-erc8004-chart-2"
-  if (value >= 41) return "text-erc8004-chart-5"
-  if (value >= 21) return "text-erc8004-chart-3"
-  return "text-erc8004-negative"
-}
-
-function MockFeedbackCard({ item }: { item: MockFeedbackItem }) {
-  return (
-    <div className="rounded-erc8004-lg border border-erc8004-border bg-erc8004-card p-4 transition-colors duration-200">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2 min-w-0 flex-wrap">
-          <span
-            className={cn(
-              "font-mono text-lg font-semibold tabular-nums",
-              feedbackScoreColor(item.value)
-            )}
-          >
-            {item.value.toFixed(1)}
-          </span>
-          {item.tags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full bg-erc8004-muted px-2 py-0.5 text-xs text-erc8004-muted-fg"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-        <div className="shrink-0 text-right">
-          <div className="font-mono text-xs text-erc8004-muted-fg">
-            {item.address}
-          </div>
-          <div className="text-xs text-erc8004-muted-fg">{item.time}</div>
-        </div>
-      </div>
-      <p className="mt-3 text-sm text-erc8004-card-fg line-clamp-2">
-        {item.text}
-      </p>
-    </div>
-  )
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Color swatch row
 // ─────────────────────────────────────────────────────────────────────────────
@@ -471,8 +290,8 @@ export function ThemePlayground() {
             className={cn(
               "px-3 py-1.5 font-mono text-xs border transition-all duration-200",
               i === activeIdx
-                ? "border-white/50 bg-white/10 text-white"
-                : "border-white/10 bg-transparent text-white/40 hover:text-white/60 hover:border-white/20"
+                ? "border-black/60 dark:border-white/50 bg-neutral-100 dark:bg-white/10 text-neutral-900 dark:text-white"
+                : "border-black/60 dark:border-white/10 bg-transparent text-neutral-400 dark:text-white/40 hover:text-neutral-600 dark:hover:text-white/60 hover:border-black/60 dark:hover:border-white/20"
             )}
           >
             {preset.name}
@@ -483,7 +302,7 @@ export function ThemePlayground() {
       {/* Preview surface — the .erc8004 class provides default variable values,
           inline styles override specific variables for the active preset. */}
       <div
-        className="erc8004 bg-erc8004-bg rounded-lg border border-white/10 p-6"
+        className="erc8004 bg-erc8004-bg rounded-lg border border-black/60 dark:border-white/10 p-6"
         style={activePreset.vars as React.CSSProperties}
       >
         <div className="flex flex-col">
@@ -498,7 +317,10 @@ export function ThemePlayground() {
       </div>
 
       {/* CSS code for the active preset */}
-      <CssCodeBlock code={getPresetCss(activePreset)} />
+      <CodeBlock
+        language={activePreset.name !== "Default" ? "css" : "tsx"}
+        code={getPresetCss(activePreset)}
+      />
     </div>
   )
 }

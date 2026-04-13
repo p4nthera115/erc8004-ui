@@ -78,7 +78,7 @@ export const Route = createFileRoute("/docs")({
   component: () => (
     <div className="max-w-screen-2xl mx-auto px-6 flex gap-8 min-h-[calc(100vh-3.5rem)]">
       <DocsSidebar />
-      <main className="flex-1 min-w-0 py-10 max-w-3xl">
+      <main className="flex-1 min-w-0 py-10 max-w-4xl">
         <Outlet />
         <DocsPagination />
       </main>

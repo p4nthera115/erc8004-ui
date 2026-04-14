@@ -159,14 +159,14 @@ function App() {
     usage: `import { AgentProvider, AgentName, ReputationScore, FeedbackList } from "@erc8004/ui"
 
 // Profile page — one agent, many components, no repetition:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <AgentName />
   <ReputationScore />
   <FeedbackList />
 </AgentProvider>
 
 // Override one component inside the provider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <AgentName />
   <AgentName agentRegistry="eip155:1:0x999..." agentId={12} />
 </AgentProvider>`,
@@ -203,7 +203,7 @@ function App() {
     previewCode: `
 export function AgentName() {
   return (
-    <AgentName agentRegistry="eip155:1:0x742..." agentId={374} />
+    <AgentName agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
   )
 }
 `,
@@ -211,10 +211,10 @@ export function AgentName() {
     usage: `import { AgentName } from "@erc8004/ui"
 
 // Direct props:
-<AgentName agentRegistry="eip155:1:0x742..." agentId={374} />
+<AgentName agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <AgentName />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,
@@ -229,10 +229,10 @@ export function AgentName() {
     usage: `import { AgentImage } from "@erc8004/ui"
 
 // Direct props:
-<AgentImage agentRegistry="eip155:1:0x742..." agentId={374} />
+<AgentImage agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <AgentImage />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,
@@ -247,10 +247,10 @@ export function AgentName() {
     usage: `import { AgentDescription } from "@erc8004/ui"
 
 // Direct props:
-<AgentDescription agentRegistry="eip155:1:0x742..." agentId={374} />
+<AgentDescription agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <AgentDescription />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,
@@ -265,10 +265,10 @@ export function AgentName() {
     usage: `import { AgentCard } from "@erc8004/ui"
 
 // Direct props:
-<AgentCard agentRegistry="eip155:1:0x742..." agentId={374} />
+<AgentCard agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <AgentCard />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,
@@ -283,10 +283,10 @@ export function AgentName() {
     usage: `import { EndpointStatus } from "@erc8004/ui"
 
 // Direct props:
-<EndpointStatus agentRegistry="eip155:1:0x742..." agentId={374} />
+<EndpointStatus agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <EndpointStatus />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,
@@ -303,10 +303,10 @@ export function AgentName() {
     usage: `import { ReputationScore } from "@erc8004/ui"
 
 // Direct props:
-<ReputationScore agentRegistry="eip155:1:0x742..." agentId={374} />
+<ReputationScore agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <ReputationScore />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,
@@ -321,10 +321,10 @@ export function AgentName() {
     usage: `import { ReputationTimeline } from "@erc8004/ui"
 
 // Direct props:
-<ReputationTimeline agentRegistry="eip155:1:0x742..." agentId={374} />
+<ReputationTimeline agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <ReputationTimeline />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,
@@ -339,10 +339,10 @@ export function AgentName() {
     usage: `import { ReputationDistribution } from "@erc8004/ui"
 
 // Direct props:
-<ReputationDistribution agentRegistry="eip155:1:0x742..." agentId={374} />
+<ReputationDistribution agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <ReputationDistribution />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,
@@ -357,10 +357,10 @@ export function AgentName() {
     usage: `import { FeedbackList } from "@erc8004/ui"
 
 // Direct props:
-<FeedbackList agentRegistry="eip155:1:0x742..." agentId={374} />
+<FeedbackList agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <FeedbackList />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,
@@ -375,10 +375,10 @@ export function AgentName() {
     usage: `import { TagCloud } from "@erc8004/ui"
 
 // Direct props:
-<TagCloud agentRegistry="eip155:1:0x742..." agentId={374} />
+<TagCloud agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <TagCloud />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,
@@ -395,10 +395,10 @@ export function AgentName() {
     usage: `import { VerificationBadge } from "@erc8004/ui"
 
 // Direct props:
-<VerificationBadge agentRegistry="eip155:1:0x742..." agentId={374} />
+<VerificationBadge agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <VerificationBadge />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,
@@ -413,10 +413,10 @@ export function AgentName() {
     usage: `import { ValidationScore } from "@erc8004/ui"
 
 // Direct props:
-<ValidationScore agentRegistry="eip155:1:0x742..." agentId={374} />
+<ValidationScore agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <ValidationScore />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,
@@ -431,10 +431,10 @@ export function AgentName() {
     usage: `import { ValidationList } from "@erc8004/ui"
 
 // Direct props:
-<ValidationList agentRegistry="eip155:1:0x742..." agentId={374} />
+<ValidationList agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <ValidationList />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,
@@ -449,10 +449,10 @@ export function AgentName() {
     usage: `import { ValidationDisplay } from "@erc8004/ui"
 
 // Direct props:
-<ValidationDisplay agentRegistry="eip155:1:0x742..." agentId={374} />
+<ValidationDisplay agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <ValidationDisplay />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,
@@ -469,10 +469,10 @@ export function AgentName() {
     usage: `import { LastActivity } from "@erc8004/ui"
 
 // Direct props:
-<LastActivity agentRegistry="eip155:1:0x742..." agentId={374} />
+<LastActivity agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <LastActivity />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,
@@ -487,10 +487,10 @@ export function AgentName() {
     usage: `import { ActivityLog } from "@erc8004/ui"
 
 // Direct props:
-<ActivityLog agentRegistry="eip155:1:0x742..." agentId={374} />
+<ActivityLog agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
 
 // Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:1:0x742..." agentId={374}>
+<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
   <ActivityLog />
 </AgentProvider>`,
     props: AGENT_IDENTITY_PROPS,

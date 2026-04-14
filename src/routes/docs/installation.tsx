@@ -23,6 +23,24 @@ function Installation() {
       {/* Install */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Install</SectionHeading>
+        <div className="border border-black/60 dark:border-white/10 bg-neutral-50 dark:bg-white/2 px-5 py-4">
+          <p className="text-sm text-neutral-500 dark:text-white/50 leading-relaxed">
+            <span className="text-neutral-600 dark:text-white/70 font-mono">
+              Note
+            </span>
+            {" — "}
+            <InlineCode>@erc8004/ui</InlineCode> is a placeholder name — the
+            package is not yet published to npm. Until publication, install
+            directly from GitHub:
+          </p>
+          <div className="mt-3">
+            <CodeBlock code={`npm install github:p4nthera115/erc8004-ui`} />
+          </div>
+          <p className="text-sm text-neutral-500 dark:text-white/50 leading-relaxed mt-3">
+            All other code examples on this page use the final import path and
+            will work unchanged once the package is published.
+          </p>
+        </div>
         <CodeBlock code={`npm install @erc8004/ui`} />
         <p className="text-sm text-neutral-400 dark:text-white/40 font-mono">
           or

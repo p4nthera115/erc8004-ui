@@ -216,8 +216,8 @@ function Theming() {
           </p>
           <CodeBlock
             code={`<ReputationScore
-  agentRegistry="eip155:1:0x742..."
-  agentId={374}
+  agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
+  agentId={2290}
   className="shadow-lg rounded-2xl p-6"
 />`}
           />
@@ -281,7 +281,7 @@ function Theming() {
   <div class="light">
     <!-- ...except these components stay light -->
     <ERC8004Provider apiKey="...">
-      <ReputationScore agentRegistry="..." agentId={374} />
+      <ReputationScore agentRegistry="..." agentId={2290} />
     </ERC8004Provider>
   </div>
 </body>`}
@@ -582,8 +582,8 @@ function Theming() {
         </p>
         <CodeBlock
           code={`<ReputationScore
-  agentRegistry="eip155:1:0x742..."
-  agentId={374}
+  agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
+  agentId={2290}
   className="p-2 text-sm rounded-none"
 />`}
         />

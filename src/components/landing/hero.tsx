@@ -356,13 +356,13 @@ function CodeBlock({
               <Line n={2} indent={1}>
                 <Attr>agentRegistry</Attr>
                 <Operator>=</Operator>
-                <Str>{'"eip155:1:0x742d...beb7"'}</Str>
+                <Str>{'"eip155:8453:0x8004...a432"'}</Str>
               </Line>
               <Line n={3} indent={1}>
                 <Attr>agentId</Attr>
                 <Operator>=</Operator>
                 <Brace>{"{"}</Brace>
-                <Num>{374}</Num>
+                <Num>{2290}</Num>
                 <Brace>{"}"}</Brace>
               </Line>
               <Line n={4}>

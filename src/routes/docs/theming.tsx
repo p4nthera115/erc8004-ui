@@ -23,10 +23,70 @@ function Theming() {
         </p>
         <p className="text-base text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
           Out of the box, the library ships with a light theme and a dark theme.
-          No configuration required — just import the stylesheet and go.
+          No configuration required — just import the stylesheet and go. Colors
+          use OKLCH rather than hex. OKLCH is perceptually uniform — lightening
+          or darkening a value produces a predictable visual shift, which makes
+          themes easier to build and tweak.
         </p>
         <CodeBlock code={`import "@erc8004/ui/styles.css"`} />
       </div>
+
+      {/* OKLCH Primer */}
+      <section className="flex flex-col gap-4">
+        <SectionHeading>OKLCH Color Format</SectionHeading>
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          All color tokens are raw{" "}
+          <InlineCode>
+            <a
+              href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2"
+            >
+              OKLCH
+            </a>
+          </InlineCode>{" "}
+          values — three space-separated numbers for{" "}
+          <InlineCode>lightness chroma hue</InlineCode>:
+        </p>
+        <ul className="flex flex-col gap-1 text-sm text-neutral-600 dark:text-white/70 leading-relaxed pl-4 list-disc">
+          <li>
+            <strong className="text-neutral-800 dark:text-white/90">
+              Lightness
+            </strong>{" "}
+            — <InlineCode>0</InlineCode> (black) to{" "}
+            <InlineCode>1</InlineCode> (white).
+          </li>
+          <li>
+            <strong className="text-neutral-800 dark:text-white/90">
+              Chroma
+            </strong>{" "}
+            — saturation. <InlineCode>0</InlineCode> is gray, higher values are
+            more vivid.
+          </li>
+          <li>
+            <strong className="text-neutral-800 dark:text-white/90">
+              Hue
+            </strong>{" "}
+            — color angle in degrees. <InlineCode>260</InlineCode> blue,{" "}
+            <InlineCode>145</InlineCode> green, <InlineCode>300</InlineCode>{" "}
+            purple, <InlineCode>25</InlineCode> red-orange.
+          </li>
+        </ul>
+        <p className="text-sm text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
+          For neutral grays, chroma and hue are both <InlineCode>0</InlineCode>{" "}
+          (e.g., <InlineCode>0.556 0 0</InlineCode> is a medium gray). Use{" "}
+          <a
+            href="https://oklch.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 text-neutral-600 dark:text-white/70 hover:text-neutral-800 dark:hover:text-white/90"
+          >
+            oklch.com
+          </a>{" "}
+          to pick values interactively.
+        </p>
+      </section>
 
       {/* Theme Playground */}
       <section className="flex flex-col gap-4">
@@ -54,7 +114,16 @@ function Theming() {
           Because the variables are scoped to <InlineCode>.erc8004</InlineCode>,
           they never conflict with your app's own styles. If your app uses
           shadcn, Tailwind's default palette, or any other styling system,
-          everything coexists cleanly.
+          everything coexists cleanly. Dark and light mode work by swapping the
+          variable values when a <InlineCode>.dark</InlineCode> or{" "}
+          <InlineCode>.light</InlineCode> class is present on an ancestor — see{" "}
+          <a
+            href="#dark-and-light-mode"
+            className="underline underline-offset-2"
+          >
+            Dark and Light Mode
+          </a>{" "}
+          below.
         </p>
       </section>
 
@@ -62,14 +131,16 @@ function Theming() {
       <section className="flex flex-col gap-4">
         <SectionHeading>Three Ways to Customize</SectionHeading>
         <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
-          You have three levels of control, from broadest to most specific. They
-          compose naturally — use any combination.
+          Pick the broadest method that does the job. Use CSS variables to
+          retheme everything, provider <InlineCode>className</InlineCode> to
+          scope a theme to a section of your app, or component{" "}
+          <InlineCode>className</InlineCode> for one-off tweaks.
         </p>
 
-        {/* CSS Variable Overrides */}
+        {/* 1. CSS Variable Overrides */}
         <div className="flex flex-col gap-3 mt-2">
           <p className="font-mono text-base text-neutral-800 dark:text-white/90">
-            1. CSS Variable Overrides (retheme everything)
+            1. CSS Variable Overrides — retheme everything
           </p>
           <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
             Override the variables in your own stylesheet. Every component picks
@@ -85,10 +156,57 @@ function Theming() {
           />
         </div>
 
-        {/* className Prop */}
+        {/* 2. Provider className */}
         <div className="flex flex-col gap-3 mt-2">
           <p className="font-mono text-base text-neutral-800 dark:text-white/90">
-            2. <InlineCode>className</InlineCode> Prop (customize one instance)
+            2. Provider <InlineCode>className</InlineCode> — scope a theme to a
+            subtree
+          </p>
+          <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+            The provider accepts a <InlineCode>className</InlineCode> prop that
+            gets merged onto the <InlineCode>.erc8004</InlineCode> wrapper. Two
+            common uses:
+          </p>
+
+          <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose mt-1">
+            <strong className="text-neutral-800 dark:text-white/90">
+              Toggle light or dark mode:
+            </strong>
+          </p>
+          <CodeBlock
+            code={`<ERC8004Provider apiKey="..." className="dark">
+  {/* dark theme active for all components inside */}
+</ERC8004Provider>
+
+<ERC8004Provider apiKey="..." className="light">
+  {/* forces light theme, even inside a .dark ancestor */}
+</ERC8004Provider>`}
+          />
+
+          <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose mt-1">
+            <strong className="text-neutral-800 dark:text-white/90">
+              Apply a custom theme class:
+            </strong>
+          </p>
+          <CodeBlock
+            language="css"
+            code={`/* Define a custom theme class */
+.erc8004.my-brand {
+  --erc8004-accent: 0.55 0.25 300;
+  --erc8004-radius: 0.75rem;
+}`}
+          />
+          <CodeBlock
+            code={`<ERC8004Provider apiKey="..." className="my-brand">
+  {/* all components inside use the custom theme */}
+</ERC8004Provider>`}
+          />
+        </div>
+
+        {/* 3. Component className */}
+        <div className="flex flex-col gap-3 mt-2">
+          <p className="font-mono text-base text-neutral-800 dark:text-white/90">
+            3. Component <InlineCode>className</InlineCode> — one-off tweaks
           </p>
           <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
             Every component accepts a <InlineCode>className</InlineCode> prop.
@@ -102,36 +220,6 @@ function Theming() {
   agentId={374}
   className="shadow-lg rounded-2xl p-6"
 />`}
-          />
-        </div>
-
-        {/* className on Provider */}
-        <div className="flex flex-col gap-3 mt-2">
-          <p className="font-mono text-base text-neutral-800 dark:text-white/90">
-            3. <InlineCode>className</InlineCode> on Provider (scope a class)
-          </p>
-          <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
-            The provider accepts a <InlineCode>className</InlineCode> prop that
-            gets merged onto the <InlineCode>.erc8004</InlineCode> wrapper. This
-            is useful for scoping dark mode or applying a custom theme class.
-          </p>
-          <CodeBlock
-            code={`<ERC8004Provider apiKey="your-graph-api-key" className="dark">
-  {/* dark theme active for all components inside */}
-</ERC8004Provider>`}
-          />
-          <CodeBlock
-            language="css"
-            code={`/* Define a custom theme class */
-.erc8004.my-brand {
-  --erc8004-accent: 0.55 0.25 300;
-  --erc8004-radius: 0.75rem;
-}`}
-          />
-          <CodeBlock
-            code={`<ERC8004Provider apiKey="your-graph-api-key" className="my-brand">
-  {/* all components inside use the custom theme */}
-</ERC8004Provider>`}
           />
         </div>
       </section>
@@ -166,49 +254,81 @@ function Theming() {
         </p>
       </section>
 
+      {/* Dark and Light Mode */}
+      <section className="flex flex-col gap-4">
+        <SectionHeading>Dark and Light Mode</SectionHeading>
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          The default theme is light — no setup needed. Adding a{" "}
+          <InlineCode>.dark</InlineCode> ancestor class switches components to
+          dark mode. This is the standard Tailwind dark mode convention that
+          most apps already use.
+        </p>
+        <CodeBlock
+          code={`<body class="dark">
+  <!-- ERC8004 components automatically use dark colors -->
+</body>`}
+        />
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          Adding a <InlineCode>.light</InlineCode> ancestor class explicitly
+          forces light mode, even inside a <InlineCode>.dark</InlineCode>{" "}
+          parent. This is useful for embedding components in a light section of
+          an otherwise-dark app.
+        </p>
+        <CodeBlock
+          code={`<body class="dark">
+  <!-- dark everywhere... -->
+
+  <div class="light">
+    <!-- ...except these components stay light -->
+    <ERC8004Provider apiKey="...">
+      <ReputationScore agentRegistry="..." agentId={374} />
+    </ERC8004Provider>
+  </div>
+</body>`}
+        />
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          Either class can go on <InlineCode>{"<body>"}</InlineCode>, a
+          container <InlineCode>div</InlineCode>, or directly on{" "}
+          <InlineCode>ERC8004Provider</InlineCode> via the{" "}
+          <InlineCode>className</InlineCode> prop. If your app already handles
+          dark mode by toggling a <InlineCode>.dark</InlineCode> class, the
+          library follows along automatically.
+        </p>
+
+        <p className="font-mono text-base text-neutral-800 dark:text-white/90 mt-2">
+          Overriding dark mode colors
+        </p>
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          To customize specific colors in dark mode, target{" "}
+          <InlineCode>.dark .erc8004</InlineCode>:
+        </p>
+        <CodeBlock
+          language="css"
+          code={`.dark .erc8004 {
+  --erc8004-accent: 0.7 0.2 260;      /* brighter blue in dark mode */
+  --erc8004-card: 0.18 0.01 260;      /* slight blue tint to cards */
+}`}
+        />
+
+        <p className="font-mono text-base text-neutral-800 dark:text-white/90 mt-2">
+          Overriding light mode colors
+        </p>
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          Similarly, to customize colors only in explicit light mode, target{" "}
+          <InlineCode>.light .erc8004</InlineCode>:
+        </p>
+        <CodeBlock
+          language="css"
+          code={`.light .erc8004 {
+  --erc8004-accent: 0.5 0.22 260;     /* deeper blue in light mode */
+  --erc8004-card: 0.98 0.005 80;      /* warm white cards */
+}`}
+        />
+      </section>
+
       {/* Token Reference */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Token Reference</SectionHeading>
-        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
-          All color values are raw{" "}
-          <InlineCode>
-            <a
-              href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-2"
-            >
-              OKLCH
-            </a>
-          </InlineCode>{" "}
-          values: <InlineCode>lightness chroma hue</InlineCode>.
-        </p>
-        <ul className="flex flex-col gap-1 text-sm text-neutral-600 dark:text-white/70 leading-relaxed pl-4 list-disc">
-          <li>
-            <strong className="text-neutral-800 dark:text-white/90">
-              Lightness
-            </strong>{" "}
-            ranges from <InlineCode>0</InlineCode> (black) to{" "}
-            <InlineCode>1</InlineCode> (white).
-          </li>
-          <li>
-            <strong className="text-neutral-800 dark:text-white/90">
-              Chroma
-            </strong>{" "}
-            controls saturation — <InlineCode>0</InlineCode> is gray, higher
-            values are more vivid.
-          </li>
-          <li>
-            <strong className="text-neutral-800 dark:text-white/90">Hue</strong>{" "}
-            is the color angle — <InlineCode>0</InlineCode> is pink/red,{" "}
-            <InlineCode>145</InlineCode> is green, <InlineCode>260</InlineCode>{" "}
-            is blue, <InlineCode>300</InlineCode> is purple.
-          </li>
-        </ul>
-        <p className="text-sm text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
-          For neutral grays, chroma and hue are both <InlineCode>0</InlineCode>{" "}
-          (e.g., <InlineCode>0.556 0 0</InlineCode> is a medium gray).
-        </p>
 
         {/* Surfaces table */}
         <p className="font-mono text-base text-neutral-800 dark:text-white/90 mt-2">
@@ -429,51 +549,6 @@ function Theming() {
         />
       </section>
 
-      {/* Dark Mode */}
-      <section className="flex flex-col gap-4">
-        <SectionHeading>Dark Mode</SectionHeading>
-        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
-          The library ships with a dark theme that activates automatically when
-          the components are inside an ancestor with the{" "}
-          <InlineCode>.dark</InlineCode> class. This is the standard Tailwind
-          dark mode convention that most apps already use.
-        </p>
-        <CodeBlock
-          code={`<body class="dark">
-  <!-- ERC8004 components automatically use dark colors -->
-</body>`}
-        />
-        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
-          You can also apply <InlineCode>.dark</InlineCode> directly to the
-          provider's scope:
-        </p>
-        <CodeBlock
-          code={`<ERC8004Provider apiKey="..." className="dark">
-  {/* dark theme active */}
-</ERC8004Provider>`}
-        />
-        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
-          No configuration, no toggle logic, no extra imports. If your app
-          already handles dark mode by toggling a <InlineCode>.dark</InlineCode>{" "}
-          class, the library follows along.
-        </p>
-
-        <p className="font-mono text-base text-neutral-800 dark:text-white/90 mt-2">
-          Overriding dark mode colors
-        </p>
-        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
-          To customize specific colors in dark mode, target{" "}
-          <InlineCode>.dark .erc8004</InlineCode>:
-        </p>
-        <CodeBlock
-          language="css"
-          code={`.dark .erc8004 {
-  --erc8004-accent: 0.7 0.2 260;      /* brighter blue in dark mode */
-  --erc8004-card: 0.18 0.01 260;      /* slight blue tint to cards */
-}`}
-        />
-      </section>
-
       {/* Examples */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Examples</SectionHeading>
@@ -534,26 +609,27 @@ function Theming() {
         />
       </section>
 
-      {/* Provider Props Reference */}
+      {/* Provider Props */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Provider Props</SectionHeading>
         <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
-          <InlineCode>ERC8004Provider</InlineCode> accepts the following props:
+          The only theming-relevant prop on{" "}
+          <InlineCode>ERC8004Provider</InlineCode> is{" "}
+          <InlineCode>className</InlineCode>, which gets merged onto the{" "}
+          <InlineCode>.erc8004</InlineCode> wrapper. See the{" "}
+          <a
+            href="/docs/components/erc8004-provider"
+            className="underline underline-offset-2"
+          >
+            ERC8004Provider component page
+          </a>{" "}
+          for the full prop reference.
         </p>
         <CodeBlock
-          code={`<ERC8004Provider
-  apiKey="your-graph-api-key"     // required — The Graph API key
-  subgraphOverrides={{ 1: "..." }} // optional — custom Subgraph URLs per chain
-  className="dark my-theme"        // optional — classes for the .erc8004 wrapper
->
+          code={`<ERC8004Provider apiKey="..." className="dark my-theme">
   {children}
 </ERC8004Provider>`}
         />
-        <p className="text-sm text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
-          To customize the look of the library, override CSS variables on{" "}
-          <InlineCode>.erc8004</InlineCode> in your stylesheet — see the token
-          reference above.
-        </p>
       </section>
 
       {/* FAQ */}
@@ -561,6 +637,32 @@ function Theming() {
         <SectionHeading>FAQ</SectionHeading>
 
         <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-2">
+            <p className="font-mono text-sm text-neutral-800 dark:text-white/90">
+              Does the library ship its own font?
+            </p>
+            <p className="text-sm text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
+              No. Components inherit <InlineCode>font-family</InlineCode> from
+              their parent, so they adopt whatever typography your app uses. Set
+              the font on <InlineCode>.erc8004</InlineCode> or any ancestor and
+              components will follow. Some elements like numeric scores and
+              addresses use monospace (<InlineCode>font-mono</InlineCode>) for
+              readability, but no base font is bundled or required.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <p className="font-mono text-sm text-neutral-800 dark:text-white/90">
+              Can I force light mode inside a dark app?
+            </p>
+            <p className="text-sm text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
+              Yes. Add <InlineCode>className="light"</InlineCode> to the
+              provider (or any ancestor of the components you want to stay
+              light). This works even when a higher ancestor has{" "}
+              <InlineCode>.dark</InlineCode> set.
+            </p>
+          </div>
+
           <div className="flex flex-col gap-2">
             <p className="font-mono text-sm text-neutral-800 dark:text-white/90">
               Will this conflict with my app's Tailwind config?

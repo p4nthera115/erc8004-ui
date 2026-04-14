@@ -3,6 +3,6 @@ import { HeroSection } from "@/components/landing/hero"
 
 export const Route = createFileRoute("/")({ component: Home })
 
-export function Home() {
+function Home() {
   return <HeroSection />
 }

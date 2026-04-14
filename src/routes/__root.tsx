@@ -13,6 +13,11 @@ function RootComponent() {
     localStorage.setItem("theme", isDark ? "dark" : "light")
   }, [isDark])
 
+  useEffect(() => {
+    // Tell the prerenderer the page is ready to be snapshotted
+    document.dispatchEvent(new Event("app-rendered"))
+  }, [])
+
   return (
     <div className="min-h-screen erc8004">
       <Nav isDark={isDark} onToggle={() => setIsDark((d) => !d)} />

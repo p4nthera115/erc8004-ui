@@ -14,7 +14,7 @@ import { VerificationBadge } from "@/components/validation/verification-badge"
 import { ValidationScore } from "@/components/validation/validation-score"
 import { ValidationList } from "@/components/validation/validation-list"
 import { ValidationDisplay } from "@/components/validation/validation-display"
-import { LastActivity } from "@/components/cross-registry/last-activity"
+import { LastActivity } from "@/components/activity/last-activity"
 import { ActivityLog } from "@/components/activity/activity-log"
 
 // ---------------------------------------------------------------------------

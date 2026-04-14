@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "tsx --tsconfig tsconfig.app.json scripts/generate-llms.ts && puppeteer browsers install chrome",
+    "prebuild": "tsx --tsconfig tsconfig.app.json scripts/generate-llms.ts",
     "build": "tsc -b && vite build",
     "build:registry": "pnpm -C packages/registry build",
     "build:mcp": "pnpm -C packages/mcp-server build",

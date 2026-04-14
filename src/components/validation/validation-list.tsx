@@ -9,7 +9,7 @@ import { cn } from "@/lib/cn"
 import type { Validation } from "@/types"
 import * as v from "valibot"
 
-const PAGE_SIZE = 10
+const DEFAULT_PAGE_SIZE = 10
 
 type ValidationItem = Pick<
   Validation,
@@ -47,43 +47,56 @@ const validationListSchema = v.object({
   ),
 })
 
-const VALIDATION_LIST_QUERY = `#graphql
-  query ($id: ID!, $first: Int!, $skip: Int!) {
-    validations(
-      where: { agent_: { id: $id } },
-      orderBy: createdAt,
-      orderDirection: desc,
-      first: $first,
-      skip: $skip
-    ) {
-      id
-      validatorAddress
-      response
-      tag
-      status
-      createdAt
-      updatedAt
-    }
-  }
-`
+export type ValidationStatusFilter = "all" | "completed" | "pending" | "expired"
 
-function useValidationList(agentRegistry: string, agentId: number, page: number) {
+function buildValidationListQuery(statusFilter: ValidationStatusFilter) {
+  const statusClause = statusFilter === "all"
+    ? ""
+    : `, status: "${statusFilter.toUpperCase()}"`
+  return `#graphql
+    query ($id: ID!, $first: Int!, $skip: Int!) {
+      validations(
+        where: { agent_: { id: $id }${statusClause} },
+        orderBy: createdAt,
+        orderDirection: desc,
+        first: $first,
+        skip: $skip
+      ) {
+        id
+        validatorAddress
+        response
+        tag
+        status
+        createdAt
+        updatedAt
+      }
+    }
+  `
+}
+
+function useValidationList(
+  agentRegistry: string,
+  agentId: number,
+  page: number,
+  pageSize: number,
+  statusFilter: ValidationStatusFilter
+) {
   const { apiKey, subgraphOverrides } = useERC8004Config()
 
   return useQuery({
-    queryKey: ["validation-list", agentRegistry, agentId, page],
+    queryKey: ["validation-list", agentRegistry, agentId, page, pageSize, statusFilter],
     queryFn: async (): Promise<ValidationListResponse> => {
       const { chainId } = parseAgentRegistry(agentRegistry)
       const url = getSubgraphUrl(chainId, apiKey, subgraphOverrides)
       const variables = {
         id: `${chainId}:${agentId}`,
-        first: PAGE_SIZE,
-        skip: page * PAGE_SIZE,
+        first: pageSize,
+        skip: page * pageSize,
       }
 
       const data = await subgraphFetch<ValidationListResponse>(
         url,
-        VALIDATION_LIST_QUERY,
+        buildValidationListQuery(statusFilter),
         variables
       )
 
@@ -117,7 +130,12 @@ function scoreColor(score: number) {
   return "text-erc8004-negative"
 }
 
-function ValidationCard({ item }: { item: ValidationItem }) {
+interface ValidationCardOptions {
+  showValidatorAddress: boolean
+  showTimestamp: boolean
+}
+
+function ValidationCard({ item, options }: { item: ValidationItem; options: ValidationCardOptions }) {
   return (
     <div className="rounded-erc8004-lg border border-erc8004-border bg-erc8004-card p-4">
       <div className="flex items-start justify-between gap-3">
@@ -141,27 +159,53 @@ function ValidationCard({ item }: { item: ValidationItem }) {
             </span>
           )}
         </div>
-        <div className="shrink-0 text-right">
-          <div className="font-mono text-xs text-erc8004-muted-fg" title={item.validatorAddress}>
-            {truncateAddress(item.validatorAddress)}
+        {(options.showValidatorAddress || options.showTimestamp) && (
+          <div className="shrink-0 text-right">
+            {options.showValidatorAddress && (
+              <div className="font-mono text-xs text-erc8004-muted-fg" title={item.validatorAddress}>
+                {truncateAddress(item.validatorAddress)}
+              </div>
+            )}
+            {options.showTimestamp && (
+              <div className="text-xs text-erc8004-muted-fg">
+                {formatRelativeTime(item.createdAt)}
+              </div>
+            )}
           </div>
-          <div className="text-xs text-erc8004-muted-fg">
-            {formatRelativeTime(item.createdAt)}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   )
 }
 
-interface ValidationListProps extends AgentIdentityProps {
+export interface ValidationListProps extends AgentIdentityProps {
+  /** Items per page. Default `10`. */
+  pageSize?: number
+  /** Show validator address. Default `true`. */
+  showValidatorAddress?: boolean
+  /** Show timestamp. Default `true`. */
+  showTimestamp?: boolean
+  /** Filter by validation status. Default `"all"`. */
+  statusFilter?: ValidationStatusFilter
+  /** Message when there are no validations. Default `"No validations yet."`. */
+  emptyMessage?: string
   className?: string
 }
 
-export function ValidationList({ className, ...props }: ValidationListProps) {
+export function ValidationList({
+  pageSize = DEFAULT_PAGE_SIZE,
+  showValidatorAddress = true,
+  showTimestamp = true,
+  statusFilter = "all",
+  emptyMessage = "No validations yet.",
+  className,
+  ...props
+}: ValidationListProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const [page, setPage] = useState(0)
-  const { data, isLoading, error } = useValidationList(agentRegistry, agentId, page)
+  const { data, isLoading, error } = useValidationList(agentRegistry, agentId, page, pageSize, statusFilter)
+
+  const cardOptions: ValidationCardOptions = { showValidatorAddress, showTimestamp }
 
   if (isLoading) {
     return (
@@ -199,13 +243,13 @@ export function ValidationList({ className, ...props }: ValidationListProps) {
   if (!data?.validations.length && page === 0) {
     return (
       <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
-        <p className="text-sm text-erc8004-muted-fg">No validations yet.</p>
+        <p className="text-sm text-erc8004-muted-fg">{emptyMessage}</p>
       </div>
     )
   }
 
   const validations = data?.validations ?? []
-  const hasNext = validations.length === PAGE_SIZE
+  const hasNext = validations.length === pageSize
   const hasPrev = page > 0
 
   return (
@@ -217,7 +261,7 @@ export function ValidationList({ className, ...props }: ValidationListProps) {
         <ul role="list" className="space-y-3">
           {validations.map((item) => (
             <li key={item.id}>
-              <ValidationCard item={item} />
+              <ValidationCard item={item} options={cardOptions} />
             </li>
           ))}
         </ul>

@@ -29,6 +29,19 @@ export type PropDef = {
   description: string
 }
 
+export type ExampleDef = {
+  name: string
+  description: string
+  preview: React.ReactNode
+  code: string
+}
+
+export type InContextDef = {
+  description: string
+  preview: React.ReactNode
+  code: string
+}
+
 export type ComponentDoc = {
   slug: string
   name: string
@@ -37,6 +50,9 @@ export type ComponentDoc = {
   importLine: string
   previewCode?: string
   usage: string
+  examples?: ExampleDef[]
+  inContext?: InContextDef
+  states?: string
   props: PropDef[]
 }
 
@@ -84,8 +100,24 @@ function withAgent(children: React.ReactNode): React.ReactNode {
 // Registry
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Shared states text
+// ---------------------------------------------------------------------------
+
+const DATA_COMPONENT_STATES =
+  "This component handles loading, error, empty, and not-found states internally. A skeleton placeholder is shown while fetching, an error message with details appears if the Subgraph is unreachable, and a short message is displayed when no data exists for this agent."
+
+const INLINE_COMPONENT_STATES =
+  "This component handles loading and error states internally with inline placeholders. No configuration needed."
+
+// ---------------------------------------------------------------------------
+// Registry
+// ---------------------------------------------------------------------------
+
 const DOCS: ComponentDoc[] = [
-  // --- Providers ---
+  // =========================================================================
+  // PROVIDERS
+  // =========================================================================
   {
     slug: "erc8004-provider",
     name: "ERC8004Provider",
@@ -193,30 +225,56 @@ function App() {
     ],
   },
 
-  // --- Identity ---
+  // =========================================================================
+  // IDENTITY
+  // =========================================================================
   {
     slug: "agent-name",
     name: "AgentName",
     description:
       "Fetches and renders the agent's registered name from the identity registry. Falls back to a truncated agent ID if no name is registered.",
     preview: withAgent(<AgentName />),
-    previewCode: `
-export function AgentName() {
-  return (
-    <AgentName agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-  )
-}
-`,
+    previewCode: `<AgentName agentRegistry="eip155:8453:0x8004...a432" agentId={2290} />`,
     importLine: `import { AgentName } from "@erc8004/ui"`,
-    usage: `import { AgentName } from "@erc8004/ui"
-
-// Direct props:
-<AgentName agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
+    usage: `<AgentName agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "Inside AgentProvider",
+        description: "Use AgentProvider to avoid repeating props when rendering multiple components for the same agent.",
+        preview: withAgent(<AgentName />),
+        code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
   <AgentName />
 </AgentProvider>`,
+      },
+    ],
+    inContext: {
+      description: "AgentName used in a profile header alongside the agent's image, description, and verification status.",
+      preview: withAgent(
+        <div className="flex items-center gap-4">
+          <AgentImage />
+          <div>
+            <div className="flex items-center gap-2">
+              <AgentName />
+              <VerificationBadge />
+            </div>
+            <AgentDescription />
+          </div>
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <div className="flex items-center gap-4">
+    <AgentImage />
+    <div>
+      <div className="flex items-center gap-2">
+        <AgentName />
+        <VerificationBadge />
+      </div>
+      <AgentDescription />
+    </div>
+  </div>
+</AgentProvider>`,
+    },
+    states: INLINE_COMPONENT_STATES,
     props: AGENT_IDENTITY_PROPS,
   },
   {
@@ -226,15 +284,44 @@ export function AgentName() {
       "Renders the agent's registered image. Supports IPFS, HTTPS, and base64 sources. Falls back to the deterministic FingerprintBadge when no image is registered.",
     preview: withAgent(<AgentImage />),
     importLine: `import { AgentImage } from "@erc8004/ui"`,
-    usage: `import { AgentImage } from "@erc8004/ui"
-
-// Direct props:
-<AgentImage agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
-  <AgentImage />
+    usage: `<AgentImage agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "With FingerprintBadge Fallback",
+        description: "When no image is registered, AgentImage automatically renders the deterministic FingerprintBadge as a fallback.",
+        preview: withAgent(<AgentImage />),
+        code: `// If the agent has no registered image, a FingerprintBadge is shown:
+<AgentImage agentRegistry="eip155:8453:0x8004...a432" agentId={2290} />`,
+      },
+    ],
+    inContext: {
+      description: "AgentImage in a profile header alongside name and verification badge.",
+      preview: withAgent(
+        <div className="flex items-center gap-4">
+          <AgentImage />
+          <div>
+            <div className="flex items-center gap-2">
+              <AgentName />
+              <VerificationBadge />
+            </div>
+            <AgentDescription />
+          </div>
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <div className="flex items-center gap-4">
+    <AgentImage />
+    <div>
+      <div className="flex items-center gap-2">
+        <AgentName />
+        <VerificationBadge />
+      </div>
+      <AgentDescription />
+    </div>
+  </div>
 </AgentProvider>`,
+    },
+    states: INLINE_COMPONENT_STATES,
     props: AGENT_IDENTITY_PROPS,
   },
   {
@@ -244,15 +331,39 @@ export function AgentName() {
       "Renders the agent's registered description text from the identity registry.",
     preview: withAgent(<AgentDescription />),
     importLine: `import { AgentDescription } from "@erc8004/ui"`,
-    usage: `import { AgentDescription } from "@erc8004/ui"
-
-// Direct props:
-<AgentDescription agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
+    usage: `<AgentDescription agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "Inside AgentProvider",
+        description: "Renders the description text without repeating agent identity props.",
+        preview: withAgent(<AgentDescription />),
+        code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
   <AgentDescription />
 </AgentProvider>`,
+      },
+    ],
+    inContext: {
+      description: "AgentDescription as part of a profile header composition.",
+      preview: withAgent(
+        <div className="flex items-center gap-4">
+          <AgentImage />
+          <div>
+            <AgentName />
+            <AgentDescription />
+          </div>
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <div className="flex items-center gap-4">
+    <AgentImage />
+    <div>
+      <AgentName />
+      <AgentDescription />
+    </div>
+  </div>
+</AgentProvider>`,
+    },
+    states: INLINE_COMPONENT_STATES,
     props: AGENT_IDENTITY_PROPS,
   },
   {
@@ -262,37 +373,110 @@ export function AgentName() {
       "Composed identity card combining avatar, name, description, owner address, and active protocol badges in a single component.",
     preview: withAgent(<AgentCard />),
     importLine: `import { AgentCard } from "@erc8004/ui"`,
-    usage: `import { AgentCard } from "@erc8004/ui"
-
-// Direct props:
-<AgentCard agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
-  <AgentCard />
+    usage: `<AgentCard agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "Without Description",
+        description: "Hide the description to create a more compact card.",
+        preview: withAgent(<AgentCard showDescription={false} />),
+        code: `<AgentCard agentRegistry="eip155:8453:0x8004...a432" agentId={2290} showDescription={false} />`,
+      },
+      {
+        name: "Without Protocol Badges",
+        description: "Hide protocol badges for a cleaner look in contexts where endpoints aren't relevant.",
+        preview: withAgent(<AgentCard showProtocolBadges={false} />),
+        code: `<AgentCard agentRegistry="eip155:8453:0x8004...a432" agentId={2290} showProtocolBadges={false} />`,
+      },
+      {
+        name: "Minimal",
+        description: "Show only avatar and name by hiding description, owner, and protocol badges.",
+        preview: withAgent(<AgentCard showDescription={false} showOwner={false} showProtocolBadges={false} />),
+        code: `<AgentCard
+  agentRegistry="eip155:8453:0x8004...a432"
+  agentId={2290}
+  showDescription={false}
+  showOwner={false}
+  showProtocolBadges={false}
+/>`,
+      },
+    ],
+    inContext: {
+      description: "AgentCard used in a marketplace grid alongside reputation data.",
+      preview: withAgent(
+        <div className="w-full max-w-sm space-y-3">
+          <AgentCard />
+          <div className="flex items-center gap-4 px-1">
+            <ReputationScore />
+            <LastActivity />
+          </div>
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <div className="w-full max-w-sm space-y-3">
+    <AgentCard />
+    <div className="flex items-center gap-4 px-1">
+      <ReputationScore />
+      <LastActivity />
+    </div>
+  </div>
 </AgentProvider>`,
-    props: AGENT_IDENTITY_PROPS,
+    },
+    states: DATA_COMPONENT_STATES,
+    props: [
+      ...AGENT_IDENTITY_PROPS,
+      { name: "showOwner", type: "boolean", required: false, default: "true", description: "Show the owner wallet address." },
+      { name: "showProtocolBadges", type: "boolean", required: false, default: "true", description: "Show protocol badges (MCP, A2A, OASF, Web, Email)." },
+      { name: "showDescription", type: "boolean", required: false, default: "true", description: "Show the agent's description text." },
+    ],
   },
   {
     slug: "endpoint-status",
     name: "EndpointStatus",
     description:
-      "Lists all registered service endpoints (MCP, A2A, OASF, web, email) with protocol labels. Shows live availability status.",
+      "Lists all registered service endpoints (MCP, A2A, OASF, web, email) with protocol labels and optional live health check indicators.",
     preview: withAgent(<EndpointStatus />),
     importLine: `import { EndpointStatus } from "@erc8004/ui"`,
-    usage: `import { EndpointStatus } from "@erc8004/ui"
-
-// Direct props:
-<EndpointStatus agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
-  <EndpointStatus />
+    usage: `<EndpointStatus agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "With Health Checks",
+        description: "Enable live HTTP health checks to show green/red status dots for each endpoint.",
+        preview: withAgent(<EndpointStatus showHealthChecks />),
+        code: `<EndpointStatus agentRegistry="eip155:8453:0x8004...a432" agentId={2290} showHealthChecks />`,
+      },
+      {
+        name: "Filtered Protocols",
+        description: "Show only MCP and A2A endpoints.",
+        preview: withAgent(<EndpointStatus protocols={["mcp", "a2a"]} />),
+        code: `<EndpointStatus agentRegistry="eip155:8453:0x8004...a432" agentId={2290} protocols={["mcp", "a2a"]} />`,
+      },
+    ],
+    inContext: {
+      description: "EndpointStatus alongside an AgentCard to form a complete identity view.",
+      preview: withAgent(
+        <div className="w-full max-w-md space-y-4">
+          <AgentCard />
+          <EndpointStatus />
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <div className="w-full max-w-md space-y-4">
+    <AgentCard />
+    <EndpointStatus />
+  </div>
 </AgentProvider>`,
-    props: AGENT_IDENTITY_PROPS,
+    },
+    states: DATA_COMPONENT_STATES,
+    props: [
+      ...AGENT_IDENTITY_PROPS,
+      { name: "showHealthChecks", type: "boolean", required: false, default: "false", description: "Show live HTTP health check dots. Opt-in because pings can be slow." },
+      { name: "protocols", type: 'Array<"mcp" | "a2a" | "oasf" | "web" | "email">', required: false, description: "Filter which protocols are shown. Default shows all." },
+    ],
   },
 
-  // --- Reputation ---
+  // =========================================================================
+  // REPUTATION
+  // =========================================================================
   {
     slug: "reputation-score",
     name: "ReputationScore",
@@ -300,52 +484,150 @@ export function AgentName() {
       "Compact inline badge showing the agent's average feedback score and total review count. Colour-coded by score range.",
     preview: withAgent(<ReputationScore />),
     importLine: `import { ReputationScore } from "@erc8004/ui"`,
-    usage: `import { ReputationScore } from "@erc8004/ui"
-
-// Direct props:
-<ReputationScore agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
-  <ReputationScore />
+    usage: `<ReputationScore agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "Without Count",
+        description: "Hide the review count for a more minimal display.",
+        preview: withAgent(<ReputationScore showCount={false} />),
+        code: `<ReputationScore agentRegistry="eip155:8453:0x8004...a432" agentId={2290} showCount={false} />`,
+      },
+      {
+        name: "Higher Precision",
+        description: "Show two decimal places for more precise scores.",
+        preview: withAgent(<ReputationScore precision={2} />),
+        code: `<ReputationScore agentRegistry="eip155:8453:0x8004...a432" agentId={2290} precision={2} />`,
+      },
+    ],
+    inContext: {
+      description: "ReputationScore in a marketplace card alongside the agent's image, name, and tag cloud.",
+      preview: withAgent(
+        <div className="w-full max-w-sm space-y-3">
+          <div className="flex items-center gap-3">
+            <AgentImage />
+            <div>
+              <AgentName />
+              <ReputationScore />
+            </div>
+          </div>
+          <TagCloud />
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <div className="flex items-center gap-3">
+    <AgentImage />
+    <div>
+      <AgentName />
+      <ReputationScore />
+    </div>
+  </div>
+  <TagCloud />
 </AgentProvider>`,
-    props: AGENT_IDENTITY_PROPS,
+    },
+    states: INLINE_COMPONENT_STATES,
+    props: [
+      ...AGENT_IDENTITY_PROPS,
+      { name: "showCount", type: "boolean", required: false, default: "true", description: 'Show/hide the "(N reviews)" count on hover.' },
+      { name: "precision", type: "number", required: false, default: "1", description: "Decimal places for the score display." },
+    ],
   },
   {
     slug: "reputation-timeline",
     name: "ReputationTimeline",
     description:
-      "Sparkline chart showing how the agent's average feedback score has trended over time.",
+      "Sparkline chart showing how the agent's feedback scores have trended over time. Pure SVG, no external charting library.",
     preview: withAgent(<ReputationTimeline />),
     importLine: `import { ReputationTimeline } from "@erc8004/ui"`,
-    usage: `import { ReputationTimeline } from "@erc8004/ui"
-
-// Direct props:
-<ReputationTimeline agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
+    usage: `<ReputationTimeline agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "Last 30 Days",
+        description: "Filter the timeline to only show feedback from the last 30 days.",
+        preview: withAgent(<ReputationTimeline range="30d" />),
+        code: `<ReputationTimeline agentRegistry="eip155:8453:0x8004...a432" agentId={2290} range="30d" />`,
+      },
+      {
+        name: "With Data Points",
+        description: "Show individual score dots on the chart.",
+        preview: withAgent(<ReputationTimeline showDataPoints />),
+        code: `<ReputationTimeline agentRegistry="eip155:8453:0x8004...a432" agentId={2290} showDataPoints />`,
+      },
+      {
+        name: "Points Only (No Trend Line)",
+        description: "Show only the data point dots without the connecting trend line.",
+        preview: withAgent(<ReputationTimeline showTrendLine={false} showDataPoints />),
+        code: `<ReputationTimeline agentRegistry="eip155:8453:0x8004...a432" agentId={2290} showTrendLine={false} showDataPoints />`,
+      },
+    ],
+    inContext: {
+      description: "ReputationTimeline alongside ReputationDistribution for a complete reputation view.",
+      preview: withAgent(
+        <div className="w-full space-y-4">
+          <ReputationTimeline />
+          <ReputationDistribution />
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
   <ReputationTimeline />
+  <ReputationDistribution />
 </AgentProvider>`,
-    props: AGENT_IDENTITY_PROPS,
+    },
+    states: DATA_COMPONENT_STATES,
+    props: [
+      ...AGENT_IDENTITY_PROPS,
+      { name: "range", type: '"7d" | "30d" | "90d" | "all"', required: false, default: '"all"', description: "Time range filter for displayed feedback." },
+      { name: "showTrendLine", type: "boolean", required: false, default: "true", description: "Show the connecting line between data points." },
+      { name: "showDataPoints", type: "boolean", required: false, default: "false", description: "Show individual score dots on the chart." },
+    ],
   },
   {
     slug: "reputation-distribution",
     name: "ReputationDistribution",
     description:
-      "Score distribution histogram showing the spread of feedback values across 5 ranges.",
+      "Score distribution histogram showing the spread of feedback values across configurable score ranges.",
     preview: withAgent(<ReputationDistribution />),
     importLine: `import { ReputationDistribution } from "@erc8004/ui"`,
-    usage: `import { ReputationDistribution } from "@erc8004/ui"
-
-// Direct props:
-<ReputationDistribution agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
+    usage: `<ReputationDistribution agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "Horizontal Orientation",
+        description: "Render the histogram as vertical bars in a horizontal row instead of horizontal bars in a vertical stack.",
+        preview: withAgent(<ReputationDistribution orientation="horizontal" />),
+        code: `<ReputationDistribution agentRegistry="eip155:8453:0x8004...a432" agentId={2290} orientation="horizontal" />`,
+      },
+      {
+        name: "Custom Bucket Count",
+        description: "Use 10 buckets for finer-grained distribution.",
+        preview: withAgent(<ReputationDistribution bucketCount={10} />),
+        code: `<ReputationDistribution agentRegistry="eip155:8453:0x8004...a432" agentId={2290} bucketCount={10} />`,
+      },
+      {
+        name: "No Axis Labels",
+        description: "Hide the range labels for a more compact chart.",
+        preview: withAgent(<ReputationDistribution showAxisLabels={false} />),
+        code: `<ReputationDistribution agentRegistry="eip155:8453:0x8004...a432" agentId={2290} showAxisLabels={false} />`,
+      },
+    ],
+    inContext: {
+      description: "ReputationDistribution used alongside a timeline chart to show both trends and spread.",
+      preview: withAgent(
+        <div className="w-full space-y-4">
+          <ReputationTimeline />
+          <ReputationDistribution />
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <ReputationTimeline />
   <ReputationDistribution />
 </AgentProvider>`,
-    props: AGENT_IDENTITY_PROPS,
+    },
+    states: DATA_COMPONENT_STATES,
+    props: [
+      ...AGENT_IDENTITY_PROPS,
+      { name: "bucketCount", type: "number", required: false, default: "5", description: "Number of histogram buckets." },
+      { name: "orientation", type: '"vertical" | "horizontal"', required: false, default: '"vertical"', description: 'Chart layout. "vertical" = horizontal bars stacked vertically. "horizontal" = vertical bars in a row.' },
+      { name: "showAxisLabels", type: "boolean", required: false, default: "true", description: "Show score range labels on the axis." },
+    ],
   },
   {
     slug: "feedback-list",
@@ -354,16 +636,63 @@ export function AgentName() {
       "Paginated list of individual feedback entries with score, tag pills, reviewer address, timestamp, and optional written review text.",
     preview: withAgent(<FeedbackList />),
     importLine: `import { FeedbackList } from "@erc8004/ui"`,
-    usage: `import { FeedbackList } from "@erc8004/ui"
-
-// Direct props:
-<FeedbackList agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
-  <FeedbackList />
+    usage: `<FeedbackList agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "Smaller Page Size",
+        description: "Show 5 items per page instead of the default 10.",
+        preview: withAgent(<FeedbackList pageSize={5} />),
+        code: `<FeedbackList agentRegistry="eip155:8453:0x8004...a432" agentId={2290} pageSize={5} />`,
+      },
+      {
+        name: "Minimal (Scores Only)",
+        description: "Hide tags, timestamps, and reviewer addresses for a compact score-only list.",
+        preview: withAgent(<FeedbackList showTags={false} showTimestamp={false} showReviewerAddress={false} pageSize={5} />),
+        code: `<FeedbackList
+  agentRegistry="eip155:8453:0x8004...a432"
+  agentId={2290}
+  showTags={false}
+  showTimestamp={false}
+  showReviewerAddress={false}
+  pageSize={5}
+/>`,
+      },
+      {
+        name: "Without Responses",
+        description: "Hide agent responses under each feedback entry.",
+        preview: withAgent(<FeedbackList showResponses={false} />),
+        code: `<FeedbackList agentRegistry="eip155:8453:0x8004...a432" agentId={2290} showResponses={false} />`,
+      },
+    ],
+    inContext: {
+      description: "FeedbackList in a reputation panel alongside the score and tag cloud.",
+      preview: withAgent(
+        <div className="w-full space-y-4">
+          <div className="flex items-center gap-4">
+            <ReputationScore />
+            <TagCloud />
+          </div>
+          <FeedbackList pageSize={3} />
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <div className="flex items-center gap-4">
+    <ReputationScore />
+    <TagCloud />
+  </div>
+  <FeedbackList pageSize={3} />
 </AgentProvider>`,
-    props: AGENT_IDENTITY_PROPS,
+    },
+    states: DATA_COMPONENT_STATES,
+    props: [
+      ...AGENT_IDENTITY_PROPS,
+      { name: "pageSize", type: "number", required: false, default: "10", description: "Items per page." },
+      { name: "showReviewerAddress", type: "boolean", required: false, default: "true", description: "Show the reviewer's wallet address." },
+      { name: "showTimestamp", type: "boolean", required: false, default: "true", description: "Show the feedback timestamp." },
+      { name: "showTags", type: "boolean", required: false, default: "true", description: "Show tag pills." },
+      { name: "showResponses", type: "boolean", required: false, default: "true", description: "Show agent responses under each feedback entry." },
+      { name: "emptyMessage", type: "string", required: false, default: '"No feedback yet."', description: "Custom message when there is no feedback." },
+    ],
   },
   {
     slug: "tag-cloud",
@@ -372,19 +701,57 @@ export function AgentName() {
       "Weighted tag pills showing the agent's most frequent feedback tags. Pill size reflects mention frequency across all feedback entries.",
     preview: withAgent(<TagCloud />),
     importLine: `import { TagCloud } from "@erc8004/ui"`,
-    usage: `import { TagCloud } from "@erc8004/ui"
-
-// Direct props:
-<TagCloud agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
-  <TagCloud />
+    usage: `<TagCloud agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "Top 5 Tags",
+        description: "Limit to the 5 most frequent tags.",
+        preview: withAgent(<TagCloud maxTags={5} />),
+        code: `<TagCloud agentRegistry="eip155:8453:0x8004...a432" agentId={2290} maxTags={5} />`,
+      },
+      {
+        name: "Minimum 3 Occurrences",
+        description: "Only show tags mentioned at least 3 times to filter out noise.",
+        preview: withAgent(<TagCloud minOccurrences={3} />),
+        code: `<TagCloud agentRegistry="eip155:8453:0x8004...a432" agentId={2290} minOccurrences={3} />`,
+      },
+    ],
+    inContext: {
+      description: "TagCloud in a marketplace card alongside agent identity and score.",
+      preview: withAgent(
+        <div className="w-full max-w-sm space-y-3">
+          <div className="flex items-center gap-3">
+            <AgentImage />
+            <div>
+              <AgentName />
+              <ReputationScore />
+            </div>
+          </div>
+          <TagCloud maxTags={5} />
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <div className="flex items-center gap-3">
+    <AgentImage />
+    <div>
+      <AgentName />
+      <ReputationScore />
+    </div>
+  </div>
+  <TagCloud maxTags={5} />
 </AgentProvider>`,
-    props: AGENT_IDENTITY_PROPS,
+    },
+    states: DATA_COMPONENT_STATES,
+    props: [
+      ...AGENT_IDENTITY_PROPS,
+      { name: "maxTags", type: "number", required: false, default: "20", description: "Maximum number of tags shown." },
+      { name: "minOccurrences", type: "number", required: false, default: "1", description: "Minimum mention count for a tag to appear." },
+    ],
   },
 
-  // --- Validation ---
+  // =========================================================================
+  // VALIDATION
+  // =========================================================================
   {
     slug: "verification-badge",
     name: "VerificationBadge",
@@ -392,34 +759,98 @@ export function AgentName() {
       "Compact inline badge showing the agent's verification tier derived from completed validations and average validation score.",
     preview: withAgent(<VerificationBadge />),
     importLine: `import { VerificationBadge } from "@erc8004/ui"`,
-    usage: `import { VerificationBadge } from "@erc8004/ui"
-
-// Direct props:
-<VerificationBadge agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
-  <VerificationBadge />
+    usage: `<VerificationBadge agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "Alongside Agent Name",
+        description: "Place next to an agent name for inline trust indication.",
+        preview: withAgent(
+          <div className="flex items-center gap-2">
+            <AgentName />
+            <VerificationBadge />
+          </div>
+        ),
+        code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <div className="flex items-center gap-2">
+    <AgentName />
+    <VerificationBadge />
+  </div>
 </AgentProvider>`,
+      },
+    ],
+    inContext: {
+      description: "VerificationBadge in a trust panel with validation score and recent validations.",
+      preview: withAgent(
+        <div className="w-full max-w-md space-y-4">
+          <div className="flex items-center gap-2">
+            <AgentName />
+            <VerificationBadge />
+          </div>
+          <ValidationScore />
+          <ValidationList pageSize={3} />
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <div className="flex items-center gap-2">
+    <AgentName />
+    <VerificationBadge />
+  </div>
+  <ValidationScore />
+  <ValidationList pageSize={3} />
+</AgentProvider>`,
+    },
+    states: INLINE_COMPONENT_STATES,
     props: AGENT_IDENTITY_PROPS,
   },
   {
     slug: "validation-score",
     name: "ValidationScore",
     description:
-      "Average validation score (0–100) with a fill bar and completed/pending counts.",
+      "Average validation score (0-100) with a fill bar and completed/pending counts.",
     preview: withAgent(<ValidationScore />),
     importLine: `import { ValidationScore } from "@erc8004/ui"`,
-    usage: `import { ValidationScore } from "@erc8004/ui"
-
-// Direct props:
-<ValidationScore agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
+    usage: `<ValidationScore agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "Without Fill Bar",
+        description: "Hide the score fill bar for a text-only display.",
+        preview: withAgent(<ValidationScore showFillBar={false} />),
+        code: `<ValidationScore agentRegistry="eip155:8453:0x8004...a432" agentId={2290} showFillBar={false} />`,
+      },
+      {
+        name: "Without Pending Count",
+        description: "Hide the pending validation count.",
+        preview: withAgent(<ValidationScore showPendingCount={false} />),
+        code: `<ValidationScore agentRegistry="eip155:8453:0x8004...a432" agentId={2290} showPendingCount={false} />`,
+      },
+    ],
+    inContext: {
+      description: "ValidationScore in a trust panel alongside the verification badge and recent validations.",
+      preview: withAgent(
+        <div className="w-full max-w-md space-y-4">
+          <div className="flex items-center gap-2">
+            <AgentName />
+            <VerificationBadge />
+          </div>
+          <ValidationScore />
+          <ValidationList pageSize={3} />
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <div className="flex items-center gap-2">
+    <AgentName />
+    <VerificationBadge />
+  </div>
   <ValidationScore />
+  <ValidationList pageSize={3} />
 </AgentProvider>`,
-    props: AGENT_IDENTITY_PROPS,
+    },
+    states: DATA_COMPONENT_STATES,
+    props: [
+      ...AGENT_IDENTITY_PROPS,
+      { name: "showFillBar", type: "boolean", required: false, default: "true", description: "Show the score fill bar." },
+      { name: "showPendingCount", type: "boolean", required: false, default: "true", description: "Show the pending validation count." },
+    ],
   },
   {
     slug: "validation-list",
@@ -428,16 +859,51 @@ export function AgentName() {
       "Paginated list of individual validation entries with score, status, tag, validator address, and timestamp.",
     preview: withAgent(<ValidationList />),
     importLine: `import { ValidationList } from "@erc8004/ui"`,
-    usage: `import { ValidationList } from "@erc8004/ui"
-
-// Direct props:
-<ValidationList agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
-  <ValidationList />
+    usage: `<ValidationList agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "Completed Only",
+        description: "Filter to show only completed validations.",
+        preview: withAgent(<ValidationList statusFilter="completed" />),
+        code: `<ValidationList agentRegistry="eip155:8453:0x8004...a432" agentId={2290} statusFilter="completed" />`,
+      },
+      {
+        name: "Smaller Page Size",
+        description: "Show 5 items per page for a compact view.",
+        preview: withAgent(<ValidationList pageSize={5} />),
+        code: `<ValidationList agentRegistry="eip155:8453:0x8004...a432" agentId={2290} pageSize={5} />`,
+      },
+    ],
+    inContext: {
+      description: "ValidationList in a trust panel alongside the verification badge and validation score.",
+      preview: withAgent(
+        <div className="w-full max-w-md space-y-4">
+          <div className="flex items-center gap-2">
+            <AgentName />
+            <VerificationBadge />
+          </div>
+          <ValidationScore />
+          <ValidationList pageSize={3} />
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <div className="flex items-center gap-2">
+    <AgentName />
+    <VerificationBadge />
+  </div>
+  <ValidationScore />
+  <ValidationList pageSize={3} />
 </AgentProvider>`,
-    props: AGENT_IDENTITY_PROPS,
+    },
+    states: DATA_COMPONENT_STATES,
+    props: [
+      ...AGENT_IDENTITY_PROPS,
+      { name: "pageSize", type: "number", required: false, default: "10", description: "Items per page." },
+      { name: "showValidatorAddress", type: "boolean", required: false, default: "true", description: "Show the validator's wallet address." },
+      { name: "showTimestamp", type: "boolean", required: false, default: "true", description: "Show the validation timestamp." },
+      { name: "statusFilter", type: '"all" | "completed" | "pending" | "expired"', required: false, default: '"all"', description: "Filter validations by status." },
+      { name: "emptyMessage", type: "string", required: false, default: '"No validations yet."', description: "Custom message when there are no validations." },
+    ],
   },
   {
     slug: "validation-display",
@@ -446,19 +912,37 @@ export function AgentName() {
       "Composed view combining VerificationBadge, ValidationScore, and ValidationList into a single unified validation panel.",
     preview: withAgent(<ValidationDisplay />),
     importLine: `import { ValidationDisplay } from "@erc8004/ui"`,
-    usage: `import { ValidationDisplay } from "@erc8004/ui"
-
-// Direct props:
-<ValidationDisplay agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
+    usage: `<ValidationDisplay agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "Inside AgentProvider",
+        description: "Use AgentProvider to avoid repeating identity props.",
+        preview: withAgent(<ValidationDisplay />),
+        code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
   <ValidationDisplay />
 </AgentProvider>`,
+      },
+    ],
+    inContext: {
+      description: "ValidationDisplay as a standalone trust panel on an agent profile page.",
+      preview: withAgent(
+        <div className="w-full max-w-lg space-y-6">
+          <AgentCard />
+          <ValidationDisplay />
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <AgentCard />
+  <ValidationDisplay />
+</AgentProvider>`,
+    },
+    states: DATA_COMPONENT_STATES,
     props: AGENT_IDENTITY_PROPS,
   },
 
-  // --- Activity ---
+  // =========================================================================
+  // ACTIVITY
+  // =========================================================================
   {
     slug: "last-activity",
     name: "LastActivity",
@@ -466,15 +950,37 @@ export function AgentName() {
       'Cross-registry relative timestamp showing when the agent was last active (e.g. "Active 3 hours ago"). Reflects the most recent event across all registries.',
     preview: withAgent(<LastActivity />),
     importLine: `import { LastActivity } from "@erc8004/ui"`,
-    usage: `import { LastActivity } from "@erc8004/ui"
-
-// Direct props:
-<LastActivity agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
+    usage: `<LastActivity agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "Inside AgentProvider",
+        description: "Renders the last activity timestamp without repeating identity props.",
+        preview: withAgent(<LastActivity />),
+        code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
   <LastActivity />
 </AgentProvider>`,
+      },
+    ],
+    inContext: {
+      description: "LastActivity in a sidebar showing agent status alongside the activity log.",
+      preview: withAgent(
+        <div className="w-full max-w-md space-y-4">
+          <div className="flex items-center gap-3">
+            <AgentName />
+            <LastActivity />
+          </div>
+          <ActivityLog pageSize={5} />
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <div className="flex items-center gap-3">
+    <AgentName />
+    <LastActivity />
+  </div>
+  <ActivityLog pageSize={5} />
+</AgentProvider>`,
+    },
+    states: INLINE_COMPONENT_STATES,
     props: AGENT_IDENTITY_PROPS,
   },
   {
@@ -484,16 +990,46 @@ export function AgentName() {
       "Chronological feed of all on-chain events across all registries — feedback and validations merged and sorted by time.",
     preview: withAgent(<ActivityLog />),
     importLine: `import { ActivityLog } from "@erc8004/ui"`,
-    usage: `import { ActivityLog } from "@erc8004/ui"
-
-// Direct props:
-<ActivityLog agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />
-
-// Inside AgentProvider:
-<AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290}>
-  <ActivityLog />
+    usage: `<ActivityLog agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
+    examples: [
+      {
+        name: "Feedback Only",
+        description: "Filter to show only feedback events.",
+        preview: withAgent(<ActivityLog eventTypes={["feedback"]} />),
+        code: `<ActivityLog agentRegistry="eip155:8453:0x8004...a432" agentId={2290} eventTypes={["feedback"]} />`,
+      },
+      {
+        name: "Smaller Page Size",
+        description: "Show only the 5 most recent events.",
+        preview: withAgent(<ActivityLog pageSize={5} />),
+        code: `<ActivityLog agentRegistry="eip155:8453:0x8004...a432" agentId={2290} pageSize={5} />`,
+      },
+    ],
+    inContext: {
+      description: "ActivityLog in a sidebar showing recent agent activity alongside last activity timestamp.",
+      preview: withAgent(
+        <div className="w-full max-w-md space-y-4">
+          <div className="flex items-center gap-3">
+            <AgentName />
+            <LastActivity />
+          </div>
+          <ActivityLog pageSize={5} />
+        </div>
+      ),
+      code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+  <div className="flex items-center gap-3">
+    <AgentName />
+    <LastActivity />
+  </div>
+  <ActivityLog pageSize={5} />
 </AgentProvider>`,
-    props: AGENT_IDENTITY_PROPS,
+    },
+    states: DATA_COMPONENT_STATES,
+    props: [
+      ...AGENT_IDENTITY_PROPS,
+      { name: "pageSize", type: "number", required: false, default: "20", description: "Maximum number of events to display." },
+      { name: "eventTypes", type: 'Array<"feedback" | "validation">', required: false, description: "Filter by event type. Default shows all." },
+    ],
   },
 ]
 

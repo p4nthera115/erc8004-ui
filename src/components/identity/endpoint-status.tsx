@@ -155,13 +155,17 @@ function HealthIndicator({ url }: { url: string }) {
   )
 }
 
-interface EndpointStatusProps extends AgentIdentityProps {
+export type EndpointProtocol = "mcp" | "a2a" | "oasf" | "web" | "email"
+
+export interface EndpointStatusProps extends AgentIdentityProps {
   /** Show live HTTP health check dots. Default: false */
   showHealthChecks?: boolean
+  /** Filter which protocols are shown. Default shows all. */
+  protocols?: EndpointProtocol[]
   className?: string
 }
 
-export function EndpointStatus({ showHealthChecks = false, className, ...agentProps }: EndpointStatusProps) {
+export function EndpointStatus({ showHealthChecks = false, protocols, className, ...agentProps }: EndpointStatusProps) {
   const { agentRegistry, agentId } = useAgentIdentity(agentProps)
   const { data, isLoading, error } = useEndpointStatus(agentRegistry, agentId)
 
@@ -199,7 +203,10 @@ export function EndpointStatus({ showHealthChecks = false, className, ...agentPr
   }
 
   const rf = data?.agent?.registrationFile
-  const endpoints = rf ? buildEndpoints(rf) : []
+  const allEndpoints = rf ? buildEndpoints(rf) : []
+  const endpoints = protocols
+    ? allEndpoints.filter((ep) => protocols.includes(ep.protocol.toLowerCase() as EndpointProtocol))
+    : allEndpoints
 
   if (endpoints.length === 0) {
     return (

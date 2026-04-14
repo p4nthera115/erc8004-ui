@@ -295,13 +295,32 @@ function ValidationRow({ event }: { event: ValidationEvent }) {
 // COMPONENT
 // ============================================================================
 
-interface ActivityLogProps extends AgentIdentityProps {
+export type ActivityEventType = "feedback" | "validation"
+
+export interface ActivityLogProps extends AgentIdentityProps {
+  /** Maximum events to display. Default `20`. */
+  pageSize?: number
+  /** Filter by event type. Default shows all. */
+  eventTypes?: ActivityEventType[]
   className?: string
 }
 
-export function ActivityLog({ className, ...props }: ActivityLogProps) {
+export function ActivityLog({
+  pageSize = 20,
+  eventTypes,
+  className,
+  ...props
+}: ActivityLogProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
-  const { events, isLoading, error } = useActivityLog(agentRegistry, agentId)
+  const { events: allEvents, isLoading, error } = useActivityLog(agentRegistry, agentId)
+
+  const events = useMemo(() => {
+    let filtered = allEvents
+    if (eventTypes) {
+      filtered = filtered.filter((e) => eventTypes.includes(e.kind as ActivityEventType))
+    }
+    return filtered.slice(0, pageSize)
+  }, [allEvents, eventTypes, pageSize])
 
   if (isLoading) {
     return (

@@ -69,11 +69,20 @@ function scoreColor(value: number) {
   return "bg-erc8004-negative"
 }
 
-interface ReputationScoreProps extends AgentIdentityProps {
+export interface ReputationScoreProps extends AgentIdentityProps {
+  /** Show/hide the review count. Default `true`. */
+  showCount?: boolean
+  /** Decimal places for the score. Default `1`. */
+  precision?: number
   className?: string
 }
 
-export function ReputationScore({ className, ...props }: ReputationScoreProps) {
+export function ReputationScore({
+  showCount = true,
+  precision = 1,
+  className,
+  ...props
+}: ReputationScoreProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useReputationStats(agentRegistry, agentId)
 
@@ -91,7 +100,7 @@ export function ReputationScore({ className, ...props }: ReputationScoreProps) {
   }
 
   const { averageFeedbackValue, totalFeedback } = data.agentStats
-  const score = averageFeedbackValue.toFixed(1)
+  const score = averageFeedbackValue.toFixed(precision)
 
   return (
     <div
@@ -102,9 +111,11 @@ export function ReputationScore({ className, ...props }: ReputationScoreProps) {
         className={`h-2 w-2 rounded-full ${scoreColor(averageFeedbackValue)}`}
       />
       <span className="font-mono text-xl text-erc8004-card-fg/80">{score}</span>
-      <span className="text-xs text-erc8004-muted-fg opacity-0 group-hover:opacity-100 transition-opacity">
-        ({totalFeedback})
-      </span>
+      {showCount && (
+        <span className="text-xs text-erc8004-muted-fg opacity-0 group-hover:opacity-100 transition-opacity">
+          ({totalFeedback})
+        </span>
+      )}
     </div>
   )
 }

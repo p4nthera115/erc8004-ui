@@ -69,8 +69,6 @@ function useTagCloud(agentRegistry: string, agentId: number) {
 // descending. We cap at TOP_N to avoid visual clutter.
 // ============================================================================
 
-const TOP_N = 20
-
 interface TagEntry {
   tag: string
   count: number
@@ -79,7 +77,9 @@ interface TagEntry {
 }
 
 function computeTagFrequency(
-  feedbacks: Array<{ tag1: string | null; tag2: string | null }>
+  feedbacks: Array<{ tag1: string | null; tag2: string | null }>,
+  maxTags: number,
+  minOccurrences: number
 ): TagEntry[] {
   const counts = new Map<string, number>()
 
@@ -91,8 +91,9 @@ function computeTagFrequency(
   if (counts.size === 0) return []
 
   const sorted = [...counts.entries()]
+    .filter(([, count]) => count >= minOccurrences)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, TOP_N)
+    .slice(0, maxTags)
 
   const maxCount = sorted[0][1]
 
@@ -127,18 +128,27 @@ function pillClasses(weight: number): string {
 // COMPONENT
 // ============================================================================
 
-interface TagCloudProps extends AgentIdentityProps {
+export interface TagCloudProps extends AgentIdentityProps {
+  /** Maximum number of tags shown. Default `20`. */
+  maxTags?: number
+  /** Minimum occurrences for a tag to appear. Default `1`. */
+  minOccurrences?: number
   className?: string
 }
 
-export function TagCloud({ className, ...props }: TagCloudProps) {
+export function TagCloud({
+  maxTags = 20,
+  minOccurrences = 1,
+  className,
+  ...props
+}: TagCloudProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useTagCloud(agentRegistry, agentId)
 
   const tags = useMemo(() => {
     if (!data?.feedbacks) return []
-    return computeTagFrequency(data.feedbacks)
-  }, [data?.feedbacks])
+    return computeTagFrequency(data.feedbacks, maxTags, minOccurrences)
+  }, [data?.feedbacks, maxTags, minOccurrences])
 
   if (isLoading) {
     return (

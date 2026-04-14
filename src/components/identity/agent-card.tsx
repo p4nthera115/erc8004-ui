@@ -118,11 +118,23 @@ const PROTOCOL_LABELS: Array<{
   { key: "emailEndpoint", label: "Email" },
 ]
 
-interface AgentCardProps extends AgentIdentityProps {
+export interface AgentCardProps extends AgentIdentityProps {
+  /** Show owner address. Default `true`. */
+  showOwner?: boolean
+  /** Show protocol badges (MCP, A2A, etc.). Default `true`. */
+  showProtocolBadges?: boolean
+  /** Show description text. Default `true`. */
+  showDescription?: boolean
   className?: string
 }
 
-export function AgentCard({ className, ...props }: AgentCardProps) {
+export function AgentCard({
+  showOwner = true,
+  showProtocolBadges = true,
+  showDescription = true,
+  className,
+  ...props
+}: AgentCardProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useAgentCard(agentRegistry, agentId)
 
@@ -203,35 +215,38 @@ export function AgentCard({ className, ...props }: AgentCardProps) {
             </h2>
           </div>
 
-          {description && (
+          {showDescription && description && (
             <p className="mt-1 line-clamp-2 text-sm text-erc8004-muted-fg">
               {description}
             </p>
           )}
 
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            {/* Owner address */}
-            <span
-              className="font-mono text-xs text-erc8004-muted-fg"
-              title={owner}
-            >
-              {truncateAddress(owner)}
-            </span>
+          {(showOwner || (showProtocolBadges && activeProtocols.length > 0)) && (
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {showOwner && (
+                <span
+                  className="font-mono text-xs text-erc8004-muted-fg"
+                  title={owner}
+                >
+                  {truncateAddress(owner)}
+                </span>
+              )}
 
-            {activeProtocols.length > 0 && (
-              <>
-                <span className="text-erc8004-border">·</span>
-                {activeProtocols.map(({ key, label }) => (
-                  <span
-                    key={key}
-                    className="rounded-full bg-erc8004-muted px-2 py-0.5 text-xs font-medium text-erc8004-muted-fg"
-                  >
-                    {label}
-                  </span>
-                ))}
-              </>
-            )}
-          </div>
+              {showProtocolBadges && activeProtocols.length > 0 && (
+                <>
+                  {showOwner && <span className="text-erc8004-border">·</span>}
+                  {activeProtocols.map(({ key, label }) => (
+                    <span
+                      key={key}
+                      className="rounded-full bg-erc8004-muted px-2 py-0.5 text-xs font-medium text-erc8004-muted-fg"
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

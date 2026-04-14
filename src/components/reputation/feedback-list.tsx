@@ -9,7 +9,7 @@ import { truncateAddress, formatRelativeTime } from "@/lib/utils"
 import { cn } from "@/lib/cn"
 import * as v from "valibot"
 
-const PAGE_SIZE = 10
+const DEFAULT_PAGE_SIZE = 10
 
 type FeedbackItem = Pick<
   Feedback,
@@ -101,19 +101,20 @@ const FEEDBACK_LIST_QUERY = `#graphql
 function useFeedbackList(
   agentRegistry: string,
   agentId: number,
-  page: number
+  page: number,
+  pageSize: number
 ) {
   const { apiKey, subgraphOverrides } = useERC8004Config()
 
   return useQuery({
-    queryKey: ["feedback-list", agentRegistry, agentId, page],
+    queryKey: ["feedback-list", agentRegistry, agentId, page, pageSize],
     queryFn: async (): Promise<FeedbackListResponse> => {
       const { chainId } = parseAgentRegistry(agentRegistry)
       const url = getSubgraphUrl(chainId, apiKey, subgraphOverrides)
       const variables = {
         id: `${chainId}:${agentId}`,
-        first: PAGE_SIZE,
-        skip: page * PAGE_SIZE,
+        first: pageSize,
+        skip: page * pageSize,
       }
 
       const data = await subgraphFetch<FeedbackListResponse>(
@@ -144,8 +145,15 @@ function scoreColor(value: number) {
   return "text-erc8004-negative"
 }
 
-function FeedbackCard({ item }: { item: FeedbackItem }) {
-  const tags = [item.tag1, item.tag2].filter(Boolean) as string[]
+interface FeedbackCardOptions {
+  showReviewerAddress: boolean
+  showTimestamp: boolean
+  showTags: boolean
+  showResponses: boolean
+}
+
+function FeedbackCard({ item, options }: { item: FeedbackItem; options: FeedbackCardOptions }) {
+  const tags = options.showTags ? ([item.tag1, item.tag2].filter(Boolean) as string[]) : []
 
   return (
     <div className="rounded-erc8004-lg border border-erc8004-border bg-erc8004-card p-4">
@@ -167,14 +175,20 @@ function FeedbackCard({ item }: { item: FeedbackItem }) {
             </div>
           )}
         </div>
-        <div className="shrink-0 text-right">
-          <div className="font-mono text-xs text-erc8004-muted-fg" title={item.clientAddress}>
-            {truncateAddress(item.clientAddress)}
+        {(options.showReviewerAddress || options.showTimestamp) && (
+          <div className="shrink-0 text-right">
+            {options.showReviewerAddress && (
+              <div className="font-mono text-xs text-erc8004-muted-fg" title={item.clientAddress}>
+                {truncateAddress(item.clientAddress)}
+              </div>
+            )}
+            {options.showTimestamp && (
+              <div className="text-xs text-erc8004-muted-fg">
+                {formatRelativeTime(item.createdAt)}
+              </div>
+            )}
           </div>
-          <div className="text-xs text-erc8004-muted-fg">
-            {formatRelativeTime(item.createdAt)}
-          </div>
-        </div>
+        )}
       </div>
 
       {item.feedbackFile?.text && (
@@ -183,7 +197,7 @@ function FeedbackCard({ item }: { item: FeedbackItem }) {
         </p>
       )}
 
-      {item.responses.length > 0 && (
+      {options.showResponses && item.responses.length > 0 && (
         <div className="mt-3 space-y-2 border-l-2 border-erc8004-border pl-3">
           {item.responses.map((response) => (
             <div key={response.id} className="text-xs text-erc8004-muted-fg">
@@ -203,14 +217,37 @@ function FeedbackCard({ item }: { item: FeedbackItem }) {
   )
 }
 
-interface FeedbackListProps extends AgentIdentityProps {
+export interface FeedbackListProps extends AgentIdentityProps {
+  /** Items per page. Default `10`. */
+  pageSize?: number
+  /** Show reviewer address. Default `true`. */
+  showReviewerAddress?: boolean
+  /** Show timestamp. Default `true`. */
+  showTimestamp?: boolean
+  /** Show tag pills. Default `true`. */
+  showTags?: boolean
+  /** Show agent responses under each feedback entry. Default `true`. */
+  showResponses?: boolean
+  /** Message when there's no feedback. Default `"No feedback yet."`. */
+  emptyMessage?: string
   className?: string
 }
 
-export function FeedbackList({ className, ...props }: FeedbackListProps) {
+export function FeedbackList({
+  pageSize = DEFAULT_PAGE_SIZE,
+  showReviewerAddress = true,
+  showTimestamp = true,
+  showTags = true,
+  showResponses = true,
+  emptyMessage = "No feedback yet.",
+  className,
+  ...props
+}: FeedbackListProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const [page, setPage] = useState(0)
-  const { data, isLoading, error } = useFeedbackList(agentRegistry, agentId, page)
+  const { data, isLoading, error } = useFeedbackList(agentRegistry, agentId, page, pageSize)
+
+  const cardOptions: FeedbackCardOptions = { showReviewerAddress, showTimestamp, showTags, showResponses }
 
   if (isLoading) {
     return (
@@ -223,7 +260,7 @@ export function FeedbackList({ className, ...props }: FeedbackListProps) {
           <div className="h-4 w-16 animate-pulse rounded-erc8004-sm bg-erc8004-muted" />
         </div>
         <div className="space-y-3 p-5">
-          {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+          {Array.from({ length: pageSize }).map((_, i) => (
             <div
               key={i}
               className="h-20 animate-pulse rounded-erc8004-lg border border-erc8004-border bg-erc8004-muted"
@@ -255,13 +292,13 @@ export function FeedbackList({ className, ...props }: FeedbackListProps) {
   if (!data?.feedbacks.length && page === 0) {
     return (
       <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
-        <p className="text-sm text-erc8004-muted-fg">No feedback yet.</p>
+        <p className="text-sm text-erc8004-muted-fg">{emptyMessage}</p>
       </div>
     )
   }
 
   const feedbacks = data?.feedbacks ?? []
-  const hasNext = feedbacks.length === PAGE_SIZE
+  const hasNext = feedbacks.length === pageSize
   const hasPrev = page > 0
 
   return (
@@ -273,7 +310,7 @@ export function FeedbackList({ className, ...props }: FeedbackListProps) {
         <ul role="list" className="space-y-3">
           {feedbacks.map((item) => (
             <li key={item.id}>
-              <FeedbackCard item={item} />
+              <FeedbackCard item={item} options={cardOptions} />
             </li>
           ))}
         </ul>

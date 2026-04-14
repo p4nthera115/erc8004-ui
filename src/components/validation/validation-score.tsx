@@ -80,11 +80,20 @@ function scoreBarColor(score: number) {
   return "bg-erc8004-negative"
 }
 
-interface ValidationScoreProps extends AgentIdentityProps {
+export interface ValidationScoreProps extends AgentIdentityProps {
+  /** Show the score fill bar. Default `true`. */
+  showFillBar?: boolean
+  /** Show the pending validation count. Default `true`. */
+  showPendingCount?: boolean
   className?: string
 }
 
-export function ValidationScore({ className, ...props }: ValidationScoreProps) {
+export function ValidationScore({
+  showFillBar = true,
+  showPendingCount = true,
+  className,
+  ...props
+}: ValidationScoreProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useValidationStats(agentRegistry, agentId)
 
@@ -131,24 +140,25 @@ export function ValidationScore({ className, ...props }: ValidationScoreProps) {
         <h3 className="text-sm font-semibold text-erc8004-card-fg">Validation Score</h3>
         <span className="text-xs text-erc8004-muted-fg">
           {completedValidations} completed
-          {pendingCount > 0 && ` · ${pendingCount} pending`}
+          {showPendingCount && pendingCount > 0 && ` · ${pendingCount} pending`}
         </span>
       </div>
 
-      <div className="flex items-end gap-3 mb-3">
+      <div className={cn("flex items-end gap-3", showFillBar && "mb-3")}>
         <span className={`font-mono text-4xl font-semibold tabular-nums leading-none ${scoreColor(averageValidationScore)}`}>
           {averageValidationScore.toFixed(0)}
         </span>
         <span className="text-sm text-erc8004-muted-fg mb-1">/ 100</span>
       </div>
 
-      {/* Score bar */}
-      <div className="h-1.5 w-full rounded-full bg-erc8004-muted overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all ${scoreBarColor(averageValidationScore)}`}
-          style={{ width: `${Math.min(averageValidationScore, 100)}%` }}
-        />
-      </div>
+      {showFillBar && (
+        <div className="h-1.5 w-full rounded-full bg-erc8004-muted overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all ${scoreBarColor(averageValidationScore)}`}
+            style={{ width: `${Math.min(averageValidationScore, 100)}%` }}
+          />
+        </div>
+      )}
     </div>
   )
 }

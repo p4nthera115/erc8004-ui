@@ -205,11 +205,25 @@ function dotFillVar(score: number): string {
 // COMPONENT
 // ============================================================================
 
-interface ReputationTimelineProps extends AgentIdentityProps {
+export type ReputationTimelineRange = "7d" | "30d" | "90d" | "all"
+
+export interface ReputationTimelineProps extends AgentIdentityProps {
+  /** Time range filter. Default `"all"`. */
+  range?: ReputationTimelineRange
+  /** Show connecting trend line between data points. Default `true`. */
+  showTrendLine?: boolean
+  /** Show individual data point dots. Default `false`. */
+  showDataPoints?: boolean
   className?: string
 }
 
-export function ReputationTimeline({ className, ...props }: ReputationTimelineProps) {
+export function ReputationTimeline({
+  range = "all",
+  showTrendLine = true,
+  showDataPoints = false,
+  className,
+  ...props
+}: ReputationTimelineProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -218,10 +232,15 @@ export function ReputationTimeline({ className, ...props }: ReputationTimelinePr
 
   // Sort feedback by time ascending (oldest first) so the line goes
   // left to right. The subgraph returns newest-first, so we reverse.
+  // Then filter by the selected time range.
   const sorted = useMemo(() => {
     if (!data?.feedbacks) return []
-    return [...data.feedbacks].sort((a, b) => a.createdAt - b.createdAt)
-  }, [data?.feedbacks])
+    const all = [...data.feedbacks].sort((a, b) => a.createdAt - b.createdAt)
+    if (range === "all") return all
+    const days = range === "7d" ? 7 : range === "30d" ? 30 : 90
+    const cutoff = Math.floor(Date.now() / 1000) - days * 86400
+    return all.filter((fb) => fb.createdAt >= cutoff)
+  }, [data?.feedbacks, range])
 
   const plot = getPlotArea()
 
@@ -419,7 +438,7 @@ export function ReputationTimeline({ className, ...props }: ReputationTimelinePr
         ))}
 
         {/* ---- Connecting line between dots ---- */}
-        {points.length > 1 && (
+        {showTrendLine && points.length > 1 && (
           <polyline
             points={polylinePoints}
             fill="none"
@@ -437,7 +456,7 @@ export function ReputationTimeline({ className, ...props }: ReputationTimelinePr
             key={i}
             cx={pt.x}
             cy={pt.y}
-            r={hoveredIndex === i ? 5 : 3.5}
+            r={hoveredIndex === i ? 5 : (showDataPoints ? 3.5 : 0)}
             style={{
               fill: dotFillVar(pt.value),
               stroke: "var(--color-erc8004-card)",

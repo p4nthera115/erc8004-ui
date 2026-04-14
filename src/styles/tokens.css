@@ -60,8 +60,13 @@
    Dark theme
    Activated when .erc8004 is inside a .dark ancestor,
    OR when .erc8004 itself has the .dark class.
+
+   Ancestor selectors use :where() to lower specificity
+   so that a direct class on the .erc8004 element always
+   wins. This lets .erc8004.light override .dark ancestors
+   and .erc8004.dark override .light ancestors.
    ============================================ */
-.dark .erc8004,
+:where(.dark) .erc8004,
 .erc8004.dark {
   --erc8004-bg:          0.145 0 0;
   --erc8004-fg:          0.985 0 0;
@@ -89,6 +94,43 @@
   --erc8004-chart-3:     0.65 0.2 25;
   --erc8004-chart-4:     0.7 0.2 310;
   --erc8004-chart-5:     0.75 0.15 70;
+}
+
+/* ============================================
+   Light theme (explicit override)
+   Forces light tokens when .light is on the .erc8004
+   element or an ancestor — even inside a .dark context.
+   Same :where() strategy as dark: ancestor-based selectors
+   have lower specificity than direct-class selectors.
+   ============================================ */
+:where(.light) .erc8004,
+.erc8004.light {
+  --erc8004-bg:          1 0 0;
+  --erc8004-fg:          0.145 0 0;
+
+  --erc8004-card:        1 0 0;
+  --erc8004-card-fg:     0.145 0 0;
+
+  --erc8004-muted:       0.97 0 0;
+  --erc8004-muted-fg:    0.556 0 0;
+
+  --erc8004-accent:      0.55 0.2 260;
+  --erc8004-accent-fg:   0.985 0 0;
+
+  --erc8004-positive:    0.55 0.17 145;
+  --erc8004-positive-fg: 0.985 0 0;
+  --erc8004-negative:    0.55 0.2 25;
+  --erc8004-negative-fg: 0.985 0 0;
+
+  --erc8004-border:      0.922 0 0;
+
+  --erc8004-ring:        0.55 0.2 260;
+
+  --erc8004-chart-1:     0.55 0.2 260;
+  --erc8004-chart-2:     0.6 0.18 145;
+  --erc8004-chart-3:     0.6 0.2 25;
+  --erc8004-chart-4:     0.65 0.2 310;
+  --erc8004-chart-5:     0.7 0.15 70;
 }
 
 /* ============================================

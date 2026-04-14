@@ -21,6 +21,21 @@ function Introduction() {
         </p>
       </div>
 
+      <section className="flex flex-col gap-6">
+        <SectionHeading>Why this exists</SectionHeading>
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          ERC-8004 is spreading across chains faster than the tooling around it.
+          Teams building on the standard end up writing the same plumbing over
+          and over — subgraph queries, chain-prefixed identifiers, three
+          different URI formats, revoked-feedback filtering — before they can
+          render a single agent name on screen. <br />
+          <br />
+          This library is the layer in between. You pass an agent's on-chain ID,
+          you get a component that works. The point is to make ERC-8004 feel
+          like any other API a frontend developer already knows how to consume.
+        </p>
+      </section>
+
       {/* Why use a library */}
       <section className="flex flex-col gap-6">
         <SectionHeading>Why use this library?</SectionHeading>

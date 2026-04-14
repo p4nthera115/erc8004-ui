@@ -4,6 +4,7 @@ import tailwindcss from "@tailwindcss/vite"
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
 import { resolve } from "path"
 import prerenderer from "@prerenderer/rollup-plugin"
+import chromium from "@sparticuz/chromium"
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -40,6 +41,11 @@ export default defineConfig({
       renderer: "@prerenderer/renderer-puppeteer",
       rendererOptions: {
         renderAfterDocumentEvent: "app-rendered",
+        launchOptions: {
+          executablePath: chromium.executablePath(),
+          args: chromium.args,
+          headless: true,
+        },
       },
     }),
     tanstackRouter({

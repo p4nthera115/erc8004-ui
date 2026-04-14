@@ -18,7 +18,7 @@ export { VerificationBadge } from "./components/validation/verification-badge"
 export { ValidationScore } from "./components/validation/validation-score"
 export { ValidationList } from "./components/validation/validation-list"
 export { ValidationDisplay } from "./components/validation/validation-display"
-export { LastActivity } from "./components/cross-registry/last-activity"
+export { LastActivity } from "./components/activity/last-activity"
 export { ActivityLog } from "./components/activity/activity-log"
 
 // Provider

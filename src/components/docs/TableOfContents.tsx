@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useLocation } from "@tanstack/react-router"
 
 type Heading = {
@@ -24,30 +24,51 @@ export function TableOfContents() {
   const suppressTimer = useRef<ReturnType<typeof setTimeout>>(null)
   const location = useLocation()
 
-  // Scan DOM for headings after each route change
+  const scanHeadings = useCallback(() => {
+    const main = document.querySelector("main")
+    if (!main) return
+
+    const elements = main.querySelectorAll("h2, h3")
+    const found: Heading[] = []
+
+    elements.forEach((el) => {
+      // Skip headings inside preview containers
+      if (el.closest("[data-toc-exclude]")) return
+      const text = el.textContent?.trim() ?? ""
+      if (!text) return
+      const level = el.tagName === "H2" ? (2 as const) : (3 as const)
+      if (!el.id) el.id = slugify(text)
+      found.push({ id: el.id, text, level })
+    })
+
+    setHeadings((prev) => {
+      // Avoid unnecessary re-renders if headings haven't changed
+      if (
+        prev.length === found.length &&
+        prev.every((h, i) => h.id === found[i].id)
+      )
+        return prev
+      return found
+    })
+    visibleIds.current.clear()
+    setActiveId(found[0]?.id ?? "")
+  }, [])
+
+  // Scan on route change
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const main = document.querySelector("main")
-      if (!main) return
+    scanHeadings()
+  }, [location.pathname, scanHeadings])
 
-      const elements = main.querySelectorAll("h2, h3")
-      const found: Heading[] = []
+  // MutationObserver to catch DOM updates after route transitions
+  useEffect(() => {
+    const main = document.querySelector("main")
+    if (!main) return
 
-      elements.forEach((el) => {
-        const text = el.textContent?.trim() ?? ""
-        if (!text) return
-        const level = el.tagName === "H2" ? (2 as const) : (3 as const)
-        if (!el.id) el.id = slugify(text)
-        found.push({ id: el.id, text, level })
-      })
+    const observer = new MutationObserver(scanHeadings)
+    observer.observe(main, { childList: true, subtree: true })
 
-      setHeadings(found)
-      visibleIds.current.clear()
-      setActiveId(found[0]?.id ?? "")
-    }, 50)
-
-    return () => clearTimeout(timer)
-  }, [location.pathname])
+    return () => observer.disconnect()
+  }, [scanHeadings])
 
   // IntersectionObserver to track active heading
   useEffect(() => {

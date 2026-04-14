@@ -280,7 +280,7 @@ export function ThemePlayground() {
   const activePreset = PRESETS[activeIdx]
 
   return (
-    <div className="flex flex-col gap-4 not-prose">
+    <div data-toc-exclude className="flex flex-col gap-4 not-prose">
       {/* Preset selector */}
       <div className="flex flex-wrap gap-2">
         {PRESETS.map((preset, i) => (

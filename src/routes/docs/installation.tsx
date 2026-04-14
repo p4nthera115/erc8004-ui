@@ -56,6 +56,10 @@ function Installation() {
         </p>
         <CodeBlock code={`npm install react react-dom @tanstack/react-query`} />
         <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          Requires React 18 or 19, and{" "}
+          <InlineCode>@tanstack/react-query</InlineCode> v5.
+        </p>
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
           If you already have React in your project, you only need to add{" "}
           <InlineCode>@tanstack/react-query</InlineCode>. TanStack Query handles
           caching and deduplication so multiple components on the same page
@@ -120,6 +124,31 @@ function App() {
           <InlineCode>ERC8004Provider</InlineCode> auto-creates a TanStack Query
           client if you haven't set one up.
         </p>
+        <div className="border border-black/60 dark:border-white/10 bg-neutral-50 dark:bg-white/2 px-5 py-4 mt-2">
+          <p className="text-sm text-neutral-600 dark:text-white/70 leading-relaxed">
+            <span className="font-mono text-neutral-700 dark:text-white/80">
+              In production
+            </span>
+            , load the API key from an environment variable rather than
+            hardcoding it:
+          </p>
+          <div className="mt-3">
+            <CodeBlock
+              code={`// Vite\napiKey={import.meta.env.VITE_GRAPH_API_KEY}\n\n// Next.js\napiKey={process.env.NEXT_PUBLIC_GRAPH_API_KEY}`}
+            />
+          </div>
+          <p className="text-sm text-neutral-500 dark:text-white/50 leading-relaxed mt-3">
+            Graph API keys are safe in frontend code (see{" "}
+            <Link
+              to="/docs/api-keys"
+              className="text-neutral-600 dark:text-white/80 underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white transition-colors"
+            >
+              API Keys
+            </Link>
+            ) — env vars are about keeping keys out of your repo and swappable
+            per environment.
+          </p>
+        </div>
       </section>
 
       {/* Existing TanStack Query */}
@@ -170,6 +199,59 @@ function App() {
   <FeedbackList />
 </AgentProvider>`}
         />
+      </section>
+
+      {/* Troubleshooting */}
+      <section className="flex flex-col gap-4">
+        <SectionHeading>Troubleshooting</SectionHeading>
+        <ul className="flex flex-col gap-5">
+          <li className="flex flex-col gap-1 max-w-prose">
+            <p className="font-mono text-sm text-neutral-800 dark:text-white/90">
+              Nothing renders, no errors.
+            </p>
+            <p className="text-sm text-neutral-700 dark:text-white leading-relaxed">
+              Check that components are wrapped in{" "}
+              <InlineCode>{"<ERC8004Provider>"}</InlineCode>. Verify{" "}
+              <InlineCode>agentRegistry</InlineCode> matches the format{" "}
+              <InlineCode>
+                eip155:{"{chainId}"}:{"{contractAddress}"}
+              </InlineCode>{" "}
+              exactly.
+            </p>
+          </li>
+          <li className="flex flex-col gap-1 max-w-prose">
+            <p className="font-mono text-sm text-neutral-800 dark:text-white/90">
+              "Failed to fetch" or 401/403 errors.
+            </p>
+            <p className="text-sm text-neutral-700 dark:text-white leading-relaxed">
+              Your Graph API key is missing, invalid, or rate-limited.
+              Double-check the key in your provider matches the one from the
+              Graph Studio dashboard.
+            </p>
+          </li>
+          <li className="flex flex-col gap-1 max-w-prose">
+            <p className="font-mono text-sm text-neutral-800 dark:text-white/90">
+              Component shows "not found" state.
+            </p>
+            <p className="text-sm text-neutral-700 dark:text-white leading-relaxed">
+              The <InlineCode>agentId</InlineCode> doesn't exist on the chain
+              specified by <InlineCode>agentRegistry</InlineCode>. Verify the
+              chain ID in the registry string matches where the agent is
+              actually registered.
+            </p>
+          </li>
+          <li className="flex flex-col gap-1 max-w-prose">
+            <p className="font-mono text-sm text-neutral-800 dark:text-white/90">
+              Multiple components re-fetching the same data.
+            </p>
+            <p className="text-sm text-neutral-700 dark:text-white leading-relaxed">
+              Ensure a single <InlineCode>QueryClient</InlineCode> instance is
+              used (or let <InlineCode>ERC8004Provider</InlineCode> create
+              one). A new <InlineCode>QueryClient</InlineCode> on every render
+              defeats caching.
+            </p>
+          </li>
+        </ul>
       </section>
 
       {/* Next steps */}

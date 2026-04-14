@@ -67,10 +67,16 @@ function ApiKeys() {
       <section className="flex flex-col gap-4">
         <SectionHeading>Is It Safe to Use in Frontend Code?</SectionHeading>
         <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
-          Yes. Graph API keys are read-only query keys. They exist for usage
-          tracking and rate limiting, not access control. They cannot modify any
-          data. This is the same pattern used by every dApp that queries The
-          Graph — including all major DeFi protocols.
+          Yes. Graph API keys are read-only query keys — they only authorise
+          GraphQL reads against Subgraphs. They cannot modify any on-chain data,
+          they cannot write to any database, and they cannot access anything
+          outside your Subgraph queries. Their only purpose is usage tracking and
+          rate limiting.
+        </p>
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          This is the same pattern used by every dApp that queries The Graph,
+          including most major DeFi protocols. Exposing the key in frontend code
+          is expected and safe.
         </p>
       </section>
 
@@ -79,16 +85,16 @@ function ApiKeys() {
         <SectionHeading>Free Tier</SectionHeading>
         <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
           The Graph offers a free tier that's sufficient for development and
-          moderate production use. Check{" "}
+          moderate production use. Sign in to{" "}
           <a
             href="https://thegraph.com/studio/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-neutral-600 dark:text-white/80 underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white transition-colors"
           >
-            their pricing page
+            the Graph Studio dashboard
           </a>{" "}
-          for current limits.
+          to view current limits and usage for your key.
         </p>
       </section>
 

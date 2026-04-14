@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { SectionHeading } from "@/components/docs/DocPageLayout"
-import { InlineCode } from "@/components/docs/CodeBlock"
+import { InlineCode, CodeBlock } from "@/components/docs/CodeBlock"
 
 export const Route = createFileRoute("/docs/concepts")({
   component: Concepts,
@@ -157,6 +157,43 @@ function Concepts() {
         </p>
       </section>
 
+      {/* Two ways to pass identifiers */}
+      <section className="flex flex-col gap-4">
+        <SectionHeading>Two Ways to Pass Identifiers</SectionHeading>
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          Components accept identifiers two ways:
+        </p>
+
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          <span className="font-mono text-neutral-800 dark:text-white/90">
+            Directly as props
+          </span>{" "}
+          — fine for a single component:
+        </p>
+        <CodeBlock
+          code={`<ReputationScore agentRegistry="eip155:8453:0x..." agentId={2290} />`}
+        />
+
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          <span className="font-mono text-neutral-800 dark:text-white/90">
+            Via <InlineCode>AgentProvider</InlineCode>
+          </span>{" "}
+          — cleaner when rendering multiple components for the same agent:
+        </p>
+        <CodeBlock
+          code={`<AgentProvider agentRegistry="eip155:8453:0x..." agentId={2290}>
+  <AgentCard />
+  <ReputationScore />
+  <FeedbackList />
+</AgentProvider>`}
+        />
+
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          Props on individual components override the provider, so you can mix
+          both patterns when needed.
+        </p>
+      </section>
+
       {/* Trustless data */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Trustless Data</SectionHeading>
@@ -166,6 +203,15 @@ function Concepts() {
           internally. This means the data you see is guaranteed to be real
           on-chain data, not something that could be spoofed by a developer
           passing fake props.
+        </p>
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          This differs from a typical React component where you'd pass something
+          like{" "}
+          <InlineCode>{'<AgentCard name="Alice" score={4.8} />'}</InlineCode> —
+          those values could be anything the developer types. Here, the component
+          fetches <InlineCode>name</InlineCode> and{" "}
+          <InlineCode>score</InlineCode> itself from on-chain data, so what's
+          displayed is what's actually registered.
         </p>
       </section>
 

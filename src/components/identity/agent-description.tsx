@@ -4,6 +4,7 @@ import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
 import { cn } from "@/lib/cn"
 import { useQuery } from "@tanstack/react-query"
+import { Skeleton } from "@/components/_internal"
 import * as v from "valibot"
 
 type AgentDescriptionResponse = {
@@ -13,13 +14,15 @@ type AgentDescriptionResponse = {
 }
 
 const agentDescriptionSchema = v.object({
-  agent: v.object({
-    registrationFile: v.nullable(
-      v.object({
-        description: v.nullable(v.string()),
-      })
-    ),
-  }),
+  agent: v.nullable(
+    v.object({
+      registrationFile: v.nullable(
+        v.object({
+          description: v.nullable(v.string()),
+        })
+      ),
+    })
+  ),
 })
 
 const AGENT_DESCRIPTION_QUERY = `#graphql
@@ -72,13 +75,9 @@ export function AgentDescription({ className, ...props }: AgentDescriptionProps)
 
   if (isLoading) {
     return (
-      <div
-        className={cn("space-y-2 animate-pulse", className)}
-        aria-busy="true"
-        aria-live="polite"
-      >
-        <div className="h-3 w-full rounded-erc8004-sm bg-erc8004-muted" />
-        <div className="h-3 w-4/5 rounded-erc8004-sm bg-erc8004-muted" />
+      <div className={cn("space-y-2", className)}>
+        <Skeleton className="h-3 w-full" />
+        <Skeleton className="h-3 w-4/5" />
       </div>
     )
   }
@@ -91,7 +90,7 @@ export function AgentDescription({ className, ...props }: AgentDescriptionProps)
   if (!description) return null
 
   return (
-    <p className={cn("text-sm text-erc8004-muted-fg", className)}>
+    <p className={cn("text-sm text-erc8004-muted-fg leading-relaxed", className)}>
       {description}
     </p>
   )

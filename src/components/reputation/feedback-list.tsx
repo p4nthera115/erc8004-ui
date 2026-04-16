@@ -5,8 +5,9 @@ import type { Feedback, FeedbackFile, FeedbackResponse } from "@/types"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
-import { truncateAddress, formatRelativeTime } from "@/lib/utils"
+import { formatRelativeTime } from "@/lib/utils"
 import { cn } from "@/lib/cn"
+import { Card, Tag, Address, Skeleton, EmptyState, ErrorState } from "@/components/_internal"
 import * as v from "valibot"
 
 const DEFAULT_PAGE_SIZE = 10
@@ -137,78 +138,68 @@ function useFeedbackList(
   })
 }
 
-function scoreColor(value: number) {
-  if (value >= 81) return "text-erc8004-positive"
-  if (value >= 61) return "text-erc8004-positive/80"
-  if (value >= 41) return "text-erc8004-chart-5"
-  if (value >= 21) return "text-erc8004-chart-3"
-  return "text-erc8004-negative"
-}
-
-interface FeedbackCardOptions {
+interface FeedbackRowOptions {
   showReviewerAddress: boolean
   showTimestamp: boolean
   showTags: boolean
   showResponses: boolean
+  coloredScores: boolean
 }
 
-function FeedbackCard({ item, options }: { item: FeedbackItem; options: FeedbackCardOptions }) {
+/** CSS var for a score value, banded green → gold → red. */
+function scoreColorVar(score: number): string {
+  if (score >= 81) return "oklch(var(--erc8004-positive))"
+  if (score >= 61) return "oklch(var(--erc8004-chart-2))"
+  if (score >= 41) return "oklch(var(--erc8004-chart-5))"
+  if (score >= 21) return "oklch(var(--erc8004-chart-3))"
+  return "oklch(var(--erc8004-negative))"
+}
+
+function FeedbackRow({ item, options }: { item: FeedbackItem; options: FeedbackRowOptions }) {
   const tags = options.showTags ? ([item.tag1, item.tag2].filter(Boolean) as string[]) : []
 
   return (
-    <div className="rounded-erc8004-lg border border-erc8004-border bg-erc8004-card p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className={`font-mono text-lg font-semibold tabular-nums ${scoreColor(item.value)}`}>
-            {item.value.toFixed(1)}
-          </span>
-          {tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full bg-erc8004-muted px-2 py-0.5 text-xs text-erc8004-muted-fg"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
+    <div className="px-4 py-3">
+      <div className="flex items-center gap-2 min-w-0">
+        <span
+          className={cn(
+            "font-mono text-base font-semibold tabular-nums",
+            !options.coloredScores && "text-erc8004-card-fg"
           )}
-        </div>
-        {(options.showReviewerAddress || options.showTimestamp) && (
-          <div className="shrink-0 text-right">
-            {options.showReviewerAddress && (
-              <div className="font-mono text-xs text-erc8004-muted-fg" title={item.clientAddress}>
-                {truncateAddress(item.clientAddress)}
-              </div>
-            )}
-            {options.showTimestamp && (
-              <div className="text-xs text-erc8004-muted-fg">
-                {formatRelativeTime(item.createdAt)}
-              </div>
-            )}
-          </div>
+          style={
+            options.coloredScores
+              ? { color: scoreColorVar(item.value) }
+              : undefined
+          }
+        >
+          {item.value.toFixed(1)}
+        </span>
+        {tags.map((tag) => (
+          <Tag key={tag}>{tag}</Tag>
+        ))}
+        {options.showReviewerAddress && (
+          <Address address={item.clientAddress} className="ml-auto shrink-0" />
+        )}
+        {options.showTimestamp && (
+          <span className="text-xs text-erc8004-muted-fg shrink-0">
+            {formatRelativeTime(item.createdAt)}
+          </span>
         )}
       </div>
 
       {item.feedbackFile?.text && (
-        <p className="mt-3 text-sm text-erc8004-card-fg line-clamp-3">
+        <p className="mt-2 text-sm text-erc8004-card-fg line-clamp-3">
           {item.feedbackFile.text}
         </p>
       )}
 
       {options.showResponses && item.responses.length > 0 && (
-        <div className="mt-3 space-y-2 border-l-2 border-erc8004-border pl-3">
+        <div className="mt-3 space-y-2 pl-4 border-l border-erc8004-border ml-2">
           {item.responses.map((response) => (
             <div key={response.id} className="text-xs text-erc8004-muted-fg">
-              <span className="font-mono">{truncateAddress(response.responder)}</span>
+              <Address address={response.responder} />
               {" · "}
               <span>{formatRelativeTime(response.createdAt)}</span>
-              {response.responseUri && (
-                <span className="ml-1 text-erc8004-muted-fg/70 truncate">
-                  {response.responseUri}
-                </span>
-              )}
             </div>
           ))}
         </div>
@@ -228,6 +219,10 @@ export interface FeedbackListProps extends AgentIdentityProps {
   showTags?: boolean
   /** Show agent responses under each feedback entry. Default `true`. */
   showResponses?: boolean
+  /**
+   * Colour the numeric score by score band (green/gold/red). Default `true`.
+   */
+  coloredScores?: boolean
   /** Message when there's no feedback. Default `"No feedback yet."`. */
   emptyMessage?: string
   className?: string
@@ -239,106 +234,86 @@ export function FeedbackList({
   showTimestamp = true,
   showTags = true,
   showResponses = true,
+  coloredScores = true,
   emptyMessage = "No feedback yet.",
   className,
   ...props
 }: FeedbackListProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const [page, setPage] = useState(0)
-  const { data, isLoading, error } = useFeedbackList(agentRegistry, agentId, page, pageSize)
+  const { data, isLoading, error, refetch } = useFeedbackList(agentRegistry, agentId, page, pageSize)
 
-  const cardOptions: FeedbackCardOptions = { showReviewerAddress, showTimestamp, showTags, showResponses }
+  const rowOptions: FeedbackRowOptions = {
+    showReviewerAddress,
+    showTimestamp,
+    showTags,
+    showResponses,
+    coloredScores,
+  }
 
   if (isLoading) {
     return (
-      <div
-        className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card", className)}
-        aria-busy="true"
-        aria-live="polite"
-      >
-        <div className="border-b border-erc8004-border px-5 py-4">
-          <div className="h-4 w-16 animate-pulse rounded-erc8004-sm bg-erc8004-muted" />
+      <Card className={cn("w-full", className)}>
+        <div className="border-b border-erc8004-border px-4 py-3">
+          <Skeleton className="h-4 w-16" />
         </div>
-        <div className="space-y-3 p-5">
-          {Array.from({ length: pageSize }).map((_, i) => (
-            <div
-              key={i}
-              className="h-20 animate-pulse rounded-erc8004-lg border border-erc8004-border bg-erc8004-muted"
-            />
+        <div className="divide-y divide-erc8004-border">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="px-4 py-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-10" />
+                <Skeleton className="h-5 w-16 rounded-erc8004-sm" />
+                <Skeleton className="h-3 w-20 ml-auto" />
+              </div>
+              <Skeleton className="h-3 w-full" />
+            </div>
           ))}
-          <div className="flex items-center justify-between pt-1">
-            <div className="h-7 w-20 animate-pulse rounded-erc8004-md bg-erc8004-muted" />
-            <div className="h-4 w-12 animate-pulse rounded-erc8004-sm bg-erc8004-muted" />
-            <div className="h-7 w-14 animate-pulse rounded-erc8004-md bg-erc8004-muted" />
-          </div>
         </div>
-      </div>
+      </Card>
     )
   }
 
   if (error) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
-        <p className="text-sm text-erc8004-negative">
-          Failed to load feedback.
-        </p>
-        <p className="mt-1 text-xs text-erc8004-negative/70">
-          {error instanceof Error ? error.message : "Unknown error"}
-        </p>
-      </div>
+      <Card className={cn("w-full", className)}>
+        <ErrorState message="Couldn't load feedback" onRetry={() => refetch()} />
+      </Card>
     )
   }
 
   if (!data?.feedbacks.length && page === 0) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
-        <p className="text-sm text-erc8004-muted-fg">{emptyMessage}</p>
-      </div>
+      <Card className={cn("w-full", className)}>
+        <EmptyState message={emptyMessage} />
+      </Card>
     )
   }
 
   const feedbacks = data?.feedbacks ?? []
-  const hasNext = feedbacks.length === pageSize
-  const hasPrev = page > 0
+  const hasMore = feedbacks.length === pageSize
 
   return (
-    <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card", className)}>
-      <div className="border-b border-erc8004-border px-5 py-4">
-        <h3 className="text-sm font-semibold text-erc8004-card-fg">Feedback</h3>
+    <Card className={cn("w-full", className)}>
+      <div className="border-b border-erc8004-border px-4 py-3">
+        <h3 className="text-sm font-medium text-erc8004-card-fg">Feedback</h3>
       </div>
-      <div className="space-y-3 p-5">
-        <ul role="list" className="space-y-3">
-          {feedbacks.map((item) => (
-            <li key={item.id}>
-              <FeedbackCard item={item} options={cardOptions} />
-            </li>
-          ))}
-        </ul>
 
-        {(hasPrev || hasNext) && (
-          <div className="flex items-center justify-between pt-1">
-            <button
-              onClick={() => setPage((p) => p - 1)}
-              disabled={!hasPrev}
-              aria-label="Previous page"
-              className="rounded-erc8004-md px-3 py-1.5 text-xs text-erc8004-muted-fg hover:text-erc8004-card-fg disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring focus-visible:ring-offset-2"
-            >
-              ← Previous
-            </button>
-            <span className="text-xs text-erc8004-muted-fg">
-              Page {page + 1}
-            </span>
-            <button
-              onClick={() => setPage((p) => p + 1)}
-              disabled={!hasNext}
-              aria-label="Next page"
-              className="rounded-erc8004-md px-3 py-1.5 text-xs text-erc8004-muted-fg hover:text-erc8004-card-fg disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring focus-visible:ring-offset-2"
-            >
-              Next →
-            </button>
-          </div>
-        )}
+      <div className="divide-y divide-erc8004-border" role="list">
+        {feedbacks.map((item) => (
+          <FeedbackRow key={item.id} item={item} options={rowOptions} />
+        ))}
       </div>
-    </div>
+
+      {hasMore && (
+        <div className="border-t border-erc8004-border px-4 py-3">
+          <button
+            onClick={() => setPage((p) => p + 1)}
+            className="bg-erc8004-muted hover:bg-erc8004-border text-erc8004-fg text-sm px-3 py-1.5 rounded-erc8004-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
+          >
+            Load more
+          </button>
+        </div>
+      )}
+    </Card>
   )
 }

@@ -6,29 +6,36 @@ import {
   type AgentIdentityProps,
 } from "@/lib/useAgentIdentity"
 import { cn } from "@/lib/cn"
+import { truncateAddress } from "@/lib/utils"
 import type { AgentRegistrationFile } from "@/types"
 import { useQuery } from "@tanstack/react-query"
+import { Skeleton } from "@/components/_internal"
 import * as v from "valibot"
 
 type AgentNameResponse = {
   agent: {
+    owner: string
     registrationFile: Pick<AgentRegistrationFile, "name"> | null
   } | null
 }
 
 const agentNameSchema = v.object({
-  agent: v.object({
-    registrationFile: v.nullable(
-      v.object({
-        name: v.nullable(v.string()),
-      })
-    ),
-  }),
+  agent: v.nullable(
+    v.object({
+      owner: v.string(),
+      registrationFile: v.nullable(
+        v.object({
+          name: v.nullable(v.string()),
+        })
+      ),
+    })
+  ),
 })
 
 const AGENT_NAME_QUERY = `#graphql
   query ($id: ID!) {
     agent(id: $id) {
+      owner
       registrationFile {
         name
       }
@@ -75,26 +82,33 @@ export function AgentName({ className, ...props }: AgentNameProps) {
   const { data, isLoading, error } = useAgentName(agentRegistry, agentId)
 
   if (isLoading) {
-    return (
-      <div
-        className={cn("h-4 w-32 animate-pulse rounded-erc8004-sm bg-erc8004-muted", className)}
-        aria-busy="true"
-        aria-live="polite"
-      />
-    )
+    return <Skeleton className={cn("h-5 w-32", className)} />
   }
 
-  if (error) {
+  if (error || !data?.agent) {
     return (
-      <span className={cn("text-erc8004-negative text-sm", className)}>
+      <span className={cn("font-mono text-xs text-erc8004-muted-fg", className)}>
         Agent #{agentId}
       </span>
     )
   }
 
+  const name = data.agent.registrationFile?.name
+
+  if (name) {
+    return (
+      <span className={cn("text-erc8004-fg font-medium", className)}>
+        {name}
+      </span>
+    )
+  }
+
   return (
-    <span className={cn("text-erc8004-card-fg", className)}>
-      {data?.agent?.registrationFile?.name ?? `Agent #${agentId}`}
+    <span
+      className={cn("font-mono text-xs text-erc8004-muted-fg", className)}
+      title={data.agent.owner}
+    >
+      {truncateAddress(data.agent.owner)}
     </span>
   )
 }

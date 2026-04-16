@@ -5,6 +5,7 @@ import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { cn } from "@/lib/cn"
+import { Card, Tag, Skeleton, EmptyState, ErrorState } from "@/components/_internal"
 import * as v from "valibot"
 
 // ============================================================================
@@ -111,17 +112,10 @@ function computeTagFrequency(
 // opacity. Three tiers keeps it readable without needing inline styles.
 // ============================================================================
 
-function pillClasses(weight: number): string {
-  if (weight >= 0.66) {
-    // Top tier — largest, boldest, full opacity
-    return "text-sm font-semibold text-erc8004-card-fg bg-erc8004-muted px-3 py-1"
-  }
-  if (weight >= 0.33) {
-    // Mid tier
-    return "text-xs font-medium text-erc8004-muted-fg bg-erc8004-muted px-2.5 py-1"
-  }
-  // Bottom tier — smallest, lightest
-  return "text-xs font-normal text-erc8004-muted-fg/60 bg-erc8004-muted/50 px-2 py-0.5"
+function tagSizeClass(weight: number): string {
+  if (weight >= 0.66) return "text-sm"
+  if (weight >= 0.33) return "text-xs"
+  return "text-xs opacity-70"
 }
 
 // ============================================================================
@@ -152,49 +146,42 @@ export function TagCloud({
 
   if (isLoading) {
     return (
-      <div
-        className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5 animate-pulse", className)}
-        aria-busy="true"
-        aria-live="polite"
-      >
-        <div className="mb-4 h-4 w-24 rounded-erc8004-sm bg-erc8004-muted" />
+      <Card className={cn("w-full p-4", className)}>
+        <Skeleton className="mb-4 h-4 w-24" />
         <div className="flex flex-wrap gap-2">
           {[80, 56, 96, 64, 48, 72, 40, 88].map((w) => (
-            <div
+            <Skeleton
               key={w}
-              className="h-6 rounded-full bg-erc8004-muted"
+              className="h-6 rounded-erc8004-sm"
               style={{ width: w }}
             />
           ))}
         </div>
-      </div>
+      </Card>
     )
   }
 
   if (error) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
-        <p className="text-sm text-erc8004-negative">Failed to load tags.</p>
-        <p className="mt-1 text-xs text-erc8004-negative/70">
-          {error instanceof Error ? error.message : "Unknown error"}
-        </p>
-      </div>
+      <Card className={cn("w-full", className)}>
+        <ErrorState message="Couldn't load tags" />
+      </Card>
     )
   }
 
   if (tags.length === 0) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
-        <h3 className="mb-3 text-sm font-semibold text-erc8004-card-fg">Specialisations</h3>
-        <p className="text-sm text-erc8004-muted-fg">No tags yet.</p>
-      </div>
+      <Card className={cn("w-full", className)}>
+        <h3 className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">Specialisations</h3>
+        <EmptyState message="No tags yet" />
+      </Card>
     )
   }
 
   return (
-    <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
+    <Card className={cn("w-full p-4", className)}>
       <div className="mb-4 flex items-baseline justify-between">
-        <h3 className="text-sm font-semibold text-erc8004-card-fg">Specialisations</h3>
+        <h3 className="text-sm font-medium text-erc8004-card-fg">Specialisations</h3>
         <span className="text-xs text-erc8004-muted-fg">
           {tags.length} tag{tags.length === 1 ? "" : "s"}
         </span>
@@ -202,15 +189,14 @@ export function TagCloud({
 
       <div className="flex flex-wrap gap-2">
         {tags.map(({ tag, count, weight }) => (
-          <span
+          <Tag
             key={tag}
-            className={`rounded-full transition-colors ${pillClasses(weight)}`}
-            title={`${count} mention${count === 1 ? "" : "s"}`}
+            className={tagSizeClass(weight)}
           >
-            {tag}
-          </span>
+            <span title={`${count} mention${count === 1 ? "" : "s"}`}>{tag}</span>
+          </Tag>
         ))}
       </div>
-    </div>
+    </Card>
   )
 }

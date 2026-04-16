@@ -4,6 +4,7 @@ import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
 import { cn } from "@/lib/cn"
+import { Tag, Skeleton } from "@/components/_internal"
 import type { AgentStats } from "@/types"
 import * as v from "valibot"
 
@@ -66,22 +67,12 @@ function useValidationStats(agentRegistry: string, agentId: number) {
   })
 }
 
-// Tier thresholds based on completedValidations and averageValidationScore
-function getTier(completedValidations: number, averageScore: number): {
-  label: string
-  color: string
-  dotColor: string
-} {
-  if (completedValidations === 0) {
-    return { label: "Unverified", color: "text-erc8004-muted-fg", dotColor: "bg-erc8004-muted-fg" }
-  }
-  if (averageScore >= 80 && completedValidations >= 5) {
-    return { label: "Highly Verified", color: "text-erc8004-positive", dotColor: "bg-erc8004-positive" }
-  }
-  if (averageScore >= 60 && completedValidations >= 3) {
-    return { label: "Verified", color: "text-erc8004-accent", dotColor: "bg-erc8004-accent" }
-  }
-  return { label: "Partially Verified", color: "text-erc8004-chart-5", dotColor: "bg-erc8004-chart-5" }
+type Tier = "unverified" | "verified" | "highly-verified"
+
+function getTier(completedValidations: number, averageScore: number): Tier {
+  if (completedValidations >= 5 && averageScore >= 85) return "highly-verified"
+  if (completedValidations >= 1 && averageScore >= 70) return "verified"
+  return "unverified"
 }
 
 interface VerificationBadgeProps extends AgentIdentityProps {
@@ -94,32 +85,52 @@ export function VerificationBadge({ className, ...props }: VerificationBadgeProp
 
   if (isLoading) {
     return (
-      <div className={cn("inline-flex items-center gap-1.5 animate-pulse", className)} aria-busy="true" aria-live="polite">
-        <div className="h-2 w-2 rounded-full bg-erc8004-muted" />
-        <div className="h-3 w-20 rounded-erc8004-sm bg-erc8004-muted" />
+      <div className={cn("inline-flex items-center gap-1.5", className)}>
+        <Skeleton className="h-5 w-20 rounded-erc8004-sm" />
       </div>
     )
   }
 
   if (error || !data?.agentStats) {
     return (
-      <div className={cn("inline-flex items-center gap-1.5", className)}>
-        <div className="h-2 w-2 rounded-full bg-erc8004-muted" />
-        <span className="text-xs text-erc8004-muted-fg">Unverified</span>
-      </div>
+      <Tag className={className}>
+        <span className="h-1.5 w-1.5 rounded-full border border-erc8004-muted-fg" />
+        Unverified
+      </Tag>
     )
   }
 
   const { completedValidations, averageValidationScore } = data.agentStats
   const tier = getTier(completedValidations, averageValidationScore)
 
+  if (tier === "unverified") {
+    return (
+      <Tag className={className}>
+        <span className="h-1.5 w-1.5 rounded-full border border-erc8004-muted-fg" />
+        Unverified
+      </Tag>
+    )
+  }
+
+  if (tier === "highly-verified") {
+    return (
+      <Tag
+        variant="positive"
+        className={className}
+      >
+        <span className="h-1.5 w-1.5 rounded-full bg-erc8004-positive-fg" />
+        {`Highly Verified · ${completedValidations}`}
+      </Tag>
+    )
+  }
+
   return (
-    <div
-      className={cn(`inline-flex items-center gap-1.5 cursor-default ${tier.color}`, className)}
-      title={`${completedValidations} validation${completedValidations === 1 ? "" : "s"} · avg score ${averageValidationScore.toFixed(0)}/100`}
+    <Tag
+      variant="positive"
+      className={className}
     >
-      <div className={`h-2 w-2 rounded-full ${tier.dotColor}`} />
-      <span className="text-xs font-medium">{tier.label}</span>
-    </div>
+      <span className="h-1.5 w-1.5 rounded-full bg-erc8004-positive-fg" />
+      Verified
+    </Tag>
   )
 }

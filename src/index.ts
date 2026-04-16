@@ -36,7 +36,10 @@ export type {
   ReputationTimelineRange,
 } from "./components/reputation/reputation-timeline"
 export type { TagCloudProps } from "./components/reputation/tag-cloud"
-export type { AgentCardProps } from "./components/identity/agent-card"
+export type {
+  AgentCardProps,
+  AgentCardLayout,
+} from "./components/identity/agent-card"
 export type {
   EndpointStatusProps,
   EndpointProtocol,

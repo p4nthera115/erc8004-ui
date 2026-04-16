@@ -240,18 +240,33 @@ function App() {
     examples: [
       {
         name: "Inside AgentProvider",
-        description: "Use AgentProvider to avoid repeating props when rendering multiple components for the same agent.",
+        description:
+          "Use AgentProvider to avoid repeating props when rendering multiple components for the same agent.",
         preview: withAgent(<AgentName />),
         code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
   <AgentName />
 </AgentProvider>`,
       },
+      {
+        name: "With Custom Styling",
+        description:
+          "Pass className to override typography. Useful for heading-level displays.",
+        preview: withAgent(
+          <AgentName className="text-2xl font-semibold tracking-tight" />
+        ),
+        code: `<AgentName
+  agentRegistry="eip155:8453:0x8004...a432"
+  agentId={2290}
+  className="text-2xl font-semibold tracking-tight"
+/>`,
+      },
     ],
     inContext: {
-      description: "AgentName used in a profile header alongside the agent's image, description, and verification status.",
+      description:
+        "AgentName used in a profile header alongside the agent's image, description, and verification status.",
       preview: withAgent(
-        <div className="flex items-center gap-4">
-          <AgentImage />
+        <div className="flex items-center gap-6">
+          <AgentImage className="min-w-16" />
           <div>
             <div className="flex items-center gap-2">
               <AgentName />
@@ -288,19 +303,34 @@ function App() {
     examples: [
       {
         name: "With FingerprintBadge Fallback",
-        description: "When no image is registered, AgentImage automatically renders the deterministic FingerprintBadge as a fallback.",
+        description:
+          "When no image is registered, AgentImage automatically renders the deterministic FingerprintBadge as a fallback.",
         preview: withAgent(<AgentImage />),
         code: `// If the agent has no registered image, a FingerprintBadge is shown:
 <AgentImage agentRegistry="eip155:8453:0x8004...a432" agentId={2290} />`,
       },
+      {
+        name: "Circular Avatar",
+        description:
+          "Use className to render as a circular avatar at a fixed size.",
+        preview: withAgent(
+          <AgentImage className="h-16 w-16 rounded-full overflow-hidden" />
+        ),
+        code: `<AgentImage
+  agentRegistry="eip155:8453:0x8004...a432"
+  agentId={2290}
+  className="h-16 w-16 rounded-full overflow-hidden"
+/>`,
+      },
     ],
     inContext: {
-      description: "AgentImage in a profile header alongside name and verification badge.",
+      description:
+        "AgentImage in a profile header alongside name and verification badge.",
       preview: withAgent(
-        <div className="flex items-center gap-4">
-          <AgentImage />
-          <div>
-            <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg">
+          <AgentImage className="min-h-24 min-w-24" />
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-4">
               <AgentName />
               <VerificationBadge />
             </div>
@@ -309,10 +339,10 @@ function App() {
         </div>
       ),
       code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
-  <div className="flex items-center gap-4">
-    <AgentImage />
-    <div>
-      <div className="flex items-center gap-2">
+  <div className="flex items-center gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg">
+    <AgentImage className="min-h-24 min-w-24" />
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-4">
         <AgentName />
         <VerificationBadge />
       </div>
@@ -335,29 +365,51 @@ function App() {
     examples: [
       {
         name: "Inside AgentProvider",
-        description: "Renders the description text without repeating agent identity props.",
+        description:
+          "Renders the description text without repeating agent identity props.",
         preview: withAgent(<AgentDescription />),
         code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
   <AgentDescription />
 </AgentProvider>`,
       },
+      {
+        name: "Truncated to Two Lines",
+        description:
+          "Use className with line-clamp to constrain long descriptions inside compact cards.",
+        preview: withAgent(
+          <AgentDescription className="line-clamp-2 max-w-sm text-sm text-erc8004-muted-fg" />
+        ),
+        code: `<AgentDescription
+  agentRegistry="eip155:8453:0x8004...a432"
+  agentId={2290}
+  className="line-clamp-2 max-w-sm text-sm text-erc8004-muted-fg"
+/>`,
+      },
     ],
     inContext: {
       description: "AgentDescription as part of a profile header composition.",
       preview: withAgent(
-        <div className="flex items-center gap-4">
-          <AgentImage />
-          <div>
-            <AgentName />
-            <AgentDescription />
+        <AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
+          <div className="flex items-center gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg">
+            <AgentImage className="min-h-24 min-w-24" />
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-4">
+                <AgentName />
+                <VerificationBadge />
+              </div>
+              <AgentDescription />
+            </div>
           </div>
-        </div>
+        </AgentProvider>
       ),
       code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
-  <div className="flex items-center gap-4">
-    <AgentImage />
-    <div>
-      <AgentName />
+  <div className="flex items-center gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg">
+    <AgentImage className="min-h-24 min-w-24" />
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-4">
+        <AgentName />
+        <VerificationBadge />
+      </div>
       <AgentDescription />
     </div>
   </div>
@@ -376,6 +428,13 @@ function App() {
     usage: `<AgentCard agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
     examples: [
       {
+        name: "Vertical Layout",
+        description:
+          "Stack the avatar above the name, agent id, and description. Ideal for marketplace grids and directory tiles.",
+        preview: withAgent(<AgentCard layout="vertical" />),
+        code: `<AgentCard agentRegistry="eip155:8453:0x8004...a432" agentId={2290} layout="vertical" />`,
+      },
+      {
         name: "Without Description",
         description: "Hide the description to create a more compact card.",
         preview: withAgent(<AgentCard showDescription={false} />),
@@ -383,27 +442,38 @@ function App() {
       },
       {
         name: "Without Protocol Badges",
-        description: "Hide protocol badges for a cleaner look in contexts where endpoints aren't relevant.",
+        description:
+          "Hide protocol badges for a cleaner look in contexts where endpoints aren't relevant.",
         preview: withAgent(<AgentCard showProtocolBadges={false} />),
         code: `<AgentCard agentRegistry="eip155:8453:0x8004...a432" agentId={2290} showProtocolBadges={false} />`,
       },
       {
         name: "Minimal",
-        description: "Show only avatar and name by hiding description, owner, and protocol badges.",
-        preview: withAgent(<AgentCard showDescription={false} showOwner={false} showProtocolBadges={false} />),
+        description:
+          "Show only avatar and name by hiding description, owner, and protocol badges.",
+        preview: withAgent(
+          <AgentCard
+            showDescription={false}
+            showOwner={false}
+            showProtocolBadges={false}
+            layout="vertical"
+          />
+        ),
         code: `<AgentCard
   agentRegistry="eip155:8453:0x8004...a432"
   agentId={2290}
   showDescription={false}
   showOwner={false}
   showProtocolBadges={false}
+  layout="vertical"
 />`,
       },
     ],
     inContext: {
-      description: "AgentCard used in a marketplace grid alongside reputation data.",
+      description:
+        "AgentCard used in a marketplace grid alongside reputation data.",
       preview: withAgent(
-        <div className="w-full max-w-sm space-y-3">
+        <div className="w-full space-y-3">
           <AgentCard />
           <div className="flex items-center gap-4 px-1">
             <ReputationScore />
@@ -424,9 +494,35 @@ function App() {
     states: DATA_COMPONENT_STATES,
     props: [
       ...AGENT_IDENTITY_PROPS,
-      { name: "showOwner", type: "boolean", required: false, default: "true", description: "Show the owner wallet address." },
-      { name: "showProtocolBadges", type: "boolean", required: false, default: "true", description: "Show protocol badges (MCP, A2A, OASF, Web, Email)." },
-      { name: "showDescription", type: "boolean", required: false, default: "true", description: "Show the agent's description text." },
+      {
+        name: "layout",
+        type: '"horizontal" | "vertical"',
+        required: false,
+        default: '"horizontal"',
+        description:
+          'Card layout. "horizontal" places the avatar next to name and description. "vertical" stacks the avatar above name, agent id, and description.',
+      },
+      {
+        name: "showOwner",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description: "Show the owner wallet address.",
+      },
+      {
+        name: "showProtocolBadges",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description: "Show protocol badges (MCP, A2A, OASF, Web, Email).",
+      },
+      {
+        name: "showDescription",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description: "Show the agent's description text.",
+      },
     ],
   },
   {
@@ -440,7 +536,8 @@ function App() {
     examples: [
       {
         name: "With Health Checks",
-        description: "Enable live HTTP health checks to show green/red status dots for each endpoint.",
+        description:
+          "Enable live HTTP health checks to show green/red status dots for each endpoint.",
         preview: withAgent(<EndpointStatus showHealthChecks />),
         code: `<EndpointStatus agentRegistry="eip155:8453:0x8004...a432" agentId={2290} showHealthChecks />`,
       },
@@ -452,7 +549,8 @@ function App() {
       },
     ],
     inContext: {
-      description: "EndpointStatus alongside an AgentCard to form a complete identity view.",
+      description:
+        "EndpointStatus alongside an AgentCard to form a complete identity view.",
       preview: withAgent(
         <div className="w-full max-w-md space-y-4">
           <AgentCard />
@@ -469,8 +567,20 @@ function App() {
     states: DATA_COMPONENT_STATES,
     props: [
       ...AGENT_IDENTITY_PROPS,
-      { name: "showHealthChecks", type: "boolean", required: false, default: "false", description: "Show live HTTP health check dots. Opt-in because pings can be slow." },
-      { name: "protocols", type: 'Array<"mcp" | "a2a" | "oasf" | "web" | "email">', required: false, description: "Filter which protocols are shown. Default shows all." },
+      {
+        name: "showHealthChecks",
+        type: "boolean",
+        required: false,
+        default: "false",
+        description:
+          "Show live HTTP health check dots. Opt-in because pings can be slow.",
+      },
+      {
+        name: "protocols",
+        type: 'Array<"mcp" | "a2a" | "oasf" | "web" | "email">',
+        required: false,
+        description: "Filter which protocols are shown. Default shows all.",
+      },
     ],
   },
 
@@ -500,7 +610,8 @@ function App() {
       },
     ],
     inContext: {
-      description: "ReputationScore in a marketplace card alongside the agent's image, name, and tag cloud.",
+      description:
+        "ReputationScore in a marketplace card alongside the agent's image, name, and tag cloud.",
       preview: withAgent(
         <div className="w-full max-w-sm space-y-3">
           <div className="flex items-center gap-3">
@@ -527,8 +638,20 @@ function App() {
     states: INLINE_COMPONENT_STATES,
     props: [
       ...AGENT_IDENTITY_PROPS,
-      { name: "showCount", type: "boolean", required: false, default: "true", description: 'Show/hide the "(N reviews)" count on hover.' },
-      { name: "precision", type: "number", required: false, default: "1", description: "Decimal places for the score display." },
+      {
+        name: "showCount",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description: 'Show/hide the "(N reviews)" count on hover.',
+      },
+      {
+        name: "precision",
+        type: "number",
+        required: false,
+        default: "1",
+        description: "Decimal places for the score display.",
+      },
     ],
   },
   {
@@ -542,7 +665,8 @@ function App() {
     examples: [
       {
         name: "Last 30 Days",
-        description: "Filter the timeline to only show feedback from the last 30 days.",
+        description:
+          "Filter the timeline to only show feedback from the last 30 days.",
         preview: withAgent(<ReputationTimeline range="30d" />),
         code: `<ReputationTimeline agentRegistry="eip155:8453:0x8004...a432" agentId={2290} range="30d" />`,
       },
@@ -554,13 +678,17 @@ function App() {
       },
       {
         name: "Points Only (No Trend Line)",
-        description: "Show only the data point dots without the connecting trend line.",
-        preview: withAgent(<ReputationTimeline showTrendLine={false} showDataPoints />),
+        description:
+          "Show only the data point dots without the connecting trend line.",
+        preview: withAgent(
+          <ReputationTimeline showTrendLine={false} showDataPoints />
+        ),
         code: `<ReputationTimeline agentRegistry="eip155:8453:0x8004...a432" agentId={2290} showTrendLine={false} showDataPoints />`,
       },
     ],
     inContext: {
-      description: "ReputationTimeline alongside ReputationDistribution for a complete reputation view.",
+      description:
+        "ReputationTimeline alongside ReputationDistribution for a complete reputation view.",
       preview: withAgent(
         <div className="w-full space-y-4">
           <ReputationTimeline />
@@ -575,9 +703,27 @@ function App() {
     states: DATA_COMPONENT_STATES,
     props: [
       ...AGENT_IDENTITY_PROPS,
-      { name: "range", type: '"7d" | "30d" | "90d" | "all"', required: false, default: '"all"', description: "Time range filter for displayed feedback." },
-      { name: "showTrendLine", type: "boolean", required: false, default: "true", description: "Show the connecting line between data points." },
-      { name: "showDataPoints", type: "boolean", required: false, default: "false", description: "Show individual score dots on the chart." },
+      {
+        name: "range",
+        type: '"7d" | "30d" | "90d" | "all"',
+        required: false,
+        default: '"all"',
+        description: "Time range filter for displayed feedback.",
+      },
+      {
+        name: "showTrendLine",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description: "Show the connecting line between data points.",
+      },
+      {
+        name: "showDataPoints",
+        type: "boolean",
+        required: false,
+        default: "false",
+        description: "Show individual score dots on the chart.",
+      },
     ],
   },
   {
@@ -591,7 +737,8 @@ function App() {
     examples: [
       {
         name: "Horizontal Orientation",
-        description: "Render the histogram as vertical bars in a horizontal row instead of horizontal bars in a vertical stack.",
+        description:
+          "Render the histogram as vertical bars in a horizontal row instead of horizontal bars in a vertical stack.",
         preview: withAgent(<ReputationDistribution orientation="horizontal" />),
         code: `<ReputationDistribution agentRegistry="eip155:8453:0x8004...a432" agentId={2290} orientation="horizontal" />`,
       },
@@ -609,7 +756,8 @@ function App() {
       },
     ],
     inContext: {
-      description: "ReputationDistribution used alongside a timeline chart to show both trends and spread.",
+      description:
+        "ReputationDistribution used alongside a timeline chart to show both trends and spread.",
       preview: withAgent(
         <div className="w-full space-y-4">
           <ReputationTimeline />
@@ -624,9 +772,36 @@ function App() {
     states: DATA_COMPONENT_STATES,
     props: [
       ...AGENT_IDENTITY_PROPS,
-      { name: "bucketCount", type: "number", required: false, default: "5", description: "Number of histogram buckets." },
-      { name: "orientation", type: '"vertical" | "horizontal"', required: false, default: '"vertical"', description: 'Chart layout. "vertical" = horizontal bars stacked vertically. "horizontal" = vertical bars in a row.' },
-      { name: "showAxisLabels", type: "boolean", required: false, default: "true", description: "Show score range labels on the axis." },
+      {
+        name: "bucketCount",
+        type: "number",
+        required: false,
+        default: "5",
+        description: "Number of histogram buckets.",
+      },
+      {
+        name: "orientation",
+        type: '"vertical" | "horizontal"',
+        required: false,
+        default: '"vertical"',
+        description:
+          'Chart layout. "vertical" = horizontal bars stacked vertically. "horizontal" = vertical bars in a row.',
+      },
+      {
+        name: "showAxisLabels",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description: "Show score range labels on the axis.",
+      },
+      {
+        name: "colored",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description:
+          "Colour bars by score band (green → gold → red). When false, uses a single accent colour.",
+      },
     ],
   },
   {
@@ -646,8 +821,16 @@ function App() {
       },
       {
         name: "Minimal (Scores Only)",
-        description: "Hide tags, timestamps, and reviewer addresses for a compact score-only list.",
-        preview: withAgent(<FeedbackList showTags={false} showTimestamp={false} showReviewerAddress={false} pageSize={5} />),
+        description:
+          "Hide tags, timestamps, and reviewer addresses for a compact score-only list.",
+        preview: withAgent(
+          <FeedbackList
+            showTags={false}
+            showTimestamp={false}
+            showReviewerAddress={false}
+            pageSize={5}
+          />
+        ),
         code: `<FeedbackList
   agentRegistry="eip155:8453:0x8004...a432"
   agentId={2290}
@@ -665,7 +848,8 @@ function App() {
       },
     ],
     inContext: {
-      description: "FeedbackList in a reputation panel alongside the score and tag cloud.",
+      description:
+        "FeedbackList in a reputation panel alongside the score and tag cloud.",
       preview: withAgent(
         <div className="w-full space-y-4">
           <div className="flex items-center gap-4">
@@ -686,12 +870,56 @@ function App() {
     states: DATA_COMPONENT_STATES,
     props: [
       ...AGENT_IDENTITY_PROPS,
-      { name: "pageSize", type: "number", required: false, default: "10", description: "Items per page." },
-      { name: "showReviewerAddress", type: "boolean", required: false, default: "true", description: "Show the reviewer's wallet address." },
-      { name: "showTimestamp", type: "boolean", required: false, default: "true", description: "Show the feedback timestamp." },
-      { name: "showTags", type: "boolean", required: false, default: "true", description: "Show tag pills." },
-      { name: "showResponses", type: "boolean", required: false, default: "true", description: "Show agent responses under each feedback entry." },
-      { name: "emptyMessage", type: "string", required: false, default: '"No feedback yet."', description: "Custom message when there is no feedback." },
+      {
+        name: "pageSize",
+        type: "number",
+        required: false,
+        default: "10",
+        description: "Items per page.",
+      },
+      {
+        name: "showReviewerAddress",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description: "Show the reviewer's wallet address.",
+      },
+      {
+        name: "showTimestamp",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description: "Show the feedback timestamp.",
+      },
+      {
+        name: "showTags",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description: "Show tag pills.",
+      },
+      {
+        name: "showResponses",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description: "Show agent responses under each feedback entry.",
+      },
+      {
+        name: "coloredScores",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description:
+          "Colour the numeric score by score band (green → gold → red).",
+      },
+      {
+        name: "emptyMessage",
+        type: "string",
+        required: false,
+        default: '"No feedback yet."',
+        description: "Custom message when there is no feedback.",
+      },
     ],
   },
   {
@@ -711,13 +939,15 @@ function App() {
       },
       {
         name: "Minimum 3 Occurrences",
-        description: "Only show tags mentioned at least 3 times to filter out noise.",
+        description:
+          "Only show tags mentioned at least 3 times to filter out noise.",
         preview: withAgent(<TagCloud minOccurrences={3} />),
         code: `<TagCloud agentRegistry="eip155:8453:0x8004...a432" agentId={2290} minOccurrences={3} />`,
       },
     ],
     inContext: {
-      description: "TagCloud in a marketplace card alongside agent identity and score.",
+      description:
+        "TagCloud in a marketplace card alongside agent identity and score.",
       preview: withAgent(
         <div className="w-full max-w-sm space-y-3">
           <div className="flex items-center gap-3">
@@ -744,8 +974,20 @@ function App() {
     states: DATA_COMPONENT_STATES,
     props: [
       ...AGENT_IDENTITY_PROPS,
-      { name: "maxTags", type: "number", required: false, default: "20", description: "Maximum number of tags shown." },
-      { name: "minOccurrences", type: "number", required: false, default: "1", description: "Minimum mention count for a tag to appear." },
+      {
+        name: "maxTags",
+        type: "number",
+        required: false,
+        default: "20",
+        description: "Maximum number of tags shown.",
+      },
+      {
+        name: "minOccurrences",
+        type: "number",
+        required: false,
+        default: "1",
+        description: "Minimum mention count for a tag to appear.",
+      },
     ],
   },
 
@@ -777,9 +1019,17 @@ function App() {
   </div>
 </AgentProvider>`,
       },
+      {
+        name: "Standalone",
+        description:
+          "Used alone as a compact trust indicator anywhere in the UI.",
+        preview: withAgent(<VerificationBadge />),
+        code: `<VerificationBadge agentRegistry="eip155:8453:0x8004...a432" agentId={2290} />`,
+      },
     ],
     inContext: {
-      description: "VerificationBadge in a trust panel with validation score and recent validations.",
+      description:
+        "VerificationBadge in a trust panel with validation score and recent validations.",
       preview: withAgent(
         <div className="w-full max-w-md space-y-4">
           <div className="flex items-center gap-2">
@@ -825,7 +1075,8 @@ function App() {
       },
     ],
     inContext: {
-      description: "ValidationScore in a trust panel alongside the verification badge and recent validations.",
+      description:
+        "ValidationScore in a trust panel alongside the verification badge and recent validations.",
       preview: withAgent(
         <div className="w-full max-w-md space-y-4">
           <div className="flex items-center gap-2">
@@ -848,8 +1099,20 @@ function App() {
     states: DATA_COMPONENT_STATES,
     props: [
       ...AGENT_IDENTITY_PROPS,
-      { name: "showFillBar", type: "boolean", required: false, default: "true", description: "Show the score fill bar." },
-      { name: "showPendingCount", type: "boolean", required: false, default: "true", description: "Show the pending validation count." },
+      {
+        name: "showFillBar",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description: "Show the score fill bar.",
+      },
+      {
+        name: "showPendingCount",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description: "Show the pending validation count.",
+      },
     ],
   },
   {
@@ -875,7 +1138,8 @@ function App() {
       },
     ],
     inContext: {
-      description: "ValidationList in a trust panel alongside the verification badge and validation score.",
+      description:
+        "ValidationList in a trust panel alongside the verification badge and validation score.",
       preview: withAgent(
         <div className="w-full max-w-md space-y-4">
           <div className="flex items-center gap-2">
@@ -898,11 +1162,41 @@ function App() {
     states: DATA_COMPONENT_STATES,
     props: [
       ...AGENT_IDENTITY_PROPS,
-      { name: "pageSize", type: "number", required: false, default: "10", description: "Items per page." },
-      { name: "showValidatorAddress", type: "boolean", required: false, default: "true", description: "Show the validator's wallet address." },
-      { name: "showTimestamp", type: "boolean", required: false, default: "true", description: "Show the validation timestamp." },
-      { name: "statusFilter", type: '"all" | "completed" | "pending" | "expired"', required: false, default: '"all"', description: "Filter validations by status." },
-      { name: "emptyMessage", type: "string", required: false, default: '"No validations yet."', description: "Custom message when there are no validations." },
+      {
+        name: "pageSize",
+        type: "number",
+        required: false,
+        default: "10",
+        description: "Items per page.",
+      },
+      {
+        name: "showValidatorAddress",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description: "Show the validator's wallet address.",
+      },
+      {
+        name: "showTimestamp",
+        type: "boolean",
+        required: false,
+        default: "true",
+        description: "Show the validation timestamp.",
+      },
+      {
+        name: "statusFilter",
+        type: '"all" | "completed" | "pending" | "expired"',
+        required: false,
+        default: '"all"',
+        description: "Filter validations by status.",
+      },
+      {
+        name: "emptyMessage",
+        type: "string",
+        required: false,
+        default: '"No validations yet."',
+        description: "Custom message when there are no validations.",
+      },
     ],
   },
   {
@@ -922,9 +1216,21 @@ function App() {
   <ValidationDisplay />
 </AgentProvider>`,
       },
+      {
+        name: "Constrained Width",
+        description:
+          "Pass className to fit the composed panel into a sidebar or trust column.",
+        preview: withAgent(<ValidationDisplay className="max-w-sm" />),
+        code: `<ValidationDisplay
+  agentRegistry="eip155:8453:0x8004...a432"
+  agentId={2290}
+  className="max-w-sm"
+/>`,
+      },
     ],
     inContext: {
-      description: "ValidationDisplay as a standalone trust panel on an agent profile page.",
+      description:
+        "ValidationDisplay as a standalone trust panel on an agent profile page.",
       preview: withAgent(
         <div className="w-full max-w-lg space-y-6">
           <AgentCard />
@@ -954,15 +1260,32 @@ function App() {
     examples: [
       {
         name: "Inside AgentProvider",
-        description: "Renders the last activity timestamp without repeating identity props.",
+        description:
+          "Renders the last activity timestamp without repeating identity props.",
         preview: withAgent(<LastActivity />),
         code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
   <LastActivity />
 </AgentProvider>`,
       },
+      {
+        name: "As Status Indicator",
+        description:
+          "Combine with a live dot and muted styling to show agent presence in a header.",
+        preview: withAgent(
+          <div className="flex items-center gap-2 text-xs text-erc8004-muted-fg">
+            <span className="h-1.5 w-1.5 rounded-full bg-erc8004-positive" />
+            <LastActivity />
+          </div>
+        ),
+        code: `<div className="flex items-center gap-2 text-xs text-erc8004-muted-fg">
+  <span className="h-1.5 w-1.5 rounded-full bg-erc8004-positive" />
+  <LastActivity agentRegistry="eip155:8453:0x8004...a432" agentId={2290} />
+</div>`,
+      },
     ],
     inContext: {
-      description: "LastActivity in a sidebar showing agent status alongside the activity log.",
+      description:
+        "LastActivity in a sidebar showing agent status alongside the activity log.",
       preview: withAgent(
         <div className="w-full max-w-md space-y-4">
           <div className="flex items-center gap-3">
@@ -1006,7 +1329,8 @@ function App() {
       },
     ],
     inContext: {
-      description: "ActivityLog in a sidebar showing recent agent activity alongside last activity timestamp.",
+      description:
+        "ActivityLog in a sidebar showing recent agent activity alongside last activity timestamp.",
       preview: withAgent(
         <div className="w-full max-w-md space-y-4">
           <div className="flex items-center gap-3">
@@ -1027,8 +1351,19 @@ function App() {
     states: DATA_COMPONENT_STATES,
     props: [
       ...AGENT_IDENTITY_PROPS,
-      { name: "pageSize", type: "number", required: false, default: "20", description: "Maximum number of events to display." },
-      { name: "eventTypes", type: 'Array<"feedback" | "validation">', required: false, description: "Filter by event type. Default shows all." },
+      {
+        name: "pageSize",
+        type: "number",
+        required: false,
+        default: "20",
+        description: "Maximum number of events to display.",
+      },
+      {
+        name: "eventTypes",
+        type: 'Array<"feedback" | "validation">',
+        required: false,
+        description: "Filter by event type. Default shows all.",
+      },
     ],
   },
 ]

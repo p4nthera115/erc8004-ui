@@ -255,19 +255,14 @@ export function AgentCard({
           {/* Owner + protocols */}
           {(showOwner ||
             (showProtocolBadges && activeProtocols.length > 0)) && (
-            <div className="mt-3 flex flex-wrap items-center gap-2">
+            <div className="mt-3 flex flex-col items-center">
               {showOwner && <Address address={owner} />}
-
-              {showOwner &&
-                showProtocolBadges &&
-                activeProtocols.length > 0 && (
-                  <span className="h-1 w-1 rounded-full bg-erc8004-border" />
-                )}
-
-              {showProtocolBadges &&
-                activeProtocols.map(({ key, label }) => (
-                  <Tag key={key}>{label}</Tag>
-                ))}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {showProtocolBadges &&
+                  activeProtocols.map(({ key, label }) => (
+                    <Tag key={key}>{label}</Tag>
+                  ))}
+              </div>
             </div>
           )}
 

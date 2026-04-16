@@ -265,10 +265,10 @@ function App() {
       description:
         "AgentName used in a profile header alongside the agent's image, description, and verification status.",
       preview: withAgent(
-        <div className="flex items-center gap-6">
-          <AgentImage className="min-w-16" />
-          <div>
-            <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg">
+          <AgentImage className="min-h-24 min-w-24" />
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-4">
               <AgentName />
               <VerificationBadge />
             </div>
@@ -277,10 +277,10 @@ function App() {
         </div>
       ),
       code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={2290}>
-  <div className="flex items-center gap-4">
-    <AgentImage />
-    <div>
-      <div className="flex items-center gap-2">
+  <div className="flex items-center gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg">
+    <AgentImage className="min-h-24 min-w-24" />
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-4">
         <AgentName />
         <VerificationBadge />
       </div>

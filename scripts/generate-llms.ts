@@ -24,7 +24,11 @@
  *     hatch for AIs that prefer one big read over many small ones.
  */
 
-import { COMPONENT_REGISTRY, type ComponentDoc, type PropDef } from "../src/components/docs/registry"
+import {
+  COMPONENT_REGISTRY,
+  type ComponentDoc,
+  type PropDef,
+} from "../src/components/docs/registry"
 import { writeFileSync, mkdirSync, rmSync, existsSync } from "node:fs"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -125,7 +129,12 @@ const GROUPS: Array<{ title: string; slugs: string[] }> = [
 // A future iteration can parse the JSX directly to extract the text content.
 // ---------------------------------------------------------------------------
 
-const GUIDES: Array<{ name: string; slug: string; description: string; url: string }> = [
+const GUIDES: Array<{
+  name: string
+  slug: string
+  description: string
+  url: string
+}> = [
   {
     name: "Introduction",
     slug: "introduction",
@@ -135,20 +144,29 @@ const GUIDES: Array<{ name: string; slug: string; description: string; url: stri
   {
     name: "Installation",
     slug: "installation",
-    description: "Install the package, set up the provider, write your first component.",
+    description:
+      "Install the package, set up the provider, write your first component.",
     url: `${SITE_URL}/docs/installation`,
   },
   {
     name: "Concepts",
     slug: "concepts",
-    description: "Core concepts: registries, agentRegistry/agentId, trustless data, supported chains.",
+    description:
+      "Core concepts: registries, agentRegistry/agentId, trustless data, supported chains.",
     url: `${SITE_URL}/docs/concepts`,
   },
   {
     name: "API Keys",
     slug: "api-keys",
-    description: "How to get a Graph API key and why it's safe to use in frontend code.",
+    description:
+      "How to get a Graph API key and why it's safe to use in frontend code.",
     url: `${SITE_URL}/docs/api-keys`,
+  },
+  {
+    name: "Components",
+    slug: "components",
+    description: "All components in the library, grouped by registry.",
+    url: `${SITE_URL}/docs/components`,
   },
   {
     name: "Theming",
@@ -159,7 +177,8 @@ const GUIDES: Array<{ name: string; slug: string; description: string; url: stri
   {
     name: "Recipes",
     slug: "recipes",
-    description: "Complete page-level compositions: profile pages, marketplace rows, comparisons.",
+    description:
+      "Complete page-level compositions: profile pages, marketplace rows, comparisons.",
     url: `${SITE_URL}/docs/recipes`,
   },
 ]
@@ -170,7 +189,8 @@ const GUIDES: Array<{ name: string; slug: string; description: string; url: stri
 
 function propsTable(props: PropDef[]): string {
   if (props.length === 0) return "_No props._\n"
-  const header = "| Prop | Type | Required | Default | Description |\n| --- | --- | --- | --- | --- |"
+  const header =
+    "| Prop | Type | Required | Default | Description |\n| --- | --- | --- | --- | --- |"
   const rows = props.map((p) => {
     const req = p.required ? "yes" : "no"
     const def = p.default ? `\`${p.default}\`` : "—"
@@ -211,12 +231,12 @@ function componentMarkdown(doc: ComponentDoc): string {
     "",
     `- Live preview & full docs: ${SITE_URL}/docs/components/${doc.slug}`,
     `- Markdown source: ${SITE_URL}/llms/${doc.slug}.md`,
-    "",
+    ""
   )
   return sections.join("\n")
 }
 
-function guideMarkdown(g: typeof GUIDES[number]): string {
+function guideMarkdown(g: (typeof GUIDES)[number]): string {
   return [
     `# ${g.name}`,
     "",
@@ -248,7 +268,9 @@ function buildLlmsTxt(): string {
   lines.push("## Setup")
   lines.push("")
   for (const g of GUIDES) {
-    lines.push(`- [${g.name}](${SITE_URL}/llms/_guides/${g.slug}.md): ${g.description}`)
+    lines.push(
+      `- [${g.name}](${SITE_URL}/llms/_guides/${g.slug}.md): ${g.description}`
+    )
   }
   lines.push("")
   lines.push("## Components")
@@ -270,9 +292,15 @@ function buildLlmsTxt(): string {
   }
   lines.push("## Optional")
   lines.push("")
-  lines.push(`- [Full bundle](${SITE_URL}/llms-full.txt): All components and guides concatenated into a single file for one-shot context loading.`)
-  lines.push(`- [GitHub repository](${GITHUB_URL}): Source code, issues, and discussions.`)
-  lines.push(`- [ERC-8004 specification](https://eips.ethereum.org/EIPS/eip-8004): The Ethereum standard this library implements.`)
+  lines.push(
+    `- [Full bundle](${SITE_URL}/llms-full.txt): All components and guides concatenated into a single file for one-shot context loading.`
+  )
+  lines.push(
+    `- [GitHub repository](${GITHUB_URL}): Source code, issues, and discussions.`
+  )
+  lines.push(
+    `- [ERC-8004 specification](https://eips.ethereum.org/EIPS/eip-8004): The Ethereum standard this library implements.`
+  )
   lines.push("")
   return lines.join("\n")
 }
@@ -291,7 +319,9 @@ function buildLlmsFull(): string {
     lines.push(PROVISIONAL_NAME_NOTICE)
     lines.push("")
   }
-  lines.push(`This file contains the complete component reference for ${PACKAGE_NAME}, generated from the canonical registry. For an indexed version with per-component links, see ${SITE_URL}/llms.txt.`)
+  lines.push(
+    `This file contains the complete component reference for ${PACKAGE_NAME}, generated from the canonical registry. For an indexed version with per-component links, see ${SITE_URL}/llms.txt.`
+  )
   lines.push("")
   lines.push("---")
   lines.push("")
@@ -299,27 +329,42 @@ function buildLlmsFull(): string {
   lines.push("")
   if (IS_PUBLISHED) {
     lines.push("```bash")
-    lines.push(`npm install ${PACKAGE_NAME} react react-dom @tanstack/react-query`)
+    lines.push(
+      `npm install ${PACKAGE_NAME} react react-dom @tanstack/react-query`
+    )
     lines.push("```")
   } else {
-    lines.push(`The package is not yet on npm. Install peer dependencies normally and add the library directly from GitHub:`)
+    lines.push(
+      `The package is not yet on npm. Install peer dependencies normally and add the library directly from GitHub:`
+    )
     lines.push("")
     lines.push("```bash")
     lines.push(`npm install react react-dom @tanstack/react-query`)
-    lines.push(`npm install ${GITHUB_URL.replace("https://", "github:").replace("github.com/", "")}`)
+    lines.push(
+      `npm install ${GITHUB_URL.replace("https://", "github:").replace(
+        "github.com/",
+        ""
+      )}`
+    )
     lines.push("```")
     lines.push("")
-    lines.push(`The import path \`${PACKAGE_NAME}\` shown below is provisional and will change once the package is published under its real name.`)
+    lines.push(
+      `The import path \`${PACKAGE_NAME}\` shown below is provisional and will change once the package is published under its real name.`
+    )
   }
   lines.push("")
   lines.push("```tsx")
-  lines.push(`import { ERC8004Provider, ReputationScore } from "${PACKAGE_NAME}"`)
+  lines.push(
+    `import { ERC8004Provider, ReputationScore } from "${PACKAGE_NAME}"`
+  )
   lines.push("")
   lines.push("function App() {")
   lines.push("  return (")
   lines.push('    <ERC8004Provider apiKey="your-graph-api-key">')
   lines.push("      <ReputationScore")
-  lines.push('        agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"')
+  lines.push(
+    '        agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"'
+  )
   lines.push("        agentId={2290}")
   lines.push("      />")
   lines.push("    </ERC8004Provider>")
@@ -327,7 +372,9 @@ function buildLlmsFull(): string {
   lines.push("}")
   lines.push("```")
   lines.push("")
-  lines.push("Get a free Graph API key at https://thegraph.com/studio. It is a read-only query key, safe to use in frontend code.")
+  lines.push(
+    "Get a free Graph API key at https://thegraph.com/studio. It is a read-only query key, safe to use in frontend code."
+  )
   lines.push("")
   lines.push("---")
   lines.push("")
@@ -380,14 +427,18 @@ function main() {
     writeFileSync(file, componentMarkdown(doc), "utf8")
     count++
   }
-  console.log(`[generate-llms] wrote ${count} per-component markdown files into ${LLMS_DIR}`)
+  console.log(
+    `[generate-llms] wrote ${count} per-component markdown files into ${LLMS_DIR}`
+  )
 
   // 4. Per-guide stub markdown
   for (const g of GUIDES) {
     const file = join(GUIDES_DIR, `${g.slug}.md`)
     writeFileSync(file, guideMarkdown(g), "utf8")
   }
-  console.log(`[generate-llms] wrote ${GUIDES.length} guide stubs into ${GUIDES_DIR}`)
+  console.log(
+    `[generate-llms] wrote ${GUIDES.length} guide stubs into ${GUIDES_DIR}`
+  )
 
   console.log("[generate-llms] Done.")
 }

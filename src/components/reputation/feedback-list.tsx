@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, keepPreviousData } from "@tanstack/react-query"
 import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
 import type { Feedback, FeedbackFile, FeedbackResponse } from "@/types"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
@@ -11,6 +11,7 @@ import { Card, Tag, Address, Skeleton, EmptyState, ErrorState } from "@/componen
 import * as v from "valibot"
 
 const DEFAULT_PAGE_SIZE = 10
+const COUNT_QUERY_LIMIT = 1000
 
 type FeedbackItem = Pick<
   Feedback,
@@ -99,6 +100,35 @@ const FEEDBACK_LIST_QUERY = `#graphql
   }
 `
 
+const FEEDBACK_COUNT_QUERY = `#graphql
+  query ($id: ID!) {
+    feedbacks(
+      where: { agent_: { id: $id }, isRevoked: false },
+      first: ${COUNT_QUERY_LIMIT}
+    ) {
+      id
+    }
+  }
+`
+
+function useFeedbackCount(agentRegistry: string, agentId: number) {
+  const { apiKey, subgraphOverrides } = useERC8004Config()
+
+  return useQuery({
+    queryKey: ["feedback-count", agentRegistry, agentId],
+    queryFn: async (): Promise<number> => {
+      const { chainId } = parseAgentRegistry(agentRegistry)
+      const url = getSubgraphUrl(chainId, apiKey, subgraphOverrides)
+      const data = await subgraphFetch<{ feedbacks: { id: string }[] }>(
+        url,
+        FEEDBACK_COUNT_QUERY,
+        { id: `${chainId}:${agentId}` }
+      )
+      return data.feedbacks.length
+    },
+  })
+}
+
 function useFeedbackList(
   agentRegistry: string,
   agentId: number,
@@ -109,6 +139,7 @@ function useFeedbackList(
 
   return useQuery({
     queryKey: ["feedback-list", agentRegistry, agentId, page, pageSize],
+    placeholderData: keepPreviousData,
     queryFn: async (): Promise<FeedbackListResponse> => {
       const { chainId } = parseAgentRegistry(agentRegistry)
       const url = getSubgraphUrl(chainId, apiKey, subgraphOverrides)
@@ -242,6 +273,7 @@ export function FeedbackList({
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const [page, setPage] = useState(0)
   const { data, isLoading, error, refetch } = useFeedbackList(agentRegistry, agentId, page, pageSize)
+  const { data: totalCount } = useFeedbackCount(agentRegistry, agentId)
 
   const rowOptions: FeedbackRowOptions = {
     showReviewerAddress,
@@ -290,7 +322,9 @@ export function FeedbackList({
   }
 
   const feedbacks = data?.feedbacks ?? []
-  const hasMore = feedbacks.length === pageSize
+  const hasNextPage = feedbacks.length === pageSize
+  const totalPages = totalCount !== undefined ? Math.ceil(totalCount / pageSize) : undefined
+  const countCapped = totalCount === COUNT_QUERY_LIMIT
 
   return (
     <Card className={cn("w-full", className)}>
@@ -304,13 +338,26 @@ export function FeedbackList({
         ))}
       </div>
 
-      {hasMore && (
-        <div className="border-t border-erc8004-border px-4 py-3">
+      {(page > 0 || hasNextPage) && (
+        <div className="border-t border-erc8004-border px-4 py-2.5 flex items-center justify-between">
+          <button
+            onClick={() => setPage((p) => p - 1)}
+            disabled={page === 0}
+            className="bg-erc8004-muted hover:bg-erc8004-border text-erc8004-fg text-sm px-3 py-1.5 rounded-erc8004-md disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
+          >
+            &#8592;
+          </button>
+          <span className="text-xs text-erc8004-muted-fg tabular-nums">
+            {totalPages !== undefined
+              ? `${page + 1} / ${totalPages}${countCapped ? "+" : ""}`
+              : `Page ${page + 1}`}
+          </span>
           <button
             onClick={() => setPage((p) => p + 1)}
-            className="bg-erc8004-muted hover:bg-erc8004-border text-erc8004-fg text-sm px-3 py-1.5 rounded-erc8004-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
+            disabled={!hasNextPage}
+            className="bg-erc8004-muted hover:bg-erc8004-border text-erc8004-fg text-sm px-3 py-1.5 rounded-erc8004-md disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
           >
-            Load more
+            &#8594;
           </button>
         </div>
       )}

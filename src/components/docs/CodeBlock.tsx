@@ -330,41 +330,41 @@ export function CodeBlock({
         .code-block { scrollbar-width: none; }
         ${TOKEN_CSS}
       `}</style>
-      <div className="relative">
-        <button
-          onClick={handleCopy}
-          className="absolute top-3 right-3 z-10 p-1.5 rounded-md text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 bg-neutral-300/50 hover:bg-neutral-300 dark:bg-white/10 dark:hover:bg-white/20 transition-colors cursor-pointer"
-          aria-label="Copy code"
-        >
-          {copied ? <FaCheck size={14} /> : <IoCopy size={14} />}
-        </button>
-        <pre className="code-block overflow-x-auto bg-neutral-200 dark:bg-neutral-900 border border-black/10 dark:border-white/10 py-4 font-mono text-sm leading-relaxed whitespace-pre">
+      <div className="flex bg-neutral-200 dark:bg-neutral-900 border border-black/10 dark:border-white/10">
+        <pre className="code-block flex-1 min-w-0 overflow-x-auto py-4 font-mono text-sm leading-relaxed whitespace-pre">
           <code>
-            {isTerminal ? (
-              lines.map((line, i) => (
-                <span key={i} className="flex">
-                  <span className="shrink-0 w-14 pl-4 text-right pr-6 select-none text-neutral-400 dark:text-neutral-600">
-                    $
+            {isTerminal
+              ? lines.map((line, i) => (
+                  <span key={i} className="flex">
+                    <span className="shrink-0 w-14 pl-4 text-right pr-6 select-none text-neutral-400 dark:text-neutral-600">
+                      $
+                    </span>
+                    <span className="cb-plain">{line}</span>
+                    {i < lines.length - 1 && "\n"}
                   </span>
-                  <span className="cb-plain">{line}</span>
-                  {i < lines.length - 1 && "\n"}
-                </span>
-              ))
-            ) : (
-              lines.map((line, i) => (
-                <span key={i} className="flex">
-                  <span className="shrink-0 w-14 pl-4 text-right pr-6 select-none text-neutral-400 dark:text-neutral-600">
-                    {i + 1}
+                ))
+              : lines.map((line, i) => (
+                  <span key={i} className="flex">
+                    <span className="shrink-0 w-14 pl-4 text-right pr-6 select-none text-neutral-400 dark:text-neutral-600">
+                      {i + 1}
+                    </span>
+                    <span>
+                      <HighlightedCode code={line} language={language} />
+                    </span>
+                    {i < lines.length - 1 && "\n"}
                   </span>
-                  <span>
-                    <HighlightedCode code={line} language={language} />
-                  </span>
-                  {i < lines.length - 1 && "\n"}
-                </span>
-              ))
-            )}
+                ))}
           </code>
         </pre>
+        <div className="shrink-0 pt-3 pr-3 ml-3">
+          <button
+            onClick={handleCopy}
+            className="p-1.5 rounded-md text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 bg-neutral-300/50 hover:bg-neutral-300 dark:bg-white/10 dark:hover:bg-white/20 transition-colors cursor-pointer"
+            aria-label="Copy code"
+          >
+            {copied ? <FaCheck size={14} /> : <IoCopy size={14} />}
+          </button>
+        </div>
       </div>
     </>
   )

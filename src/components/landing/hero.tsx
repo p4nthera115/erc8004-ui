@@ -399,9 +399,9 @@ function CodeBlock({
                   highlighted={highlighted === "AgentImage"}
                   {...lineHoverProps("AgentImage")}
                 >
-                  <Punct>{"</"}</Punct>
+                  <Punct>{"<"}</Punct>
                   <Tag>AgentImage</Tag>
-                  <Punct>{">"}</Punct>
+                  <Punct>{" />"}</Punct>
                 </Line>
                 <Line
                   n={6}
@@ -409,9 +409,9 @@ function CodeBlock({
                   highlighted={highlighted === "AgentName"}
                   {...lineHoverProps("AgentName")}
                 >
-                  <Punct>{"</"}</Punct>
+                  <Punct>{"<"}</Punct>
                   <Tag>AgentName</Tag>
-                  <Punct>{">"}</Punct>
+                  <Punct>{" />"}</Punct>
                 </Line>
                 <Line
                   n={7}
@@ -419,9 +419,9 @@ function CodeBlock({
                   highlighted={highlighted === "ReputationScore"}
                   {...lineHoverProps("ReputationScore")}
                 >
-                  <Punct>{"</"}</Punct>
+                  <Punct>{"<"}</Punct>
                   <Tag>ReputationScore</Tag>
-                  <Punct>{">"}</Punct>
+                  <Punct>{" />"}</Punct>
                 </Line>
                 <Line
                   n={8}
@@ -429,17 +429,17 @@ function CodeBlock({
                   highlighted={highlighted === "AgentDescription"}
                   {...lineHoverProps("AgentDescription")}
                 >
-                  <Punct>{"</"}</Punct>
+                  <Punct>{"<"}</Punct>
                   <Tag>AgentDescription</Tag>
-                  <Punct>{">"}</Punct>
+                  <Punct>{" />"}</Punct>
                 </Line>
               </motion.div>
             )}
             <motion.div layout>
               <Line n={!active ? 9 : 6}>
-                <Punct>{"</"}</Punct>
+                <Punct>{"<"}</Punct>
                 <Tag>AgentProvider</Tag>
-                <Punct>{">"}</Punct>
+                <Punct>{" />"}</Punct>
               </Line>
             </motion.div>
           </code>

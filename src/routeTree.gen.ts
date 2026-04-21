@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DocsIndexRouteImport } from './routes/docs/index'
 import { Route as DocsThemingRouteImport } from './routes/docs/theming'
 import { Route as DocsRecipesRouteImport } from './routes/docs/recipes'
 import { Route as DocsIntroductionRouteImport } from './routes/docs/introduction'
@@ -29,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DocsIndexRoute = DocsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DocsRoute,
 } as any)
 const DocsThemingRoute = DocsThemingRouteImport.update({
   id: '/theming',
@@ -80,18 +86,19 @@ export interface FileRoutesByFullPath {
   '/docs/introduction': typeof DocsIntroductionRoute
   '/docs/recipes': typeof DocsRecipesRoute
   '/docs/theming': typeof DocsThemingRoute
+  '/docs/': typeof DocsIndexRoute
   '/docs/components/$slug': typeof DocsComponentsSlugRoute
   '/docs/components/': typeof DocsComponentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/docs': typeof DocsRouteWithChildren
   '/docs/api-keys': typeof DocsApiKeysRoute
   '/docs/concepts': typeof DocsConceptsRoute
   '/docs/installation': typeof DocsInstallationRoute
   '/docs/introduction': typeof DocsIntroductionRoute
   '/docs/recipes': typeof DocsRecipesRoute
   '/docs/theming': typeof DocsThemingRoute
+  '/docs': typeof DocsIndexRoute
   '/docs/components/$slug': typeof DocsComponentsSlugRoute
   '/docs/components': typeof DocsComponentsIndexRoute
 }
@@ -105,6 +112,7 @@ export interface FileRoutesById {
   '/docs/introduction': typeof DocsIntroductionRoute
   '/docs/recipes': typeof DocsRecipesRoute
   '/docs/theming': typeof DocsThemingRoute
+  '/docs/': typeof DocsIndexRoute
   '/docs/components/$slug': typeof DocsComponentsSlugRoute
   '/docs/components/': typeof DocsComponentsIndexRoute
 }
@@ -119,18 +127,19 @@ export interface FileRouteTypes {
     | '/docs/introduction'
     | '/docs/recipes'
     | '/docs/theming'
+    | '/docs/'
     | '/docs/components/$slug'
     | '/docs/components/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/docs'
     | '/docs/api-keys'
     | '/docs/concepts'
     | '/docs/installation'
     | '/docs/introduction'
     | '/docs/recipes'
     | '/docs/theming'
+    | '/docs'
     | '/docs/components/$slug'
     | '/docs/components'
   id:
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/docs/introduction'
     | '/docs/recipes'
     | '/docs/theming'
+    | '/docs/'
     | '/docs/components/$slug'
     | '/docs/components/'
   fileRoutesById: FileRoutesById
@@ -167,6 +177,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/docs/': {
+      id: '/docs/'
+      path: '/'
+      fullPath: '/docs/'
+      preLoaderRoute: typeof DocsIndexRouteImport
+      parentRoute: typeof DocsRoute
     }
     '/docs/theming': {
       id: '/docs/theming'
@@ -234,6 +251,7 @@ interface DocsRouteChildren {
   DocsIntroductionRoute: typeof DocsIntroductionRoute
   DocsRecipesRoute: typeof DocsRecipesRoute
   DocsThemingRoute: typeof DocsThemingRoute
+  DocsIndexRoute: typeof DocsIndexRoute
   DocsComponentsSlugRoute: typeof DocsComponentsSlugRoute
   DocsComponentsIndexRoute: typeof DocsComponentsIndexRoute
 }
@@ -245,6 +263,7 @@ const DocsRouteChildren: DocsRouteChildren = {
   DocsIntroductionRoute: DocsIntroductionRoute,
   DocsRecipesRoute: DocsRecipesRoute,
   DocsThemingRoute: DocsThemingRoute,
+  DocsIndexRoute: DocsIndexRoute,
   DocsComponentsSlugRoute: DocsComponentsSlugRoute,
   DocsComponentsIndexRoute: DocsComponentsIndexRoute,
 }

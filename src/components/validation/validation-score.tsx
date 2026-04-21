@@ -4,6 +4,7 @@ import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
 import { cn } from "@/lib/cn"
+import { Card, Skeleton, EmptyState, ErrorState } from "@/components/_internal"
 import type { AgentStats } from "@/types"
 import * as v from "valibot"
 
@@ -66,59 +67,47 @@ function useValidationStats(agentRegistry: string, agentId: number) {
   })
 }
 
-function scoreColor(score: number) {
-  if (score >= 80) return "text-erc8004-positive"
-  if (score >= 60) return "text-erc8004-accent"
-  if (score >= 40) return "text-erc8004-chart-5"
-  return "text-erc8004-negative"
-}
-
-function scoreBarColor(score: number) {
-  if (score >= 80) return "bg-erc8004-positive"
-  if (score >= 60) return "bg-erc8004-accent"
-  if (score >= 40) return "bg-erc8004-chart-5"
-  return "bg-erc8004-negative"
-}
-
-interface ValidationScoreProps extends AgentIdentityProps {
+export interface ValidationScoreProps extends AgentIdentityProps {
+  /** Show the score fill bar. Default `true`. */
+  showFillBar?: boolean
+  /** Show the pending validation count. Default `true`. */
+  showPendingCount?: boolean
   className?: string
 }
 
-export function ValidationScore({ className, ...props }: ValidationScoreProps) {
+export function ValidationScore({
+  showFillBar = true,
+  showPendingCount = true,
+  className,
+  ...props
+}: ValidationScoreProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useValidationStats(agentRegistry, agentId)
 
   if (isLoading) {
     return (
-      <div
-        className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5 animate-pulse", className)}
-        aria-busy="true"
-        aria-live="polite"
-      >
-        <div className="h-4 w-28 rounded-erc8004-sm bg-erc8004-muted mb-4" />
-        <div className="h-8 w-16 rounded-erc8004-sm bg-erc8004-muted mb-2" />
-        <div className="h-2 w-full rounded-full bg-erc8004-muted" />
-      </div>
+      <Card className={cn("w-full p-5", className)}>
+        <Skeleton className="mb-4 h-4 w-28" />
+        <Skeleton className="mb-3 h-7 w-20" />
+        <Skeleton className="h-1.5 w-full rounded-full" />
+      </Card>
     )
   }
 
   if (error) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
-        <p className="text-sm text-erc8004-negative">Failed to load validation score.</p>
-        <p className="mt-1 text-xs text-erc8004-negative/70">
-          {error instanceof Error ? error.message : "Unknown error"}
-        </p>
-      </div>
+      <Card className={cn("w-full", className)}>
+        <ErrorState message="Couldn't load validation score" />
+      </Card>
     )
   }
 
   if (!data?.agentStats || data.agentStats.completedValidations === 0) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
-        <h3 className="text-sm font-semibold text-erc8004-card-fg mb-3">Validation Score</h3>
-        <p className="text-sm text-erc8004-muted-fg">No validations yet.</p>
-      </div>
+      <Card className={cn("w-full", className)}>
+        <h3 className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">Validation Score</h3>
+        <EmptyState message="No validations yet" />
+      </Card>
     )
   }
 
@@ -126,29 +115,33 @@ export function ValidationScore({ className, ...props }: ValidationScoreProps) {
   const pendingCount = totalValidations - completedValidations
 
   return (
-    <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-erc8004-card-fg">Validation Score</h3>
+    <Card className={cn("w-full p-5", className)}>
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-sm font-medium text-erc8004-card-fg">Validation Score</h3>
         <span className="text-xs text-erc8004-muted-fg">
           {completedValidations} completed
-          {pendingCount > 0 && ` · ${pendingCount} pending`}
+          {showPendingCount && pendingCount > 0 && ` · ${pendingCount} pending`}
         </span>
       </div>
 
-      <div className="flex items-end gap-3 mb-3">
-        <span className={`font-mono text-4xl font-semibold tabular-nums leading-none ${scoreColor(averageValidationScore)}`}>
+      <div className={cn("flex items-end gap-2", showFillBar && "mb-3")}>
+        <span className="text-3xl font-semibold tabular-nums leading-none text-erc8004-card-fg">
           {averageValidationScore.toFixed(0)}
         </span>
-        <span className="text-sm text-erc8004-muted-fg mb-1">/ 100</span>
+        <span className="text-base text-erc8004-muted-fg mb-0.5">/ 100</span>
       </div>
 
-      {/* Score bar */}
-      <div className="h-1.5 w-full rounded-full bg-erc8004-muted overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all ${scoreBarColor(averageValidationScore)}`}
-          style={{ width: `${Math.min(averageValidationScore, 100)}%` }}
-        />
-      </div>
-    </div>
+      {showFillBar && (
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-erc8004-muted">
+          <div
+            className="h-full rounded-full bg-erc8004-positive"
+            style={{
+              width: `${Math.min(averageValidationScore, 100)}%`,
+              transition: "width 200ms ease-out",
+            }}
+          />
+        </div>
+      )}
+    </Card>
   )
 }

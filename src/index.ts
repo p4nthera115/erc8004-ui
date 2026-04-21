@@ -24,7 +24,37 @@ export { ActivityLog } from "./components/activity/activity-log"
 // Provider
 export { ERC8004Provider } from "./provider/ERC8004Provider"
 
-// Types
+// Component prop types
+export type { FeedbackListProps } from "./components/reputation/feedback-list"
+export type { ReputationScoreProps } from "./components/reputation/reputation-score"
+export type {
+  ReputationDistributionProps,
+  ReputationDistributionOrientation,
+} from "./components/reputation/reputation-distribution"
+export type {
+  ReputationTimelineProps,
+  ReputationTimelineRange,
+} from "./components/reputation/reputation-timeline"
+export type { TagCloudProps } from "./components/reputation/tag-cloud"
+export type {
+  AgentCardProps,
+  AgentCardLayout,
+} from "./components/identity/agent-card"
+export type {
+  EndpointStatusProps,
+  EndpointProtocol,
+} from "./components/identity/endpoint-status"
+export type {
+  ValidationListProps,
+  ValidationStatusFilter,
+} from "./components/validation/validation-list"
+export type { ValidationScoreProps } from "./components/validation/validation-score"
+export type {
+  ActivityLogProps,
+  ActivityEventType,
+} from "./components/activity/activity-log"
+
+// Data types
 export type {
   SharedProps,
   AgentData,

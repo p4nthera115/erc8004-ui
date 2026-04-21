@@ -2,12 +2,19 @@ import { useQuery } from "@tanstack/react-query"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
-import { truncateAddress } from "@/lib/utils"
 import {
   useAgentIdentity,
   type AgentIdentityProps,
 } from "@/lib/useAgentIdentity"
 import { cn } from "@/lib/cn"
+import {
+  Card,
+  Address,
+  Tag,
+  Skeleton,
+  EmptyState,
+  ErrorState,
+} from "@/components/_internal"
 import * as v from "valibot"
 import { FingerprintBadge } from "./FingerprintBadge"
 
@@ -118,53 +125,88 @@ const PROTOCOL_LABELS: Array<{
   { key: "emailEndpoint", label: "Email" },
 ]
 
-interface AgentCardProps extends AgentIdentityProps {
+export type AgentCardLayout = "horizontal" | "vertical"
+
+export interface AgentCardProps extends AgentIdentityProps {
+  /**
+   * Card layout. `"horizontal"` places the avatar next to the name and
+   * description (default). `"vertical"` stacks avatar above name, id, and
+   * description — better for grid tiles and marketplace listings.
+   */
+  layout?: AgentCardLayout
+  /** Show owner address. Default `true`. */
+  showOwner?: boolean
+  /** Show protocol badges (MCP, A2A, etc.). Default `true`. */
+  showProtocolBadges?: boolean
+  /** Show description text. Default `true`. */
+  showDescription?: boolean
   className?: string
 }
 
-export function AgentCard({ className, ...props }: AgentCardProps) {
+export function AgentCard({
+  layout = "horizontal",
+  showOwner = true,
+  showProtocolBadges = true,
+  showDescription = true,
+  className,
+  ...props
+}: AgentCardProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
-  const { data, isLoading, error } = useAgentCard(agentRegistry, agentId)
+  const { data, isLoading, error, refetch } = useAgentCard(
+    agentRegistry,
+    agentId
+  )
 
   if (isLoading) {
+    if (layout === "vertical") {
+      return (
+        <Card shadow className={cn("w-full p-6", className)}>
+          <Skeleton className="h-20 w-20 rounded-erc8004-md" />
+          <Skeleton className="mt-4 h-5 w-36" />
+          <div className="mt-2 flex items-center gap-2">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-5 w-12 rounded-erc8004-sm" />
+          </div>
+          <Skeleton className="mt-4 h-3 w-full" />
+          <Skeleton className="mt-2 h-3 w-3/4" />
+        </Card>
+      )
+    }
     return (
-      <div
-        className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5 animate-pulse", className)}
-        aria-busy="true"
-        aria-live="polite"
-      >
+      <Card shadow className={cn("w-full p-6", className)}>
         <div className="flex gap-4">
-          <div className="h-16 w-16 shrink-0 rounded-full bg-erc8004-muted" />
-          <div className="flex-1 space-y-2 pt-1">
-            <div className="h-4 w-32 rounded-erc8004-sm bg-erc8004-muted" />
-            <div className="h-3 w-full rounded-erc8004-sm bg-erc8004-muted/50" />
-            <div className="h-3 w-3/4 rounded-erc8004-sm bg-erc8004-muted/50" />
+          <Skeleton className="h-12 w-12 shrink-0 rounded-erc8004-md" />
+          <div className="flex-1 space-y-3 pt-0.5">
+            <Skeleton className="h-5 w-36" />
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-5 w-12 rounded-erc8004-sm" />
+              <Skeleton className="h-5 w-10 rounded-erc8004-sm" />
+            </div>
           </div>
         </div>
-      </div>
+        <Skeleton className="mt-4 h-3 w-full" />
+        <Skeleton className="mt-2 h-3 w-3/4" />
+      </Card>
     )
   }
 
   if (error) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
-        <p className="text-sm text-erc8004-negative">
-          Failed to load agent data.
-        </p>
-        <p className="mt-1 text-xs text-erc8004-negative/70">
-          {error instanceof Error ? error.message : "Unknown error"}
-        </p>
-      </div>
+      <Card shadow className={cn("w-full", className)}>
+        <ErrorState
+          message="Couldn't load this agent"
+          onRetry={() => refetch()}
+        />
+      </Card>
     )
   }
 
   if (!data?.agent) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
-        <p className="text-sm text-erc8004-muted-fg">
-          Agent not found.
-        </p>
-      </div>
+      <Card shadow className={cn("w-full", className)}>
+        <EmptyState message="Agent not found" />
+      </Card>
     )
   }
 
@@ -175,11 +217,71 @@ export function AgentCard({ className, ...props }: AgentCardProps) {
 
   const activeProtocols = PROTOCOL_LABELS.filter(({ key }) => rf?.[key] != null)
 
+  if (layout === "vertical") {
+    const avatarSize = 80
+    return (
+      <Card shadow className={cn("p-6 max-w-sm w-fit", className)}>
+        <div className="flex flex-col justify-center items-center text-center">
+          {/* Avatar */}
+          <div
+            className="aspect-square shrink-0 overflow-hidden rounded-erc8004-md border border-erc8004-border"
+            style={{ width: avatarSize, height: avatarSize }}
+          >
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <FingerprintBadge
+                agentRegistry={agentRegistry}
+                agentId={agentId}
+                size={avatarSize}
+              />
+            )}
+          </div>
+
+          {/* Name + agent id */}
+          <div className="mt-4 min-w-0">
+            <h2 className="truncate text-lg font-medium text-erc8004-card-fg">
+              {name}
+            </h2>
+            <p className="mt-0.5 text-xs text-erc8004-muted-fg tabular-nums">
+              #{agentId}
+            </p>
+          </div>
+
+          {/* Owner + protocols */}
+          {(showOwner ||
+            (showProtocolBadges && activeProtocols.length > 0)) && (
+            <div className="mt-3 flex flex-col items-center">
+              {showOwner && <Address address={owner} />}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {showProtocolBadges &&
+                  activeProtocols.map(({ key, label }) => (
+                    <Tag key={key}>{label}</Tag>
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Description */}
+          {showDescription && description && (
+            <p className="mt-4 line-clamp-3 text-sm text-erc8004-muted-fg leading-relaxed">
+              {description}
+            </p>
+          )}
+        </div>
+      </Card>
+    )
+  }
+
   return (
-    <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
+    <Card shadow className={cn("w-fit p-6", className)}>
+      {/* Top row: avatar + name + address + protocol tags */}
       <div className="flex gap-4">
-        {/* Avatar */}
-        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full">
+        <div className="h-12 w-12 aspect-square shrink-0 overflow-hidden rounded-erc8004-md border border-erc8004-border">
           {imageUrl ? (
             <img
               src={imageUrl}
@@ -190,50 +292,42 @@ export function AgentCard({ className, ...props }: AgentCardProps) {
             <FingerprintBadge
               agentRegistry={agentRegistry}
               agentId={agentId}
-              size={64}
+              size={48}
             />
           )}
         </div>
 
-        {/* Body */}
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
-            <h2 className="truncate text-base font-semibold text-erc8004-card-fg">
-              {name}
-            </h2>
-          </div>
+          <h2 className="truncate text-lg font-medium text-erc8004-card-fg">
+            {name}
+          </h2>
 
-          {description && (
-            <p className="mt-1 line-clamp-2 text-sm text-erc8004-muted-fg">
-              {description}
-            </p>
-          )}
+          {(showOwner ||
+            (showProtocolBadges && activeProtocols.length > 0)) && (
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              {showOwner && <Address address={owner} />}
 
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            {/* Owner address */}
-            <span
-              className="font-mono text-xs text-erc8004-muted-fg"
-              title={owner}
-            >
-              {truncateAddress(owner)}
-            </span>
+              {showOwner &&
+                showProtocolBadges &&
+                activeProtocols.length > 0 && (
+                  <span className="h-1 w-1 rounded-full bg-erc8004-border" />
+                )}
 
-            {activeProtocols.length > 0 && (
-              <>
-                <span className="text-erc8004-border">·</span>
-                {activeProtocols.map(({ key, label }) => (
-                  <span
-                    key={key}
-                    className="rounded-full bg-erc8004-muted px-2 py-0.5 text-xs font-medium text-erc8004-muted-fg"
-                  >
-                    {label}
-                  </span>
+              {showProtocolBadges &&
+                activeProtocols.map(({ key, label }) => (
+                  <Tag key={key}>{label}</Tag>
                 ))}
-              </>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
-    </div>
+
+      {/* Bottom row: description */}
+      {showDescription && description && (
+        <p className="mt-4 line-clamp-2 text-sm text-erc8004-muted-fg leading-relaxed">
+          {description}
+        </p>
+      )}
+    </Card>
   )
 }

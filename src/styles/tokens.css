@@ -18,42 +18,42 @@
    ============================================ */
 .erc8004 {
   /* --- Base surfaces --- */
-  --erc8004-bg:          1 0 0;            /* page/component background — white */
-  --erc8004-fg:          0.145 0 0;        /* default text — near-black */
+  --erc8004-bg: 1 0 0; /* page/component background — white */
+  --erc8004-fg: 0.145 0 0; /* default text — near-black */
 
   /* --- Card / elevated surfaces --- */
-  --erc8004-card:        1 0 0;            /* card background */
-  --erc8004-card-fg:     0.145 0 0;        /* card text */
+  --erc8004-card: 1 0 0; /* card background */
+  --erc8004-card-fg: 0.145 0 0; /* card text */
 
   /* --- Muted / subdued content --- */
-  --erc8004-muted:       0.97 0 0;         /* subtle background (empty states, secondary surfaces) */
-  --erc8004-muted-fg:    0.556 0 0;        /* secondary text (descriptions, timestamps, helper text) */
+  --erc8004-muted: 0.97 0 0; /* subtle background (empty states, secondary surfaces) */
+  --erc8004-muted-fg: 0.556 0 0; /* secondary text (descriptions, timestamps, helper text) */
 
   /* --- Accent / brand color --- */
-  --erc8004-accent:      0.55 0.2 260;     /* primary accent — blue */
-  --erc8004-accent-fg:   0.985 0 0;        /* text on accent surfaces — white */
+  --erc8004-accent: 0.55 0.2 260; /* primary accent — blue */
+  --erc8004-accent-fg: 0.985 0 0; /* text on accent surfaces — white */
 
   /* --- Semantic: positive/negative --- */
-  --erc8004-positive:    0.55 0.17 145;    /* success, positive scores — green */
-  --erc8004-positive-fg: 0.985 0 0;        /* text on positive surfaces */
-  --erc8004-negative:    0.55 0.2 25;      /* error, negative scores — red */
-  --erc8004-negative-fg: 0.985 0 0;        /* text on negative surfaces */
+  --erc8004-positive: 0.55 0.17 145; /* success, positive scores — green */
+  --erc8004-positive-fg: 0.985 0 0; /* text on positive surfaces */
+  --erc8004-negative: 0.55 0.2 25; /* error, negative scores — red */
+  --erc8004-negative-fg: 0.985 0 0; /* text on negative surfaces */
 
   /* --- Borders & dividers --- */
-  --erc8004-border:      0.922 0 0;        /* default border color */
+  --erc8004-border: 0.922 0 0; /* default border color */
 
   /* --- Focus rings --- */
-  --erc8004-ring:        0.55 0.2 260;     /* focus ring color — matches accent */
+  --erc8004-ring: 0.55 0.2 260; /* focus ring color — matches accent */
 
   /* --- Chart palette (for ReputationChart, etc.) --- */
-  --erc8004-chart-1:     0.55 0.2 260;     /* blue */
-  --erc8004-chart-2:     0.6 0.18 145;     /* green */
-  --erc8004-chart-3:     0.6 0.2 25;       /* red-orange */
-  --erc8004-chart-4:     0.65 0.2 310;     /* purple */
-  --erc8004-chart-5:     0.7 0.15 70;      /* gold */
+  --erc8004-chart-1: 0.55 0.2 260; /* blue */
+  --erc8004-chart-2: 0.6 0.18 145; /* green */
+  --erc8004-chart-3: 0.6 0.2 25; /* red-orange */
+  --erc8004-chart-4: 0.65 0.2 310; /* purple */
+  --erc8004-chart-5: 0.7 0.15 70; /* gold */
 
   /* --- Radius scale --- */
-  --erc8004-radius:      0.5rem;           /* base radius — all others derive from this */
+  --erc8004-radius: 0.5rem; /* base radius — all others derive from this */
 }
 
 /* ============================================
@@ -68,32 +68,32 @@
    ============================================ */
 :where(.dark) .erc8004,
 .erc8004.dark {
-  --erc8004-bg:          0.145 0 0;
-  --erc8004-fg:          0.985 0 0;
+  --erc8004-bg: 0.145 0 0;
+  --erc8004-fg: 0.985 0 0;
 
-  --erc8004-card:        0.205 0 0;
-  --erc8004-card-fg:     0.985 0 0;
+  --erc8004-card: 0.205 0 0;
+  --erc8004-card-fg: 0.985 0 0;
 
-  --erc8004-muted:       0.269 0 0;
-  --erc8004-muted-fg:    0.708 0 0;
+  --erc8004-muted: 0.269 0 0;
+  --erc8004-muted-fg: 0.708 0 0;
 
-  --erc8004-accent:      0.6 0.2 260;
-  --erc8004-accent-fg:   0.985 0 0;
+  --erc8004-accent: 0.6 0.2 260;
+  --erc8004-accent-fg: 0.985 0 0;
 
-  --erc8004-positive:    0.6 0.17 145;
+  --erc8004-positive: 0.6 0.17 145;
   --erc8004-positive-fg: 0.985 0 0;
-  --erc8004-negative:    0.6 0.2 25;
+  --erc8004-negative: 0.6 0.2 25;
   --erc8004-negative-fg: 0.985 0 0;
 
-  --erc8004-border:      0.3 0 0;
+  --erc8004-border: 0.3 0 0;
 
-  --erc8004-ring:        0.6 0.2 260;
+  --erc8004-ring: 0.6 0.2 260;
 
-  --erc8004-chart-1:     0.6 0.2 260;
-  --erc8004-chart-2:     0.65 0.18 145;
-  --erc8004-chart-3:     0.65 0.2 25;
-  --erc8004-chart-4:     0.7 0.2 310;
-  --erc8004-chart-5:     0.75 0.15 70;
+  --erc8004-chart-1: 0.6 0.2 260;
+  --erc8004-chart-2: 0.65 0.18 145;
+  --erc8004-chart-3: 0.65 0.2 25;
+  --erc8004-chart-4: 0.7 0.2 310;
+  --erc8004-chart-5: 0.75 0.15 70;
 }
 
 /* ============================================
@@ -105,32 +105,32 @@
    ============================================ */
 :where(.light) .erc8004,
 .erc8004.light {
-  --erc8004-bg:          1 0 0;
-  --erc8004-fg:          0.145 0 0;
+  --erc8004-bg: 1 0 0;
+  --erc8004-fg: 0.145 0 0;
 
-  --erc8004-card:        1 0 0;
-  --erc8004-card-fg:     0.145 0 0;
+  --erc8004-card: 1 0 0;
+  --erc8004-card-fg: 0.145 0 0;
 
-  --erc8004-muted:       0.97 0 0;
-  --erc8004-muted-fg:    0.556 0 0;
+  --erc8004-muted: 0.97 0 0;
+  --erc8004-muted-fg: 0.556 0 0;
 
-  --erc8004-accent:      0.55 0.2 260;
-  --erc8004-accent-fg:   0.985 0 0;
+  --erc8004-accent: 0.55 0.2 260;
+  --erc8004-accent-fg: 0.985 0 0;
 
-  --erc8004-positive:    0.55 0.17 145;
+  --erc8004-positive: 0.55 0.17 145;
   --erc8004-positive-fg: 0.985 0 0;
-  --erc8004-negative:    0.55 0.2 25;
+  --erc8004-negative: 0.55 0.2 25;
   --erc8004-negative-fg: 0.985 0 0;
 
-  --erc8004-border:      0.922 0 0;
+  --erc8004-border: 0.922 0 0;
 
-  --erc8004-ring:        0.55 0.2 260;
+  --erc8004-ring: 0.55 0.2 260;
 
-  --erc8004-chart-1:     0.55 0.2 260;
-  --erc8004-chart-2:     0.6 0.18 145;
-  --erc8004-chart-3:     0.6 0.2 25;
-  --erc8004-chart-4:     0.65 0.2 310;
-  --erc8004-chart-5:     0.7 0.15 70;
+  --erc8004-chart-1: 0.55 0.2 260;
+  --erc8004-chart-2: 0.6 0.18 145;
+  --erc8004-chart-3: 0.6 0.2 25;
+  --erc8004-chart-4: 0.65 0.2 310;
+  --erc8004-chart-5: 0.7 0.15 70;
 }
 
 /* ============================================
@@ -141,40 +141,40 @@
    ============================================ */
 @theme inline {
   /* Surfaces */
-  --color-erc8004-bg:          oklch(var(--erc8004-bg));
-  --color-erc8004-fg:          oklch(var(--erc8004-fg));
-  --color-erc8004-card:        oklch(var(--erc8004-card));
-  --color-erc8004-card-fg:     oklch(var(--erc8004-card-fg));
-  --color-erc8004-muted:       oklch(var(--erc8004-muted));
-  --color-erc8004-muted-fg:    oklch(var(--erc8004-muted-fg));
+  --color-erc8004-bg: oklch(var(--erc8004-bg));
+  --color-erc8004-fg: oklch(var(--erc8004-fg));
+  --color-erc8004-card: oklch(var(--erc8004-card));
+  --color-erc8004-card-fg: oklch(var(--erc8004-card-fg));
+  --color-erc8004-muted: oklch(var(--erc8004-muted));
+  --color-erc8004-muted-fg: oklch(var(--erc8004-muted-fg));
 
   /* Accent */
-  --color-erc8004-accent:      oklch(var(--erc8004-accent));
-  --color-erc8004-accent-fg:   oklch(var(--erc8004-accent-fg));
+  --color-erc8004-accent: oklch(var(--erc8004-accent));
+  --color-erc8004-accent-fg: oklch(var(--erc8004-accent-fg));
 
   /* Semantic */
-  --color-erc8004-positive:    oklch(var(--erc8004-positive));
+  --color-erc8004-positive: oklch(var(--erc8004-positive));
   --color-erc8004-positive-fg: oklch(var(--erc8004-positive-fg));
-  --color-erc8004-negative:    oklch(var(--erc8004-negative));
+  --color-erc8004-negative: oklch(var(--erc8004-negative));
   --color-erc8004-negative-fg: oklch(var(--erc8004-negative-fg));
 
   /* Borders */
-  --color-erc8004-border:      oklch(var(--erc8004-border));
+  --color-erc8004-border: oklch(var(--erc8004-border));
 
   /* Focus rings */
-  --color-erc8004-ring:        oklch(var(--erc8004-ring));
+  --color-erc8004-ring: oklch(var(--erc8004-ring));
 
   /* Chart palette */
-  --color-erc8004-chart-1:     oklch(var(--erc8004-chart-1));
-  --color-erc8004-chart-2:     oklch(var(--erc8004-chart-2));
-  --color-erc8004-chart-3:     oklch(var(--erc8004-chart-3));
-  --color-erc8004-chart-4:     oklch(var(--erc8004-chart-4));
-  --color-erc8004-chart-5:     oklch(var(--erc8004-chart-5));
+  --color-erc8004-chart-1: oklch(var(--erc8004-chart-1));
+  --color-erc8004-chart-2: oklch(var(--erc8004-chart-2));
+  --color-erc8004-chart-3: oklch(var(--erc8004-chart-3));
+  --color-erc8004-chart-4: oklch(var(--erc8004-chart-4));
+  --color-erc8004-chart-5: oklch(var(--erc8004-chart-5));
 
   /* Radius scale (derived from base) */
-  --radius-erc8004-sm:  calc(var(--erc8004-radius) * 0.6);
-  --radius-erc8004-md:  calc(var(--erc8004-radius) * 0.8);
-  --radius-erc8004-lg:  var(--erc8004-radius);
-  --radius-erc8004-xl:  calc(var(--erc8004-radius) * 1.4);
+  --radius-erc8004-sm: calc(var(--erc8004-radius) * 0.6);
+  --radius-erc8004-md: calc(var(--erc8004-radius) * 0.8);
+  --radius-erc8004-lg: var(--erc8004-radius);
+  --radius-erc8004-xl: calc(var(--erc8004-radius) * 1.4);
   --radius-erc8004-2xl: calc(var(--erc8004-radius) * 1.8);
 }

@@ -4,6 +4,7 @@ import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
 import { cn } from "@/lib/cn"
+import { Skeleton } from "@/components/_internal"
 import type { AgentStats } from "@/types"
 import * as v from "valibot"
 
@@ -63,48 +64,64 @@ function useReputationStats(agentRegistry: string, agentId: number) {
   })
 }
 
-function scoreColor(value: number) {
-  if (value >= 7) return "bg-erc8004-positive"
-  if (value >= 4) return "bg-erc8004-chart-5"
-  return "bg-erc8004-negative"
-}
-
-interface ReputationScoreProps extends AgentIdentityProps {
+export interface ReputationScoreProps extends AgentIdentityProps {
+  /** Show/hide the review count. Default `true`. */
+  showCount?: boolean
+  /** Decimal places for the score. Default `1`. */
+  precision?: number
   className?: string
 }
 
-export function ReputationScore({ className, ...props }: ReputationScoreProps) {
+export function ReputationScore({
+  showCount = true,
+  precision = 1,
+  className,
+  ...props
+}: ReputationScoreProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useReputationStats(agentRegistry, agentId)
 
   if (isLoading) {
     return (
-      <div className={cn("inline-flex items-center gap-1.5 animate-pulse", className)} aria-busy="true" aria-live="polite">
-        <div className="h-1.5 w-1.5 rounded-full bg-erc8004-muted" />
-        <div className="h-3 w-8 rounded-erc8004-sm bg-erc8004-muted" />
+      <div className={cn("inline-flex items-center gap-3", className)}>
+        <Skeleton className="h-8 w-16" />
+        <div className="space-y-1">
+          <Skeleton className="h-3 w-8" />
+          <Skeleton className="h-3 w-20" />
+        </div>
       </div>
     )
   }
 
   if (error || !data?.agentStats) {
-    return <div className={cn("h-1.5 w-1.5 rounded-full bg-erc8004-muted", className)} />
+    return (
+      <div className={cn("inline-flex items-center gap-3", className)}>
+        <span className="text-2xl font-semibold tabular-nums text-erc8004-muted-fg">--</span>
+      </div>
+    )
   }
 
   const { averageFeedbackValue, totalFeedback } = data.agentStats
-  const score = averageFeedbackValue.toFixed(1)
+  const score = averageFeedbackValue.toFixed(precision)
 
   return (
     <div
-      className={cn("group inline-flex items-center gap-3 cursor-default", className)}
+      className={cn("inline-flex items-center gap-3 cursor-default", className)}
       title={`${totalFeedback} ${totalFeedback === 1 ? "review" : "reviews"}`}
     >
-      <div
-        className={`h-2 w-2 rounded-full ${scoreColor(averageFeedbackValue)}`}
-      />
-      <span className="font-mono text-xl text-erc8004-card-fg/80">{score}</span>
-      <span className="text-xs text-erc8004-muted-fg opacity-0 group-hover:opacity-100 transition-opacity">
-        ({totalFeedback})
+      <span className="text-2xl font-semibold tabular-nums text-erc8004-card-fg">
+        {score}
       </span>
+      {showCount && (
+        <div className="flex flex-col">
+          <span className="text-xs text-erc8004-muted-fg uppercase tracking-wide">
+            AVG
+          </span>
+          <span className="text-xs text-erc8004-muted-fg">
+            {totalFeedback} {totalFeedback === 1 ? "review" : "reviews"}
+          </span>
+        </div>
+      )}
     </div>
   )
 }

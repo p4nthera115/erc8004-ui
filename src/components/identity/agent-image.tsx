@@ -7,6 +7,7 @@ import {
 } from "@/lib/useAgentIdentity"
 import { cn } from "@/lib/cn"
 import { useQuery } from "@tanstack/react-query"
+import { Skeleton } from "@/components/_internal"
 import * as v from "valibot"
 import { FingerprintBadge } from "./FingerprintBadge"
 
@@ -17,13 +18,15 @@ type AgentImageResponse = {
 }
 
 const agentImageSchema = v.object({
-  agent: v.object({
-    registrationFile: v.nullable(
-      v.object({
-        image: v.nullable(v.string()),
-      })
-    ),
-  }),
+  agent: v.nullable(
+    v.object({
+      registrationFile: v.nullable(
+        v.object({
+          image: v.nullable(v.string()),
+        })
+      ),
+    })
+  ),
 })
 
 const AGENT_IMAGE_QUERY = `#graphql
@@ -78,17 +81,19 @@ interface AgentImageProps extends AgentIdentityProps {
   size?: number
 }
 
-export function AgentImage({ className, size = 64, ...props }: AgentImageProps) {
+export function AgentImage({
+  className,
+  size = 64,
+  ...props
+}: AgentImageProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading } = useAgentImage(agentRegistry, agentId)
 
   if (isLoading) {
     return (
-      <div
-        className={cn("animate-pulse rounded-full bg-erc8004-muted", className)}
+      <Skeleton
+        className={cn("rounded-erc8004-md", className)}
         style={{ width: size, height: size }}
-        aria-busy="true"
-        aria-live="polite"
       />
     )
   }
@@ -96,7 +101,13 @@ export function AgentImage({ className, size = 64, ...props }: AgentImageProps) 
   const imageUrl = data?.agent?.registrationFile?.image
 
   return (
-    <div className={cn("overflow-hidden rounded-full", className)} style={{ width: size, height: size }}>
+    <div
+      className={cn(
+        "overflow-hidden rounded-erc8004-md border border-erc8004-border ",
+        className
+      )}
+      style={{ width: size, height: size }}
+    >
       {imageUrl ? (
         <img
           src={resolveImageUrl(imageUrl)}

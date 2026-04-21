@@ -4,6 +4,7 @@ import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
 import { cn } from "@/lib/cn"
+import { Card, Tag, Skeleton, EmptyState, ErrorState } from "@/components/_internal"
 import * as v from "valibot"
 
 type EndpointStatusResponse = {
@@ -155,84 +156,78 @@ function HealthIndicator({ url }: { url: string }) {
   )
 }
 
-interface EndpointStatusProps extends AgentIdentityProps {
+export type EndpointProtocol = "mcp" | "a2a" | "oasf" | "web" | "email"
+
+export interface EndpointStatusProps extends AgentIdentityProps {
   /** Show live HTTP health check dots. Default: false */
   showHealthChecks?: boolean
+  /** Filter which protocols are shown. Default shows all. */
+  protocols?: EndpointProtocol[]
   className?: string
 }
 
-export function EndpointStatus({ showHealthChecks = false, className, ...agentProps }: EndpointStatusProps) {
+export function EndpointStatus({ showHealthChecks = false, protocols, className, ...agentProps }: EndpointStatusProps) {
   const { agentRegistry, agentId } = useAgentIdentity(agentProps)
   const { data, isLoading, error } = useEndpointStatus(agentRegistry, agentId)
 
   if (isLoading) {
     return (
-      <div
-        className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5 animate-pulse", className)}
-        aria-busy="true"
-        aria-live="polite"
-      >
-        <div className="mb-4 h-4 w-24 rounded-erc8004-sm bg-erc8004-muted" />
+      <Card className={cn("w-full p-4", className)}>
+        <Skeleton className="mb-4 h-4 w-24" />
         <div className="space-y-2.5">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex items-center gap-3">
-              <div className="h-3 w-12 rounded-erc8004-sm bg-erc8004-muted/50" />
-              <div className="h-3 flex-1 rounded-erc8004-sm bg-erc8004-muted/50" />
+              <Skeleton className="h-5 w-12 rounded-erc8004-sm" />
+              <Skeleton className="h-3 flex-1" />
             </div>
           ))}
         </div>
-      </div>
+      </Card>
     )
   }
 
   if (error) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
-        <p className="text-sm text-erc8004-negative">
-          Failed to load endpoints.
-        </p>
-        <p className="mt-1 text-xs text-erc8004-negative/70">
-          {error instanceof Error ? error.message : "Unknown error"}
-        </p>
-      </div>
+      <Card className={cn("w-full", className)}>
+        <ErrorState message="Couldn't load endpoints" onRetry={() => void 0} />
+      </Card>
     )
   }
 
   const rf = data?.agent?.registrationFile
-  const endpoints = rf ? buildEndpoints(rf) : []
+  const allEndpoints = rf ? buildEndpoints(rf) : []
+  const endpoints = protocols
+    ? allEndpoints.filter((ep) => protocols.includes(ep.protocol.toLowerCase() as EndpointProtocol))
+    : allEndpoints
 
   if (endpoints.length === 0) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
-        <h3 className="mb-3 text-sm font-semibold text-erc8004-card-fg">
+      <Card className={cn("w-full", className)}>
+        <h3 className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">
           Endpoints
         </h3>
-        <p className="text-sm text-erc8004-muted-fg">
-          No endpoints registered.
-        </p>
-      </div>
+        <EmptyState message="No endpoints registered" />
+      </Card>
     )
   }
 
   return (
-    <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
-      <h3 className="mb-4 text-sm font-semibold text-erc8004-card-fg">
+    <Card className={cn("w-full p-4", className)}>
+      <h3 className="mb-4 text-sm font-medium text-erc8004-card-fg">
         Endpoints
       </h3>
 
       <div className="flex flex-col gap-2">
         {endpoints.map(({ protocol, url, version, isEmail }) => (
           <div key={protocol} className="flex items-center gap-3">
-            {/* Protocol badge */}
-            <span className="w-14 shrink-0 rounded-full bg-erc8004-muted px-2 py-0.5 text-center text-xs font-medium text-erc8004-muted-fg">
+            <Tag variant="accent" className="w-14 shrink-0 justify-center">
               {protocol}
-            </span>
+            </Tag>
 
-            {/* URL */}
             {isEmail ? (
               <a
                 href={`mailto:${url}`}
-                className="min-w-0 flex-1 truncate text-sm text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
+                className="min-w-0 flex-1 truncate font-mono text-xs text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
                 title={url}
               >
                 {url}
@@ -242,25 +237,23 @@ export function EndpointStatus({ showHealthChecks = false, className, ...agentPr
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="min-w-0 flex-1 truncate text-sm text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
+                className="min-w-0 flex-1 truncate font-mono text-xs text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
                 title={url}
               >
                 {truncateUrl(url)}
               </a>
             )}
 
-            {/* Version tag */}
             {version && (
               <span className="shrink-0 text-xs tabular-nums text-erc8004-muted-fg">
                 v{version}
               </span>
             )}
 
-            {/* Health check dot */}
             {showHealthChecks && !isEmail && <HealthIndicator url={url} />}
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   )
 }

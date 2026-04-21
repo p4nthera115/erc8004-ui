@@ -13,6 +13,22 @@ export function SectionHeading({ children }: { children: React.ReactNode }) {
   )
 }
 
+function SubHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="text-sm font-mono text-neutral-600 dark:text-white/70 mb-3">
+      {children}
+    </h3>
+  )
+}
+
+function PreviewBox({ children }: { children: React.ReactNode }) {
+  return (
+    <div data-toc-exclude className="rounded border border-black/60 dark:border-white/10 bg-neutral-50 dark:bg-white/2 p-8 flex items-center justify-center min-h-32">
+      {children}
+    </div>
+  )
+}
+
 function PropRow({ prop }: { prop: ComponentDoc["props"][number] }) {
   return (
     <tr className="border-t border-black/60 dark:border-white/10">
@@ -56,13 +72,11 @@ export function DocPageLayout({ doc }: { doc: ComponentDoc }) {
         </p>
       </div>
 
-      {/* Preview */}
+      {/* Default Preview */}
       {doc.preview !== null && (
         <section>
           <SectionHeading>Preview</SectionHeading>
-          <div data-toc-exclude className="rounded border border-black/60 dark:border-white/10 bg-neutral-50 dark:bg-white/2 p-8 flex items-center justify-center min-h-32">
-            {doc.preview}
-          </div>
+          <PreviewBox>{doc.preview}</PreviewBox>
           {doc.previewCode && (
             <CodeBlock code={doc.importLine + "\n" + doc.previewCode} />
           )}
@@ -75,6 +89,35 @@ export function DocPageLayout({ doc }: { doc: ComponentDoc }) {
         <CodeBlock code={doc.importLine} />
         <CodeBlock code={doc.usage} />
       </section>
+
+      {/* Examples */}
+      {doc.examples && doc.examples.length > 0 && (
+        <section className="flex flex-col gap-10">
+          <SectionHeading>Examples</SectionHeading>
+          {doc.examples.map((example) => (
+            <div key={example.name} className="flex flex-col gap-3">
+              <SubHeading>{example.name}</SubHeading>
+              <p className="text-sm text-neutral-500 dark:text-white/50 -mt-1 mb-1">
+                {example.description}
+              </p>
+              <PreviewBox>{example.preview}</PreviewBox>
+              <CodeBlock code={example.code} />
+            </div>
+          ))}
+        </section>
+      )}
+
+      {/* In Context */}
+      {doc.inContext && (
+        <section className="flex flex-col gap-4">
+          <SectionHeading>In Context</SectionHeading>
+          <p className="text-sm text-neutral-500 dark:text-white/50">
+            {doc.inContext.description}
+          </p>
+          <PreviewBox>{doc.inContext.preview}</PreviewBox>
+          <CodeBlock code={doc.inContext.code} />
+        </section>
+      )}
 
       {/* API Reference */}
       <section>
@@ -108,6 +151,16 @@ export function DocPageLayout({ doc }: { doc: ComponentDoc }) {
           </table>
         </div>
       </section>
+
+      {/* States */}
+      {doc.states && (
+        <section>
+          <SectionHeading>States</SectionHeading>
+          <p className="text-sm text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
+            {doc.states}
+          </p>
+        </section>
+      )}
     </div>
   )
 }

@@ -1,11 +1,15 @@
 import { useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
+import {
+  useAgentIdentity,
+  type AgentIdentityProps,
+} from "@/lib/useAgentIdentity"
 import type { Feedback } from "@/types"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { cn } from "@/lib/cn"
+import { Card, Skeleton, EmptyState, ErrorState } from "@/components/_internal"
 import * as v from "valibot"
 
 type DistributionResponse = {
@@ -77,23 +81,46 @@ function useFeedbackDistribution(agentRegistry: string, agentId: number) {
 // ============================================================================
 
 interface Bucket {
-  /** Inclusive lower bound of the score range */
   min: number
-  /** Inclusive upper bound of the score range */
   max: number
-  /** Human-readable label shown on the Y-axis (e.g. "81–100") */
   label: string
-  /** Tailwind background-color class for the filled bar */
-  barClass: string
 }
 
-const BUCKETS: Bucket[] = [
-  { min: 81, max: 100, label: "81–100", barClass: "bg-erc8004-positive" },
-  { min: 61, max: 80,  label: "61–80",  barClass: "bg-erc8004-positive/70" },
-  { min: 41, max: 60,  label: "41–60",  barClass: "bg-erc8004-chart-5" },
-  { min: 21, max: 40,  label: "21–40",  barClass: "bg-erc8004-chart-3" },
-  { min: 0,  max: 20,  label: "0–20",   barClass: "bg-erc8004-negative" },
+const DEFAULT_BUCKETS: Bucket[] = [
+  { min: 81, max: 100, label: "81–100" },
+  { min: 61, max: 80, label: "61–80" },
+  { min: 41, max: 60, label: "41–60" },
+  { min: 21, max: 40, label: "21–40" },
+  { min: 0, max: 20, label: "0–20" },
 ]
+
+function generateBuckets(count: number): Bucket[] {
+  if (count === 5) return DEFAULT_BUCKETS
+  const step = 100 / count
+  const buckets: Bucket[] = []
+  for (let i = count - 1; i >= 0; i--) {
+    const min = Math.round(i * step)
+    const max = i === count - 1 ? 100 : Math.round((i + 1) * step) - 1
+    buckets.push({ min, max, label: `${min}–${max}` })
+  }
+  return buckets
+}
+
+/**
+ * Maps a bucket's midpoint score (0–100) to a CSS var colour so the
+ * gradient reads green → gold → red regardless of how many buckets
+ * the developer asks for.
+ */
+function bucketColorVar(bucket: Bucket): string {
+  const mid = (bucket.min + bucket.max) / 2
+  if (mid >= 81) return "oklch(var(--erc8004-positive))"
+  if (mid >= 61) return "oklch(var(--erc8004-chart-2))"
+  if (mid >= 41) return "oklch(var(--erc8004-chart-5))"
+  if (mid >= 21) return "oklch(var(--erc8004-chart-3))"
+  return "oklch(var(--erc8004-negative))"
+}
+
+export type ReputationDistributionOrientation = "vertical" | "horizontal"
 
 // ============================================================================
 // BUCKETING LOGIC
@@ -113,9 +140,12 @@ interface BucketCount {
   count: number
 }
 
-function bucketFeedback(values: number[]): BucketCount[] {
+function bucketFeedback(
+  values: number[],
+  activeBuckets: Bucket[]
+): BucketCount[] {
   // Start every bucket's count at 0
-  const counts: BucketCount[] = BUCKETS.map((bucket) => ({
+  const counts: BucketCount[] = activeBuckets.map((bucket) => ({
     bucket,
     count: 0,
   }))
@@ -141,23 +171,49 @@ function bucketFeedback(values: number[]): BucketCount[] {
 // COMPONENT
 // ============================================================================
 
-interface ReputationDistributionProps extends AgentIdentityProps {
+export interface ReputationDistributionProps extends AgentIdentityProps {
+  /** Number of histogram buckets. Default `5`. */
+  bucketCount?: number
+  /** Chart orientation. Default `"vertical"` (vertical stack of horizontal bars). */
+  orientation?: ReputationDistributionOrientation
+  /** Show axis labels. Default `true`. */
+  showAxisLabels?: boolean
+  /**
+   * Colour bars by score band (green/gold/red) rather than a single accent
+   * colour. Default `true`.
+   */
+  colored?: boolean
   className?: string
 }
 
-export function ReputationDistribution({ className, ...props }: ReputationDistributionProps) {
+export function ReputationDistribution({
+  bucketCount = 5,
+  orientation = "vertical",
+  showAxisLabels = true,
+  colored = true,
+  className,
+  ...props
+}: ReputationDistributionProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
   // Fetch reputation data. If another reputation component on the page
   // already requested data for the same agent, TanStack Query reuses the
   // cached result — no duplicate network requests.
-  const { data, isLoading, error } = useFeedbackDistribution(agentRegistry, agentId)
+  const { data, isLoading, error } = useFeedbackDistribution(
+    agentRegistry,
+    agentId
+  )
+
+  const buckets = useMemo(() => generateBuckets(bucketCount), [bucketCount])
 
   // useMemo ensures we only re-compute buckets when the underlying
   // feedback array actually changes — not on every render.
   const bucketCounts = useMemo(() => {
     if (!data?.feedbacks) return null
-    return bucketFeedback(data.feedbacks.map((f) => f.value))
-  }, [data?.feedbacks])
+    return bucketFeedback(
+      data.feedbacks.map((f) => f.value),
+      buckets
+    )
+  }, [data?.feedbacks, buckets])
 
   // The "max count" is the highest number of reviews in any single bucket.
   // We use it to calculate each bar's width as a percentage:
@@ -175,62 +231,61 @@ export function ReputationDistribution({ className, ...props }: ReputationDistri
     return bucketCounts.reduce((sum, b) => sum + b.count, 0)
   }, [bucketCounts])
 
-  // --- Loading state ---
-  // Shows placeholder "skeleton" bars while data is being fetched.
   if (isLoading) {
     return (
-      <div
-        className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5 animate-pulse", className)}
-        aria-busy="true"
-        aria-live="polite"
-      >
-        <div className="mb-4 h-4 w-36 rounded-erc8004-sm bg-erc8004-muted" />
-        <div className="flex flex-col gap-2.5">
-          {BUCKETS.map((b) => (
-            <div key={b.label} className="flex items-center gap-3">
-              <div className="h-3 w-12 rounded-erc8004-sm bg-erc8004-muted" />
-              <div className="h-5 flex-1 rounded-erc8004-sm bg-erc8004-muted/50" />
-            </div>
-          ))}
+      <Card className={cn("w-full p-4", className)}>
+        <Skeleton className="mb-4 h-4 w-36" />
+        <div
+          className={
+            orientation === "vertical"
+              ? "flex flex-col gap-2.5"
+              : "flex items-end gap-2"
+          }
+        >
+          {buckets.map((b) =>
+            orientation === "vertical" ? (
+              <div key={b.label} className="flex items-center gap-3">
+                <Skeleton className="h-3 w-12" />
+                <Skeleton className="h-5 flex-1" />
+              </div>
+            ) : (
+              <div
+                key={b.label}
+                className="flex flex-1 flex-col items-center gap-1"
+              >
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-3 w-8" />
+              </div>
+            )
+          )}
         </div>
-      </div>
+      </Card>
     )
   }
 
-  // --- Error state ---
   if (error) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
-        <p className="text-sm text-erc8004-negative">
-          Failed to load reputation data.{" "}
-        </p>
-        <p className="mt-1 text-xs text-erc8004-negative/70">
-          {error instanceof Error ? error.message : "Unknown error"}
-        </p>
-      </div>
+      <Card className={cn("w-full", className)}>
+        <ErrorState message="Couldn't load reputation data" />
+      </Card>
     )
   }
 
-  // --- Empty state ---
   if (!bucketCounts || totalReviews === 0) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
-        <h3 className="mb-3 text-sm font-semibold text-erc8004-card-fg">
+      <Card className={cn("w-full", className)}>
+        <h3 className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">
           Score Distribution
         </h3>
-        <p className="text-sm text-erc8004-muted-fg">
-          No feedback yet.
-        </p>
-      </div>
+        <EmptyState message="No feedback yet" />
+      </Card>
     )
   }
 
-  // --- Histogram ---
   return (
-    <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
-      {/* Header: title + total review count */}
+    <Card className={cn("w-full p-4", className)}>
       <div className="mb-4 flex items-baseline justify-between">
-        <h3 className="text-sm font-semibold text-erc8004-card-fg">
+        <h3 className="text-sm font-medium text-erc8004-card-fg">
           Score Distribution
         </h3>
         <span className="text-xs text-erc8004-muted-fg">
@@ -238,39 +293,80 @@ export function ReputationDistribution({ className, ...props }: ReputationDistri
         </span>
       </div>
 
-      {/* One row per bucket, highest range at the top */}
-      <div className="flex flex-col gap-2">
-        {bucketCounts.map(({ bucket, count }) => {
-          const widthPercent = (count / maxCount) * 100
-
-          return (
-            <div key={bucket.label} className="flex items-center gap-3">
-              {/* Range label — fixed width so bars align vertically */}
-              <span className="w-12 shrink-0 text-right text-xs tabular-nums text-erc8004-muted-fg">
-                {bucket.label}
-              </span>
-
-              {/* Bar track with filled portion */}
-              <div className="relative h-5 flex-1 overflow-hidden rounded-erc8004-sm bg-erc8004-muted">
-                <div
-                  className={`absolute inset-y-0 left-0 rounded-erc8004-sm ${bucket.barClass}`}
-                  style={{
-                    // Inline style because Tailwind can't generate dynamic
-                    // percentage classes at build time.
-                    width: `${widthPercent}%`,
-                    transition: "width 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
-                  }}
-                />
+      {orientation === "vertical" ? (
+        <div className="flex flex-col gap-2">
+          {bucketCounts.map(({ bucket, count }) => {
+            const widthPercent = (count / maxCount) * 100
+            return (
+              <div key={bucket.label} className="flex items-center gap-3">
+                {showAxisLabels && (
+                  <span className="w-12 shrink-0 text-right text-xs tabular-nums text-erc8004-muted-fg">
+                    {bucket.label}
+                  </span>
+                )}
+                <div className="relative h-5 flex-1 overflow-hidden rounded-erc8004-sm bg-erc8004-muted">
+                  <div
+                    className={cn(
+                      "absolute inset-y-0 left-0 rounded-erc8004-sm",
+                      !colored && "bg-erc8004-accent"
+                    )}
+                    style={{
+                      width: count > 0 ? `${widthPercent}%` : "0%",
+                      transition: "width 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
+                      background: colored ? bucketColorVar(bucket) : undefined,
+                    }}
+                  />
+                </div>
+                <span className="w-8 shrink-0 text-right text-xs tabular-nums text-erc8004-muted-fg">
+                  {count}
+                </span>
               </div>
-
-              {/* Count number */}
-              <span className="w-8 shrink-0 text-right text-xs tabular-nums text-erc8004-muted-fg">
-                {count}
-              </span>
-            </div>
-          )
-        })}
-      </div>
-    </div>
+            )
+          })}
+        </div>
+      ) : (
+        <div className="flex items-end gap-2" style={{ height: 120 }}>
+          {[...bucketCounts].reverse().map(({ bucket, count }) => {
+            const heightPercent = (count / maxCount) * 100
+            return (
+              <div
+                key={bucket.label}
+                className="flex flex-1 flex-col items-center gap-1 h-full justify-end"
+              >
+                <span className="text-xs tabular-nums text-erc8004-muted-fg">
+                  {count}
+                </span>
+                <div
+                  className="w-full overflow-hidden rounded-t-erc8004-sm bg-erc8004-muted"
+                  style={{
+                    height: count > 0 ? `${heightPercent}%` : "4px",
+                    transition: "height 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
+                  }}
+                >
+                  {count > 0 && (
+                    <div
+                      className={cn(
+                        "h-full w-full",
+                        !colored && "bg-erc8004-accent"
+                      )}
+                      style={{
+                        background: colored
+                          ? bucketColorVar(bucket)
+                          : undefined,
+                      }}
+                    />
+                  )}
+                </div>
+                {showAxisLabels && (
+                  <span className="text-[10px] tabular-nums text-erc8004-muted-fg whitespace-nowrap">
+                    {bucket.label}
+                  </span>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </Card>
   )
 }

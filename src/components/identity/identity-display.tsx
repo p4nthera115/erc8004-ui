@@ -2,12 +2,12 @@ import { useQuery } from "@tanstack/react-query"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
-import { truncateAddress } from "@/lib/utils"
 import {
   useAgentIdentity,
   type AgentIdentityProps,
 } from "@/lib/useAgentIdentity"
 import { cn } from "@/lib/cn"
+import { Card, Address, Tag, Skeleton, EmptyState, ErrorState } from "@/components/_internal"
 import * as v from "valibot"
 import { FingerprintBadge } from "./FingerprintBadge"
 
@@ -136,55 +136,44 @@ interface IdentityDisplayProps extends AgentIdentityProps {
 
 export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
   const { agentRegistry, agentId } = useAgentIdentity(props)
-  const { data, isLoading, error } = useIdentityDisplay(agentRegistry, agentId)
+  const { data, isLoading, error, refetch } = useIdentityDisplay(agentRegistry, agentId)
 
   if (isLoading) {
     return (
-      <div
-        className={cn("w-full overflow-hidden rounded-erc8004-xl border border-erc8004-border bg-erc8004-card animate-pulse", className)}
-        aria-busy="true"
-        aria-live="polite"
-      >
-        <div className="flex gap-4 p-5">
-          <div className="h-16 w-16 shrink-0 rounded-full bg-erc8004-muted" />
-          <div className="flex-1 space-y-2 pt-1">
-            <div className="h-4 w-36 rounded-erc8004-sm bg-erc8004-muted" />
-            <div className="h-3 w-full rounded-erc8004-sm bg-erc8004-muted/50" />
-            <div className="h-3 w-2/3 rounded-erc8004-sm bg-erc8004-muted/50" />
+      <Card className={cn("w-full overflow-hidden", className)}>
+        <div className="flex gap-4 p-6">
+          <Skeleton className="h-12 w-12 shrink-0 rounded-erc8004-md" />
+          <div className="flex-1 space-y-3 pt-0.5">
+            <Skeleton className="h-5 w-36" />
+            <Skeleton className="h-3 w-full" />
+            <Skeleton className="h-3 w-2/3" />
           </div>
         </div>
-        <div className="border-t border-erc8004-border p-5 space-y-2.5">
+        <div className="border-t border-erc8004-border px-6 py-4 space-y-2.5">
           {[1, 2].map((i) => (
             <div key={i} className="flex items-center gap-3">
-              <div className="h-5 w-12 rounded-full bg-erc8004-muted" />
-              <div className="h-3 flex-1 rounded-erc8004-sm bg-erc8004-muted/50" />
+              <Skeleton className="h-5 w-12 rounded-erc8004-sm" />
+              <Skeleton className="h-3 flex-1" />
             </div>
           ))}
         </div>
-      </div>
+      </Card>
     )
   }
 
   if (error) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
-        <p className="text-sm text-erc8004-negative">
-          Failed to load agent identity.
-        </p>
-        <p className="mt-1 text-xs text-erc8004-negative/70">
-          {error instanceof Error ? error.message : "Unknown error"}
-        </p>
-      </div>
+      <Card className={cn("w-full", className)}>
+        <ErrorState message="Couldn't load agent identity" onRetry={() => refetch()} />
+      </Card>
     )
   }
 
   if (!data?.agent) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
-        <p className="text-sm text-erc8004-muted-fg">
-          Agent not found.
-        </p>
-      </div>
+      <Card className={cn("w-full", className)}>
+        <EmptyState message="Agent not found" />
+      </Card>
     )
   }
 
@@ -203,10 +192,10 @@ export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
     : []
 
   return (
-    <div className={cn("w-full overflow-hidden rounded-erc8004-xl border border-erc8004-border bg-erc8004-card", className)}>
+    <Card className={cn("w-full overflow-hidden", className)}>
       {/* Identity header */}
-      <div className="flex gap-4 p-5">
-        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full">
+      <div className="flex gap-4 p-6">
+        <div className="h-12 w-12 shrink-0 overflow-hidden rounded-erc8004-md border border-erc8004-border">
           {imageUrl ? (
             <img
               src={imageUrl}
@@ -217,46 +206,41 @@ export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
             <FingerprintBadge
               agentRegistry={agentRegistry}
               agentId={agentId}
-              size={64}
+              size={48}
             />
           )}
         </div>
 
         <div className="min-w-0 flex-1">
-          <h2 className="truncate text-base font-semibold text-erc8004-card-fg">
+          <h2 className="truncate text-lg font-medium text-erc8004-card-fg">
             {name}
           </h2>
           {description && (
-            <p className="mt-1 line-clamp-2 text-sm text-erc8004-muted-fg">
+            <p className="mt-1 line-clamp-2 text-sm text-erc8004-muted-fg leading-relaxed">
               {description}
             </p>
           )}
-          <p
-            className="mt-2 font-mono text-xs text-erc8004-muted-fg"
-            title={owner}
-          >
-            {truncateAddress(owner)}
-          </p>
+          <Address address={owner} className="mt-2" />
         </div>
       </div>
 
       {/* Endpoints */}
       {endpoints.length > 0 && (
-        <div className="border-t border-erc8004-border px-5 py-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-erc8004-muted-fg">
+        <div className="border-t border-erc8004-border px-6 py-4">
+          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-erc8004-muted-fg">
             Endpoints
           </p>
           <div className="flex flex-col gap-2">
             {endpoints.map(({ label, url, version, isEmail }) => (
               <div key={label} className="flex items-center gap-3">
-                <span className="w-14 shrink-0 rounded-full bg-erc8004-muted px-2 py-0.5 text-center text-xs font-medium text-erc8004-muted-fg">
+                <Tag variant="accent" className="w-14 shrink-0 justify-center">
                   {label}
-                </span>
+                </Tag>
 
                 {isEmail ? (
                   <a
                     href={`mailto:${url}`}
-                    className="min-w-0 flex-1 truncate text-sm text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
+                    className="min-w-0 flex-1 truncate font-mono text-xs text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
                     title={url}
                   >
                     {url}
@@ -266,7 +250,7 @@ export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="min-w-0 flex-1 truncate text-sm text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
+                    className="min-w-0 flex-1 truncate font-mono text-xs text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
                     title={url}
                   >
                     {truncateUrl(url)}
@@ -283,6 +267,6 @@ export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
           </div>
         </div>
       )}
-    </div>
+    </Card>
   )
 }

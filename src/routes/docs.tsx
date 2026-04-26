@@ -5,8 +5,6 @@ import { NAV } from "@/components/docs/nav"
 import { DocsPagination } from "@/components/docs/DocsPagination"
 
 function DocsSidebar() {
-  // TODO: highlight current page in sidebar
-
   const ref = useRef<HTMLElement>(null)
   const [scrolling, setScrolling] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null)
@@ -53,7 +51,9 @@ function DocsSidebar() {
                     to={item.to}
                     params={{ slug: item.slug }}
                     className="text-sm text-neutral-950 dark:text-white py-0.5 hover:bg-black/10 dark:hover:bg-white/20 px-2"
-                    activeProps={{ className: "text-sm text-text py-0.5" }}
+                    activeProps={{
+                      className: "bg-black/10 dark:bg-white/15 font-medium",
+                    }}
                   >
                     {item.label}
                   </Link>
@@ -61,8 +61,11 @@ function DocsSidebar() {
                   <Link
                     key={item.label}
                     to={item.to}
+                    activeOptions={{ exact: true }}
                     className="text-sm text-neutral-950 dark:text-white py-0.5 hover:bg-black/5 dark:hover:bg-white/20 px-2"
-                    activeProps={{ className: "text-sm text-text py-0.5" }}
+                    activeProps={{
+                      className: "bg-black/10 dark:bg-white/15 font-medium",
+                    }}
                   >
                     {item.label}
                   </Link>

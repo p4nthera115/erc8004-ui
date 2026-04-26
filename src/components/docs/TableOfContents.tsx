@@ -48,10 +48,10 @@ export function TableOfContents() {
         prev.every((h, i) => h.id === found[i].id)
       )
         return prev
+      visibleIds.current.clear()
+      setActiveId(found[0]?.id ?? "")
       return found
     })
-    visibleIds.current.clear()
-    setActiveId(found[0]?.id ?? "")
   }, [])
 
   // Scan on route change

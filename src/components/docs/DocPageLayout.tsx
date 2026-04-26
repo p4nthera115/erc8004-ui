@@ -80,7 +80,10 @@ function SubHeading({ children }: { children: React.ReactNode }) {
 
 function PreviewBox({ children }: { children: React.ReactNode }) {
   return (
-    <div data-toc-exclude className="rounded border border-black/60 dark:border-white/10 bg-neutral-50 dark:bg-white/2 p-8 flex items-center justify-center min-h-32">
+    <div
+      data-toc-exclude
+      className="rounded border border-black/60 dark:border-white/10 bg-neutral-50 dark:bg-white/2 p-8 flex items-center justify-center min-h-32"
+    >
       {children}
     </div>
   )

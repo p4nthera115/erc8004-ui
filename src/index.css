@@ -35,6 +35,8 @@ html.dark {
 
 html {
   overscroll-behavior-y: none;
+  /* Inset hash-anchor scrolls so headings clear the 81px sticky navbar. */
+  scroll-padding-top: 100px;
 }
 
 body {

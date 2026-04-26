@@ -50,7 +50,10 @@ function Concepts() {
           they shape the empty states you'll see:
         </p>
 
-        <Callout variant="warning" title="Validation Registry isn't on mainnet yet">
+        <Callout
+          variant="warning"
+          title="Validation Registry isn't on mainnet yet"
+        >
           The smart contracts are only deployed on testnets (Sepolia confirmed).
           The subgraph schema supports validation entities across all
           deployments, so <InlineCode>VerificationBadge</InlineCode>,{" "}
@@ -61,7 +64,10 @@ function Concepts() {
           empty state rather than an error.
         </Callout>
 
-        <Callout variant="info" title="AgentStats isn't present on every subgraph">
+        <Callout
+          variant="info"
+          title="AgentStats isn't present on every subgraph"
+        >
           <InlineCode>AgentStats</InlineCode> is a pre-computed summary entity
           (totals, averages, last activity) that the subgraph maintains as
           events come in. It's confirmed on Ethereum Sepolia but may be absent
@@ -70,8 +76,8 @@ function Concepts() {
           <InlineCode>VerificationBadge</InlineCode>,{" "}
           <InlineCode>ValidationScore</InlineCode>, and{" "}
           <InlineCode>LastActivity</InlineCode>. These components treat a
-          missing entity as an empty state rather than an error, so they'll
-          fall back gracefully on chains without it.
+          missing entity as an empty state rather than an error, so they'll fall
+          back gracefully on chains without it.
         </Callout>
       </section>
 
@@ -239,8 +245,8 @@ function Concepts() {
           This differs from a typical React component where you'd pass something
           like{" "}
           <InlineCode>{'<AgentCard name="Alice" score={4.8} />'}</InlineCode> —
-          those values could be anything the developer types. Here, the component
-          fetches <InlineCode>name</InlineCode> and{" "}
+          those values could be anything the developer types. Here, the
+          component fetches <InlineCode>name</InlineCode> and{" "}
           <InlineCode>score</InlineCode> itself from on-chain data, so what's
           displayed is what's actually registered.
         </p>
@@ -253,9 +259,13 @@ function Concepts() {
           {[
             { name: "Ethereum Mainnet", id: 1 },
             { name: "Base Mainnet", id: 8453 },
+            { name: "Polygon Mainnet", id: 137 },
+            { name: "BSC Mainnet", id: 56 },
+            { name: "Monad Mainnet", id: 143 },
             { name: "Ethereum Sepolia", id: 11155111, note: "testnet" },
             { name: "Base Sepolia", id: 84532, note: "testnet" },
-            { name: "Polygon Mainnet", id: 137 },
+            { name: "BSC Chapel", id: 97, note: "testnet" },
+            { name: "Monad Testnet", id: 10143, note: "testnet" },
           ].map((chain) => (
             <div
               key={chain.id}

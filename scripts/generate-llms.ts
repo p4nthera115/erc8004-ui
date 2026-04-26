@@ -201,6 +201,27 @@ function propsTable(props: PropDef[]): string {
   return [header, ...rows].join("\n") + "\n"
 }
 
+// Rewrite internal `/docs/...` links inside markdown bodies to absolute SITE_URL
+// links so AI consumers can resolve them without a base URL.
+function absolutizeDocsLinks(body: string): string {
+  return body.replace(
+    /\]\((\/docs\/[^)]+)\)/g,
+    (_match, path) => `](${SITE_URL}${path})`
+  )
+}
+
+function notesMarkdown(notes: ComponentDoc["notes"]): string {
+  if (!notes || notes.length === 0) return ""
+  const lines: string[] = []
+  for (const note of notes) {
+    const label =
+      note.title ?? (note.variant === "warning" ? "Warning" : "Note")
+    lines.push(`> **${label}:** ${absolutizeDocsLinks(note.body)}`)
+    lines.push("")
+  }
+  return lines.join("\n")
+}
+
 function componentMarkdown(doc: ComponentDoc): string {
   const sections: string[] = [
     `# ${doc.name}`,
@@ -213,11 +234,12 @@ function componentMarkdown(doc: ComponentDoc): string {
     sections.push(`> ${PROVISIONAL_NAME_NOTICE}`)
     sections.push("")
   }
+  sections.push(`## Description`, "", doc.description, "")
+  const notesSection = notesMarkdown(doc.notes)
+  if (notesSection) {
+    sections.push(`## Caveats`, "", notesSection)
+  }
   sections.push(
-    `## Description`,
-    "",
-    doc.description,
-    "",
     `## Props`,
     "",
     propsTable(doc.props),

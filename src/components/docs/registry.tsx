@@ -42,10 +42,23 @@ export type InContextDef = {
   code: string
 }
 
+/**
+ * Documentation callout shown between a component's description and Preview.
+ * Body is a plain string with optional markdown-style links: `[label](href)`.
+ * The same string is rendered in the live docs and emitted into the generated
+ * llms markdown — single source of truth.
+ */
+export type NoteDef = {
+  variant: "info" | "warning"
+  title?: string
+  body: string
+}
+
 export type ComponentDoc = {
   slug: string
   name: string
   description: string
+  notes?: NoteDef[]
   preview: React.ReactNode
   importLine: string
   previewCode?: string
@@ -109,6 +122,20 @@ const DATA_COMPONENT_STATES =
 
 const INLINE_COMPONENT_STATES =
   "This component handles loading and error states internally with inline placeholders. No configuration needed."
+
+// ---------------------------------------------------------------------------
+// Shared notes — see /docs/concepts for the full context.
+// ---------------------------------------------------------------------------
+
+const AGENT_STATS_NOTE: NoteDef = {
+  variant: "info",
+  body: "This component reads from the AgentStats entity, which isn't present on every chain's subgraph. On chains where it's missing, the component renders its empty state rather than an error. See [Concepts › Supported Chains](/docs/concepts#supported-chains).",
+}
+
+const VALIDATION_REGISTRY_NOTE: NoteDef = {
+  variant: "warning",
+  body: "The Validation Registry contracts aren't deployed on mainnet yet. On mainnet chains this component always renders its empty state. See [Concepts › Validation Registry](/docs/concepts#validation-registry).",
+}
 
 // ---------------------------------------------------------------------------
 // Registry
@@ -592,6 +619,7 @@ function App() {
     name: "ReputationScore",
     description:
       "Compact inline badge showing the agent's average feedback score and total review count. Colour-coded by score range.",
+    notes: [AGENT_STATS_NOTE],
     preview: withAgent(<ReputationScore />),
     importLine: `import { ReputationScore } from "@erc8004/ui"`,
     usage: `<ReputationScore agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
@@ -999,6 +1027,7 @@ function App() {
     name: "VerificationBadge",
     description:
       "Compact inline badge showing the agent's verification tier derived from completed validations and average validation score.",
+    notes: [AGENT_STATS_NOTE, VALIDATION_REGISTRY_NOTE],
     preview: withAgent(<VerificationBadge />),
     importLine: `import { VerificationBadge } from "@erc8004/ui"`,
     usage: `<VerificationBadge agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
@@ -1057,6 +1086,7 @@ function App() {
     name: "ValidationScore",
     description:
       "Average validation score (0-100) with a fill bar and completed/pending counts.",
+    notes: [AGENT_STATS_NOTE, VALIDATION_REGISTRY_NOTE],
     preview: withAgent(<ValidationScore />),
     importLine: `import { ValidationScore } from "@erc8004/ui"`,
     usage: `<ValidationScore agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
@@ -1120,6 +1150,7 @@ function App() {
     name: "ValidationList",
     description:
       "Paginated list of individual validation entries with score, status, tag, validator address, and timestamp.",
+    notes: [VALIDATION_REGISTRY_NOTE],
     preview: withAgent(<ValidationList />),
     importLine: `import { ValidationList } from "@erc8004/ui"`,
     usage: `<ValidationList agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
@@ -1204,6 +1235,7 @@ function App() {
     name: "ValidationDisplay",
     description:
       "Composed view combining VerificationBadge, ValidationScore, and ValidationList into a single unified validation panel.",
+    notes: [VALIDATION_REGISTRY_NOTE],
     preview: withAgent(<ValidationDisplay />),
     importLine: `import { ValidationDisplay } from "@erc8004/ui"`,
     usage: `<ValidationDisplay agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,
@@ -1254,6 +1286,7 @@ function App() {
     name: "LastActivity",
     description:
       'Cross-registry relative timestamp showing when the agent was last active (e.g. "Active 3 hours ago"). Reflects the most recent event across all registries.',
+    notes: [AGENT_STATS_NOTE],
     preview: withAgent(<LastActivity />),
     importLine: `import { LastActivity } from "@erc8004/ui"`,
     usage: `<LastActivity agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={2290} />`,

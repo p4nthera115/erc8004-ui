@@ -1,5 +1,62 @@
-import type { ComponentDoc } from "./registry"
+import type { ComponentDoc, NoteDef } from "./registry"
 import { CodeBlock, InlineCode } from "./CodeBlock"
+import { Callout } from "./Callout"
+import { Link } from "@tanstack/react-router"
+
+// Parse `[label](href)` link syntax in note bodies. Internal `/docs/...` hrefs
+// (with or without a #hash) use TanStack Router's <Link>; everything else falls
+// back to a plain anchor.
+function renderNoteBody(body: string): React.ReactNode {
+  const parts: React.ReactNode[] = []
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
+  let lastIndex = 0
+  let key = 0
+  for (const match of body.matchAll(linkRegex)) {
+    const [full, label, href] = match
+    const start = match.index ?? 0
+    if (start > lastIndex) parts.push(body.slice(lastIndex, start))
+    if (href.startsWith("/")) {
+      const [path, hash] = href.split("#")
+      parts.push(
+        <Link
+          key={key++}
+          to={path}
+          hash={hash}
+          className="underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white transition-colors"
+        >
+          {label}
+        </Link>
+      )
+    } else {
+      parts.push(
+        <a
+          key={key++}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white transition-colors"
+        >
+          {label}
+        </a>
+      )
+    }
+    lastIndex = start + full.length
+  }
+  if (lastIndex < body.length) parts.push(body.slice(lastIndex))
+  return parts
+}
+
+function NoteList({ notes }: { notes: NoteDef[] }) {
+  return (
+    <div className="flex flex-col gap-3">
+      {notes.map((note, i) => (
+        <Callout key={i} variant={note.variant} title={note.title}>
+          {renderNoteBody(note.body)}
+        </Callout>
+      ))}
+    </div>
+  )
+}
 
 // ---------------------------------------------------------------------------
 // Sub-components
@@ -71,6 +128,9 @@ export function DocPageLayout({ doc }: { doc: ComponentDoc }) {
           {doc.description}
         </p>
       </div>
+
+      {/* Notes — caveats and warnings, rendered before Preview */}
+      {doc.notes && doc.notes.length > 0 && <NoteList notes={doc.notes} />}
 
       {/* Default Preview */}
       {doc.preview !== null && (

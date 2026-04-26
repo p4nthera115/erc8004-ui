@@ -88,7 +88,12 @@ function Introduction() {
               {
                 label: "Validation Registry isn't on mainnet yet",
                 detail:
-                  "The schema supports it and testnet works, but mainnet validation data doesn't exist. Components need to handle this gracefully.",
+                  "The smart contracts are only deployed on testnets (Sepolia confirmed). The subgraph schema supports validation entities across all deployments, so VerificationBadge, ValidationScore, and ValidationList will build and test end-to-end on Sepolia. On mainnet, validation queries return empty by design, not because something is broken. Components must render an informative empty state rather than an error.",
+              },
+              {
+                label: "AgentStats isn't present on every subgraph",
+                detail:
+                  "AgentStats is a pre-computed summary entity (totals, averages, last activity) that the subgraph maintains as events come in. It's confirmed on Ethereum Sepolia but may be absent on other deployments. Four components rely on it exclusively — ReputationScore, VerificationBadge, ValidationScore, and LastActivity. These components treat a missing entity as an empty state rather than an error, so they'll fall back gracefully on chains without it.",
               },
               {
                 label: "Four states per component",

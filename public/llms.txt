@@ -10,6 +10,7 @@
 - [Installation](https://erc8004-ui.vercel.app/llms/_guides/installation.md): Install the package, set up the provider, write your first component.
 - [Concepts](https://erc8004-ui.vercel.app/llms/_guides/concepts.md): Core concepts: registries, agentRegistry/agentId, trustless data, supported chains.
 - [API Keys](https://erc8004-ui.vercel.app/llms/_guides/api-keys.md): How to get a Graph API key and why it's safe to use in frontend code.
+- [Components](https://erc8004-ui.vercel.app/llms/_guides/components.md): All components in the library, grouped by registry.
 - [Theming](https://erc8004-ui.vercel.app/llms/_guides/theming.md): Styling, dark mode, and customisation patterns.
 - [Recipes](https://erc8004-ui.vercel.app/llms/_guides/recipes.md): Complete page-level compositions: profile pages, marketplace rows, comparisons.
 
@@ -26,20 +27,20 @@
 - [AgentImage](https://erc8004-ui.vercel.app/llms/agent-image.md): Renders the agent's registered image.
 - [AgentDescription](https://erc8004-ui.vercel.app/llms/agent-description.md): Renders the agent's registered description text from the identity registry.
 - [AgentCard](https://erc8004-ui.vercel.app/llms/agent-card.md): Composed identity card combining avatar, name, description, owner address, and active protocol badges in a single component.
-- [EndpointStatus](https://erc8004-ui.vercel.app/llms/endpoint-status.md): Lists all registered service endpoints (MCP, A2A, OASF, web, email) with protocol labels.
+- [EndpointStatus](https://erc8004-ui.vercel.app/llms/endpoint-status.md): Lists all registered service endpoints (MCP, A2A, OASF, web, email) with protocol labels and optional live health check indicators.
 
 ### Reputation
 
 - [ReputationScore](https://erc8004-ui.vercel.app/llms/reputation-score.md): Compact inline badge showing the agent's average feedback score and total review count.
-- [ReputationTimeline](https://erc8004-ui.vercel.app/llms/reputation-timeline.md): Sparkline chart showing how the agent's average feedback score has trended over time.
-- [ReputationDistribution](https://erc8004-ui.vercel.app/llms/reputation-distribution.md): Score distribution histogram showing the spread of feedback values across 5 ranges.
+- [ReputationTimeline](https://erc8004-ui.vercel.app/llms/reputation-timeline.md): Sparkline chart showing how the agent's feedback scores have trended over time.
+- [ReputationDistribution](https://erc8004-ui.vercel.app/llms/reputation-distribution.md): Score distribution histogram showing the spread of feedback values across configurable score ranges.
 - [FeedbackList](https://erc8004-ui.vercel.app/llms/feedback-list.md): Paginated list of individual feedback entries with score, tag pills, reviewer address, timestamp, and optional written review text.
 - [TagCloud](https://erc8004-ui.vercel.app/llms/tag-cloud.md): Weighted tag pills showing the agent's most frequent feedback tags.
 
 ### Validation
 
 - [VerificationBadge](https://erc8004-ui.vercel.app/llms/verification-badge.md): Compact inline badge showing the agent's verification tier derived from completed validations and average validation score.
-- [ValidationScore](https://erc8004-ui.vercel.app/llms/validation-score.md): Average validation score (0–100) with a fill bar and completed/pending counts.
+- [ValidationScore](https://erc8004-ui.vercel.app/llms/validation-score.md): Average validation score (0-100) with a fill bar and completed/pending counts.
 - [ValidationList](https://erc8004-ui.vercel.app/llms/validation-list.md): Paginated list of individual validation entries with score, status, tag, validator address, and timestamp.
 - [ValidationDisplay](https://erc8004-ui.vercel.app/llms/validation-display.md): Composed view combining VerificationBadge, ValidationScore, and ValidationList into a single unified validation panel.
 

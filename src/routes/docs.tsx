@@ -5,6 +5,8 @@ import { NAV } from "@/components/docs/nav"
 import { DocsPagination } from "@/components/docs/DocsPagination"
 
 function DocsSidebar() {
+  // TODO: highlight current page in sidebar
+
   const ref = useRef<HTMLElement>(null)
   const [scrolling, setScrolling] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null)

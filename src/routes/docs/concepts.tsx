@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { SectionHeading } from "@/components/docs/DocPageLayout"
 import { InlineCode, CodeBlock } from "@/components/docs/CodeBlock"
+import { Callout } from "@/components/docs/Callout"
 
 export const Route = createFileRoute("/docs/concepts")({
   component: Concepts,
@@ -45,8 +46,33 @@ function Concepts() {
           >
             Introduction
           </Link>
-          .
+          . Two gaps in the underlying data are worth flagging up front, since
+          they shape the empty states you'll see:
         </p>
+
+        <Callout variant="warning" title="Validation Registry isn't on mainnet yet">
+          The smart contracts are only deployed on testnets (Sepolia confirmed).
+          The subgraph schema supports validation entities across all
+          deployments, so <InlineCode>VerificationBadge</InlineCode>,{" "}
+          <InlineCode>ValidationScore</InlineCode>, and{" "}
+          <InlineCode>ValidationList</InlineCode> will build and test end-to-end
+          on Sepolia. On mainnet, validation queries return empty by design, not
+          because something is broken. Components must render an informative
+          empty state rather than an error.
+        </Callout>
+
+        <Callout variant="info" title="AgentStats isn't present on every subgraph">
+          <InlineCode>AgentStats</InlineCode> is a pre-computed summary entity
+          (totals, averages, last activity) that the subgraph maintains as
+          events come in. It's confirmed on Ethereum Sepolia but may be absent
+          on other deployments. Four components rely on it exclusively —{" "}
+          <InlineCode>ReputationScore</InlineCode>,{" "}
+          <InlineCode>VerificationBadge</InlineCode>,{" "}
+          <InlineCode>ValidationScore</InlineCode>, and{" "}
+          <InlineCode>LastActivity</InlineCode>. These components treat a
+          missing entity as an empty state rather than an error, so they'll
+          fall back gracefully on chains without it.
+        </Callout>
       </section>
 
       {/* The three registries */}
@@ -85,19 +111,24 @@ function Concepts() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <h3 className="font-mono text-sm text-neutral-800 dark:text-white/90">
-            Validation Registry
-          </h3>
-          <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
-            Like a certification body. Independent third-party verifiers can
-            assess an agent and record a score (0–100). This is where "has this
-            agent been independently verified?" data lives.
-          </p>
-          <p className="text-xs text-neutral-400 dark:text-white/30 mt-1 font-mono">
-            Components: VerificationBadge, ValidationScore, ValidationList —
-            Note: Validation Registry not yet deployed to mainnet.
-          </p>
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
+            <h3 className="font-mono text-sm text-neutral-800 dark:text-white/90">
+              Validation Registry
+            </h3>
+            <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+              Like a certification body. Independent third-party verifiers can
+              assess an agent and record a score (0–100). This is where "has
+              this agent been independently verified?" data lives.
+            </p>
+            <p className="text-xs text-neutral-400 dark:text-white/30 mt-1 font-mono">
+              Components: VerificationBadge, ValidationScore, ValidationList
+            </p>
+          </div>
+          <Callout variant="warning">
+            Not yet deployed to any mainnet chain. Testnet (Sepolia) only.
+            Components return empty on mainnet.
+          </Callout>
         </div>
       </section>
 
@@ -244,6 +275,15 @@ function Concepts() {
             </div>
           ))}
         </div>
+        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+          Note: <InlineCode>AgentStats</InlineCode> — the entity that powers{" "}
+          <InlineCode>ReputationScore</InlineCode>,{" "}
+          <InlineCode>VerificationBadge</InlineCode>,{" "}
+          <InlineCode>ValidationScore</InlineCode>, and{" "}
+          <InlineCode>LastActivity</InlineCode> — is not present on every
+          chain's subgraph. It's confirmed on Ethereum Sepolia. Affected
+          components will render their empty state on chains without it.
+        </p>
       </section>
 
       {/* Where data comes from */}

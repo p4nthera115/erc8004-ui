@@ -29,6 +29,7 @@ import {
   type ComponentDoc,
   type PropDef,
 } from "../src/components/docs/registry"
+import { GUIDE_REGISTRY, GUIDE_ORDER } from "./guides-registry"
 import { writeFileSync, mkdirSync, rmSync, existsSync } from "node:fs"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -121,67 +122,24 @@ const GROUPS: Array<{ title: string; slugs: string[] }> = [
 ]
 
 // ---------------------------------------------------------------------------
-// Guide pages — these come from the docs route files. We extract their prose
-// content using a small prose-extraction helper rather than maintaining a
-// duplicate copy. The route files import from the same registry anyway.
-//
-// For now we link to them by URL; the actual prose lives in the route files.
-// A future iteration can parse the JSX directly to extract the text content.
+// Guide pages — content lives in `scripts/guides-registry.ts`, the canonical
+// source. Each guide's body is hand-authored markdown converted from the
+// corresponding `src/routes/docs/{slug}.tsx` route file. The script imports
+// the registry the same way it imports COMPONENT_REGISTRY for components.
 // ---------------------------------------------------------------------------
 
-const GUIDES: Array<{
-  name: string
-  slug: string
-  description: string
-  url: string
-}> = [
-  {
-    name: "Introduction",
-    slug: "introduction",
-    description: "Why this library exists and what problems it solves.",
-    url: `${SITE_URL}/docs/introduction`,
-  },
-  {
-    name: "Installation",
-    slug: "installation",
-    description:
-      "Install the package, set up the provider, write your first component.",
-    url: `${SITE_URL}/docs/installation`,
-  },
-  {
-    name: "Concepts",
-    slug: "concepts",
-    description:
-      "Core concepts: registries, agentRegistry/agentId, trustless data, supported chains.",
-    url: `${SITE_URL}/docs/concepts`,
-  },
-  {
-    name: "API Keys",
-    slug: "api-keys",
-    description:
-      "How to get a Graph API key and why it's safe to use in frontend code.",
-    url: `${SITE_URL}/docs/api-keys`,
-  },
-  {
-    name: "Components",
-    slug: "components",
-    description: "All components in the library, grouped by registry.",
-    url: `${SITE_URL}/docs/components`,
-  },
-  {
-    name: "Theming",
-    slug: "theming",
-    description: "Styling, dark mode, and customisation patterns.",
-    url: `${SITE_URL}/docs/theming`,
-  },
-  {
-    name: "Recipes",
-    slug: "recipes",
-    description:
-      "Complete page-level compositions: profile pages, marketplace rows, comparisons.",
-    url: `${SITE_URL}/docs/recipes`,
-  },
-]
+const GUIDES = GUIDE_ORDER.map((slug) => {
+  const g = GUIDE_REGISTRY[slug]
+  if (!g) {
+    throw new Error(`[generate-llms] Missing guide in registry: ${slug}`)
+  }
+  return {
+    name: g.name,
+    slug: g.slug,
+    description: g.description,
+    url: `${SITE_URL}/docs/${slug}`,
+  }
+})
 
 // ---------------------------------------------------------------------------
 // Markdown formatting helpers
@@ -258,19 +216,65 @@ function componentMarkdown(doc: ComponentDoc): string {
   return sections.join("\n")
 }
 
-function guideMarkdown(g: (typeof GUIDES)[number]): string {
-  return [
-    `# ${g.name}`,
-    "",
-    g.description,
-    "",
-    `Full content: ${g.url}`,
-    "",
-    `> Note: this is a stub. The full prose lives in the docs site route file ` +
-      `(\`src/routes/pages/${g.slug}.tsx\`). To inline the full content here, ` +
-      `extract the JSX text in a future iteration of generate-llms.ts.`,
-    "",
-  ].join("\n")
+function applyGuidePlaceholders(body: string): string {
+  return body
+    .replace(/\{\{SITE_URL\}\}/g, SITE_URL)
+    .replace(/\{\{PACKAGE_NAME\}\}/g, PACKAGE_NAME)
+}
+
+function guideMarkdown(slug: string): string {
+  const guide = GUIDE_REGISTRY[slug]
+  if (!guide) {
+    throw new Error(`[generate-llms] Unknown guide slug: ${slug}`)
+  }
+
+  const sections: string[] = []
+  sections.push(`# ${guide.name}`)
+  sections.push("")
+
+  if (!IS_PUBLISHED) {
+    sections.push(`> ${PROVISIONAL_NAME_NOTICE}`)
+    sections.push("")
+  }
+
+  // Top-of-page caveats — mirrors componentMarkdown's "Caveats" section.
+  const notesSection = notesMarkdown(guide.notes)
+  if (notesSection) {
+    sections.push("## Caveats")
+    sections.push("")
+    sections.push(notesSection)
+  }
+
+  // Body — substitute placeholders, then absolutize internal /docs/... links.
+  sections.push(absolutizeDocsLinks(applyGuidePlaceholders(guide.body)))
+
+  // The components guide is intentionally a stub in the registry — append the
+  // grouped component list from GROUPS so it stays in sync with llms.txt.
+  if (slug === "components") {
+    sections.push("")
+    for (const group of GROUPS) {
+      sections.push(`### ${group.title}`)
+      sections.push("")
+      for (const cslug of group.slugs) {
+        const doc = COMPONENT_REGISTRY[cslug]
+        if (!doc) continue
+        const oneLine = doc.description.split(/(?<=\.)\s/)[0]
+        sections.push(
+          `- [${doc.name}](${SITE_URL}/llms/${doc.slug}.md): ${oneLine}`
+        )
+      }
+      sections.push("")
+    }
+  }
+
+  sections.push("")
+  sections.push("## Reference")
+  sections.push("")
+  sections.push(`- Live page: ${SITE_URL}/docs/${slug}`)
+  sections.push(`- Markdown source: ${SITE_URL}/llms/_guides/${slug}.md`)
+  sections.push("")
+
+  return sections.join("\n")
 }
 
 // ---------------------------------------------------------------------------
@@ -342,7 +346,7 @@ function buildLlmsFull(): string {
     lines.push("")
   }
   lines.push(
-    `This file contains the complete component reference for ${PACKAGE_NAME}, generated from the canonical registry. For an indexed version with per-component links, see ${SITE_URL}/llms.txt.`
+    `This file contains the complete guides and component reference for ${PACKAGE_NAME}, generated from the canonical registries. For an indexed version with per-page links, see ${SITE_URL}/llms.txt.`
   )
   lines.push("")
   lines.push("---")
@@ -400,6 +404,13 @@ function buildLlmsFull(): string {
   lines.push("")
   lines.push("---")
   lines.push("")
+  lines.push("## Guides")
+  lines.push("")
+  for (const slug of GUIDE_ORDER) {
+    lines.push(guideMarkdown(slug))
+    lines.push("---")
+    lines.push("")
+  }
   lines.push("## Components")
   lines.push("")
   for (const group of GROUPS) {
@@ -453,13 +464,13 @@ function main() {
     `[generate-llms] wrote ${count} per-component markdown files into ${LLMS_DIR}`
   )
 
-  // 4. Per-guide stub markdown
-  for (const g of GUIDES) {
-    const file = join(GUIDES_DIR, `${g.slug}.md`)
-    writeFileSync(file, guideMarkdown(g), "utf8")
+  // 4. Per-guide markdown
+  for (const slug of GUIDE_ORDER) {
+    const file = join(GUIDES_DIR, `${slug}.md`)
+    writeFileSync(file, guideMarkdown(slug), "utf8")
   }
   console.log(
-    `[generate-llms] wrote ${GUIDES.length} guide stubs into ${GUIDES_DIR}`
+    `[generate-llms] wrote ${GUIDE_ORDER.length} guide markdown files into ${GUIDES_DIR}`
   )
 
   console.log("[generate-llms] Done.")

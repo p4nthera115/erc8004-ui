@@ -260,7 +260,7 @@ function componentMarkdown(doc: ComponentDoc): string {
     `## Reference`,
     "",
     `- Live preview & full docs: ${SITE_URL}/docs/components/${doc.slug}`,
-    `- Markdown source: ${SITE_URL}/llms/${doc.slug}.md`,
+    `- Markdown source: ${SITE_URL}/docs/components/${doc.slug}.md`,
     ""
   )
 
@@ -311,7 +311,7 @@ function guideMarkdown(slug: string): string {
         if (!doc) continue
         const oneLine = doc.description.split(/(?<=\.)\s/)[0]
         sections.push(
-          `- [${doc.name}](${SITE_URL}/llms/${doc.slug}.md): ${oneLine}`
+          `- [${doc.name}](${SITE_URL}/docs/components/${doc.slug}.md): ${oneLine}`
         )
       }
       sections.push("")
@@ -322,7 +322,7 @@ function guideMarkdown(slug: string): string {
   sections.push("## Reference")
   sections.push("")
   sections.push(`- Live page: ${SITE_URL}/docs/${slug}`)
-  sections.push(`- Markdown source: ${SITE_URL}/llms/_guides/${slug}.md`)
+  sections.push(`- Markdown source: ${SITE_URL}/docs/${slug}.md`)
   sections.push("")
 
   return sections.join("\n")
@@ -345,8 +345,11 @@ function buildLlmsTxt(): string {
   lines.push("## Setup")
   lines.push("")
   for (const g of GUIDES) {
+    // Link to the canonical /docs/{slug}.md path so llms.txt entries match the
+    // sitemap (after stripping .md). The vercel.json rewrite proxies these to
+    // the underlying /llms/_guides/{slug}.md file.
     lines.push(
-      `- [${g.name}](${SITE_URL}/llms/_guides/${g.slug}.md): ${g.description}`
+      `- [${g.name}](${SITE_URL}/docs/${g.slug}.md): ${g.description}`
     )
   }
   lines.push("")
@@ -363,7 +366,9 @@ function buildLlmsTxt(): string {
       }
       // First sentence of description only — the menu should be scannable
       const oneLine = doc.description.split(/(?<=\.)\s/)[0]
-      lines.push(`- [${doc.name}](${SITE_URL}/llms/${doc.slug}.md): ${oneLine}`)
+      lines.push(
+        `- [${doc.name}](${SITE_URL}/docs/components/${doc.slug}.md): ${oneLine}`
+      )
     }
     lines.push("")
   }

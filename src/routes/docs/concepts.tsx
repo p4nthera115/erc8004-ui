@@ -146,7 +146,16 @@ function Concepts() {
           agent across any chain:
         </p>
 
-        <div className="border border-black/60 dark:border-white/10 divide-y divide-black/60 dark:divide-white/10">
+        {/*
+          data-markdown-ignore: this card lays out the prose visually for the
+          web reader. The same content is in the markdown body in linear prose
+          form; comparing both would conflate two presentations of the same
+          information. Agents read the markdown.
+        */}
+        <div
+          data-markdown-ignore
+          className="border border-black/60 dark:border-white/10 divide-y divide-black/60 dark:divide-white/10"
+        >
           <div className="px-5 py-4 flex flex-col gap-1">
             <span className="font-mono text-sm text-neutral-800 dark:text-white/90">
               agentRegistry
@@ -255,7 +264,14 @@ function Concepts() {
       {/* Supported chains */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Supported Chains</SectionHeading>
-        <div className="border border-black/60 dark:border-white/10 divide-y divide-black/60 dark:divide-white/10">
+        {/*
+          data-markdown-ignore: visual chain list. Markdown twin renders this
+          as a real markdown table — see scripts/guides-registry.ts.
+        */}
+        <div
+          data-markdown-ignore
+          className="border border-black/60 dark:border-white/10 divide-y divide-black/60 dark:divide-white/10"
+        >
           {[
             { name: "Ethereum Mainnet", id: 1 },
             { name: "Base Mainnet", id: 8453 },

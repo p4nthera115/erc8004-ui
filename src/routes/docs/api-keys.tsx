@@ -47,7 +47,11 @@ function ApiKeys() {
             </>,
           ].map((step, i) => (
             <li key={i} className="flex items-start gap-3">
-              <span className="font-mono text-xs text-neutral-400 dark:text-white/30 mt-0.5 shrink-0 w-4">
+              {/* Number gutter is presentation chrome — markdown numbers steps natively. */}
+              <span
+                data-markdown-ignore
+                className="font-mono text-xs text-neutral-400 dark:text-white/30 mt-0.5 shrink-0 w-4"
+              >
                 {i + 1}.
               </span>
               <span className="text-sm text-neutral-700 dark:text-white leading-relaxed">

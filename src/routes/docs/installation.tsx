@@ -257,7 +257,13 @@ function App() {
       {/* Next steps */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Next Steps</SectionHeading>
-        <ul className="flex flex-col gap-2">
+        {/*
+          data-markdown-ignore: in-page navigation. Markdown agents discover
+          these pages via llms.txt rather than this presentation block, and
+          the inline label-plus-description pattern would otherwise confuse
+          AFDocs's content-parity check.
+        */}
+        <ul data-markdown-ignore className="flex flex-col gap-2">
           <li>
             <Link
               to="/docs/concepts"

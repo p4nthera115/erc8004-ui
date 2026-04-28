@@ -310,7 +310,15 @@ export function CodeBlock({
           {isTerminal
             ? lines.map((line, i) => (
                 <span key={i} className="flex">
-                  <span className="shrink-0 w-14 pl-4 text-right pr-6 select-none text-neutral-400 dark:text-neutral-600">
+                  {/*
+                    data-markdown-ignore: line-number gutter is presentation
+                    chrome — the markdown twin doesn't carry it, and including
+                    it skews AFDocs's content-parity comparison.
+                  */}
+                  <span
+                    data-markdown-ignore
+                    className="shrink-0 w-14 pl-4 text-right pr-6 select-none text-neutral-400 dark:text-neutral-600"
+                  >
                     $
                   </span>
                   <span className="cb-plain">{line}</span>
@@ -319,7 +327,10 @@ export function CodeBlock({
               ))
             : lines.map((line, i) => (
                 <span key={i} className="flex">
-                  <span className="shrink-0 w-14 pl-4 text-right pr-6 select-none text-neutral-400 dark:text-neutral-600">
+                  <span
+                    data-markdown-ignore
+                    className="shrink-0 w-14 pl-4 text-right pr-6 select-none text-neutral-400 dark:text-neutral-600"
+                  >
                     {i + 1}
                   </span>
                   <span>

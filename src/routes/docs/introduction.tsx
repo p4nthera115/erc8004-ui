@@ -105,12 +105,18 @@ function Introduction() {
                 key={item.label}
                 className="flex flex-col gap-0.5 border border-black/20 dark:border-white/15 bg-neutral-100 dark:bg-neutral-900 p-5"
               >
-                <span className="text-sm text-black dark:text-white">
+                {/*
+                  <p> rather than <span> so HTML-to-text extractors (e.g.
+                  AFDocs) emit a newline between label and detail. Two adjacent
+                  inline elements inside a single <li> would concatenate as one
+                  segment, breaking content-parity comparison with the markdown.
+                */}
+                <p className="text-sm text-black dark:text-white">
                   {item.label}
-                </span>
-                <span className="text-sm text-neutral-600 dark:text-white/50 leading-relaxed">
+                </p>
+                <p className="text-sm text-neutral-600 dark:text-white/50 leading-relaxed">
                   {item.detail}
-                </span>
+                </p>
               </li>
             ))}
           </ul>

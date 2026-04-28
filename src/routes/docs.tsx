@@ -81,7 +81,13 @@ export const Route = createFileRoute("/docs")({
           order before content so agents that strip presentation see it first.
           This satisfies AFDocs' "LLMS TXT Directive" check.
         */}
-        <blockquote className="sr-only">
+        {/*
+          data-markdown-ignore tells AFDocs (and other agent tooling) to skip
+          this element when comparing HTML to the markdown twin: this preamble
+          and the pagination footer are page chrome that the markdown source
+          intentionally doesn't carry.
+        */}
+        <blockquote className="sr-only" data-markdown-ignore>
           For the complete documentation index, see{" "}
           <a href="/llms.txt">/llms.txt</a>. A single-fetch full bundle is at{" "}
           <a href="/llms-full.txt">/llms-full.txt</a>. Every docs page is also
@@ -89,7 +95,9 @@ export const Route = createFileRoute("/docs")({
           requesting it with <code>Accept: text/markdown</code>.
         </blockquote>
         <Outlet />
-        <DocsPagination />
+        <div data-markdown-ignore>
+          <DocsPagination />
+        </div>
       </main>
       <DocsSidebar />
       <TableOfContents />

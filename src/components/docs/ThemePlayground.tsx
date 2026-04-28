@@ -280,7 +280,15 @@ export function ThemePlayground() {
   const activePreset = PRESETS[activeIdx]
 
   return (
-    <div data-toc-exclude className="flex flex-col gap-4 not-prose">
+    // data-markdown-ignore: interactive playground showing live previews and
+    // demo agent data. The text content (preset names, demo prose) isn't
+    // documentation, so include it neither in the markdown twin nor in
+    // parity comparison.
+    <div
+      data-toc-exclude
+      data-markdown-ignore
+      className="flex flex-col gap-4 not-prose"
+    >
       {/* Preset selector */}
       <div className="flex flex-wrap gap-2">
         {PRESETS.map((preset, i) => (

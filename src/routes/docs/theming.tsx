@@ -507,7 +507,11 @@ function Theming() {
           The library derives a set of radius sizes from the single{" "}
           <InlineCode>--erc8004-radius</InlineCode> base value:
         </p>
-        <div className="border border-black/60 dark:border-white/10 divide-y divide-black/60 dark:divide-white/10 text-sm font-mono">
+        {/* data-markdown-ignore: visual radius-scale table; markdown twin uses a real table. */}
+        <div
+          data-markdown-ignore
+          className="border border-black/60 dark:border-white/10 divide-y divide-black/60 dark:divide-white/10 text-sm font-mono"
+        >
           <div className="grid grid-cols-3 px-4 py-2 text-neutral-400 dark:text-white/40 text-xs uppercase tracking-wider">
             <span>Class</span>
             <span>Size</span>
@@ -740,8 +744,15 @@ function Theming() {
 }
 
 function TokenTable({ rows }: { rows: [string, string, string, string][] }) {
+  // data-markdown-ignore: visual token table. The markdown twin in
+  // scripts/guides-registry.ts renders the same data as a real markdown
+  // table; including this CSS-grid version in parity comparison would
+  // double-count the same content as mismatched segments.
   return (
-    <div className="border border-black/60 dark:border-white/10 divide-y divide-black/60 dark:divide-white/10 text-sm overflow-x-auto">
+    <div
+      data-markdown-ignore
+      className="border border-black/60 dark:border-white/10 divide-y divide-black/60 dark:divide-white/10 text-sm overflow-x-auto"
+    >
       <div className="grid grid-cols-4 px-4 py-2 text-neutral-400 dark:text-white/40 text-xs uppercase tracking-wider font-mono">
         <span>Token</span>
         <span>CSS Variable</span>

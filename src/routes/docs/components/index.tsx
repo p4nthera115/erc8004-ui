@@ -144,7 +144,12 @@ function ComponentsIndex() {
           <h2 className="text-[10px] font-mono uppercase tracking-widest text-neutral-400 dark:text-white/40">
             {group.title}
           </h2>
-          <div className="flex flex-col">
+          {/*
+            data-markdown-ignore: navigation listing. Each row's name + summary
+            collapse into one segment that doesn't substring-match the markdown
+            twin's bullet syntax. Agents browse components via llms.txt.
+          */}
+          <div data-markdown-ignore className="flex flex-col">
             {group.items.map((item) => (
               <Link
                 key={item.slug}

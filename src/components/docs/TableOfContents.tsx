@@ -120,7 +120,7 @@ export function TableOfContents() {
   if (headings.length < 2) return null
 
   return (
-    <aside className="hidden xl:block w-52 shrink-0 sticky top-[81px] h-[calc(100svh-81px)] overflow-y-auto py-8 pl-6">
+    <aside className="hidden xl:block w-52 shrink-0 sticky top-[81px] h-[calc(100svh-81px)] overflow-y-auto py-8 pl-6 order-3">
       <p className="font-mono text-[10px] uppercase tracking-widest text-neutral-400 dark:text-white/30 mb-4 select-none">
         On This Page
       </p>

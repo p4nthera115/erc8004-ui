@@ -24,6 +24,7 @@ export default defineConfig(async () => {
       prerenderer({
         routes: [
           "/",
+          "/404",
           "/docs/introduction",
           "/docs/installation",
           "/docs/concepts",

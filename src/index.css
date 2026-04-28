@@ -60,6 +60,31 @@ body {
   border-radius: 3px;
 }
 
+/*
+  Docs sidebar scrollbar — hoisted from src/routes/docs.tsx so the prerendered
+  HTML doesn't carry an inline <style> block on every docs page (this kept
+  page content far below the truncation budget for AI agents).
+*/
+.docs-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.docs-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.docs-sidebar::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 0;
+  transition: background 0.3s;
+}
+html.dark .docs-sidebar[data-scrolling="true"]::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 0;
+}
+html:not(.dark) .docs-sidebar[data-scrolling="true"]::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0;
+}
+
 .diagonal-lines {
   background-color: #f8f8f8;
   opacity: 1;

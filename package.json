@@ -7,6 +7,7 @@
     "dev": "vite",
     "prebuild": "tsx --tsconfig tsconfig.app.json scripts/generate-llms.ts",
     "build": "tsc -b && vite build",
+    "postbuild": "node -e \"const fs=require('node:fs');const path=require('node:path');const src=path.join('dist','404','index.html');const dst=path.join('dist','404.html');if(fs.existsSync(src)){fs.copyFileSync(src,dst);console.log('[postbuild] copied',src,'->',dst);}else{console.warn('[postbuild] missing',src);}\"",
     "build:registry": "pnpm -C packages/registry build",
     "build:mcp": "pnpm -C packages/mcp-server build",
     "build:packages": "pnpm build:registry && pnpm build:mcp",

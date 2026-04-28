@@ -91,7 +91,16 @@ function Theming() {
       {/* Theme Playground */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Playground</SectionHeading>
-        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
+        {/*
+          data-markdown-ignore: this intro is interactive-playground specific.
+          The markdown twin (scripts/guides-registry.ts) instead points readers
+          to the live site, so the wording differs and the parity check would
+          flag this paragraph as missing.
+        */}
+        <p
+          data-markdown-ignore
+          className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose"
+        >
           Click a preset to see all the token changes take effect live. The code
           block below the preview shows exactly what CSS you would write to
           reproduce that theme in your own app.

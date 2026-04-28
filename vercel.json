@@ -3,27 +3,6 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/docs/components/:slug",
-      "has": [
-        { "type": "header", "key": "accept", "value": ".*text/markdown.*" }
-      ],
-      "destination": "/llms/:slug.md"
-    },
-    {
-      "source": "/docs/:slug",
-      "has": [
-        { "type": "header", "key": "accept", "value": ".*text/markdown.*" }
-      ],
-      "destination": "/llms/_guides/:slug.md"
-    },
-    {
-      "source": "/docs",
-      "has": [
-        { "type": "header", "key": "accept", "value": ".*text/markdown.*" }
-      ],
-      "destination": "/llms.txt"
-    },
-    {
       "source": "/docs/components/:slug.md",
       "destination": "/llms/:slug.md"
     },

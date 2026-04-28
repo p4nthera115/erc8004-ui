@@ -180,6 +180,16 @@ function notesMarkdown(notes: ComponentDoc["notes"]): string {
   return lines.join("\n")
 }
 
+/**
+ * Component markdown — mirrors the section structure rendered by
+ * `src/components/docs/DocPageLayout.tsx` so the markdown agents fetch via
+ * Accept: text/markdown stays at content parity with the HTML version. The
+ * sections, in order:
+ *   Description → Caveats → Preview (code) → Usage → Examples → In Context →
+ *   API Reference (props table) → States → Reference
+ * Optional sections are skipped when the registry entry doesn't define them,
+ * matching the conditional rendering in DocPageLayout.
+ */
 function componentMarkdown(doc: ComponentDoc): string {
   const sections: string[] = [
     `# ${doc.name}`,
@@ -188,31 +198,72 @@ function componentMarkdown(doc: ComponentDoc): string {
     `**Import:** \`${doc.importLine}\``,
     "",
   ]
+
   if (!IS_PUBLISHED) {
     sections.push(`> ${PROVISIONAL_NAME_NOTICE}`)
     sections.push("")
   }
+
   sections.push(`## Description`, "", doc.description, "")
+
   const notesSection = notesMarkdown(doc.notes)
   if (notesSection) {
     sections.push(`## Caveats`, "", notesSection)
   }
+
+  if (doc.previewCode) {
+    sections.push(
+      `## Preview`,
+      "",
+      "```tsx",
+      `${doc.importLine}\n${doc.previewCode}`,
+      "```",
+      ""
+    )
+  }
+
   sections.push(
-    `## Props`,
-    "",
-    propsTable(doc.props),
     `## Usage`,
     "",
     "```tsx",
-    doc.usage,
+    `${doc.importLine}\n${doc.usage}`,
     "```",
-    "",
+    ""
+  )
+
+  if (doc.examples && doc.examples.length > 0) {
+    sections.push(`## Examples`, "")
+    for (const example of doc.examples) {
+      sections.push(`### ${example.name}`, "")
+      if (example.description) {
+        sections.push(example.description, "")
+      }
+      sections.push("```tsx", example.code, "```", "")
+    }
+  }
+
+  if (doc.inContext) {
+    sections.push(`## In Context`, "")
+    if (doc.inContext.description) {
+      sections.push(doc.inContext.description, "")
+    }
+    sections.push("```tsx", doc.inContext.code, "```", "")
+  }
+
+  sections.push(`## API Reference`, "", propsTable(doc.props))
+
+  if (doc.states) {
+    sections.push(`## States`, "", doc.states, "")
+  }
+
+  sections.push(
     `## Reference`,
     "",
     `- Live preview & full docs: ${SITE_URL}/docs/components/${doc.slug}`,
     `- Markdown source: ${SITE_URL}/llms/${doc.slug}.md`,
     ""
   )
+
   return sections.join("\n")
 }
 

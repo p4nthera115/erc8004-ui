@@ -85,6 +85,86 @@ html:not(.dark) .docs-sidebar[data-scrolling="true"]::-webkit-scrollbar-thumb {
   border-radius: 0;
 }
 
+/*
+  Code block syntax highlighting — hoisted from
+  src/components/docs/CodeBlock.tsx so the prerendered HTML doesn't repeat the
+  same <style> block once per code sample. Without this, every CodeBlock
+  embeds ~30 lines of CSS into the page body, which the AFDocs content-parity
+  check counts as text and reports as a markdown/HTML mismatch.
+*/
+.code-block::-webkit-scrollbar {
+  display: none;
+}
+.code-block {
+  scrollbar-width: none;
+}
+.cb-keyword {
+  color: #d6336c;
+}
+.cb-tag {
+  color: #1864ab;
+}
+.cb-htmltag {
+  color: #16a34a;
+}
+.cb-attr {
+  color: #6741d9;
+}
+.cb-string {
+  color: #2f9e44;
+}
+.cb-number {
+  color: #1971c2;
+}
+.cb-comment {
+  color: #868e96;
+}
+.cb-operator {
+  color: #d6336c;
+}
+.cb-brace {
+  color: #d08700;
+}
+.cb-punct {
+  color: #343a40;
+}
+.cb-plain {
+  color: #1c1c1c;
+}
+html.dark .cb-keyword {
+  color: #f97583;
+}
+html.dark .cb-tag {
+  color: #79b8ff;
+}
+html.dark .cb-htmltag {
+  color: #86efac;
+}
+html.dark .cb-attr {
+  color: #b392f0;
+}
+html.dark .cb-string {
+  color: #9ecbff;
+}
+html.dark .cb-number {
+  color: #79b8ff;
+}
+html.dark .cb-comment {
+  color: #60666b;
+}
+html.dark .cb-operator {
+  color: #f97583;
+}
+html.dark .cb-brace {
+  color: #facc15;
+}
+html.dark .cb-punct {
+  color: #ffffff;
+}
+html.dark .cb-plain {
+  color: #e1e4e8;
+}
+
 .diagonal-lines {
   background-color: #f8f8f8;
   opacity: 1;

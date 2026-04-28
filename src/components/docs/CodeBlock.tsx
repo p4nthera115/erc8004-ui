@@ -21,30 +21,10 @@ type TokenType =
 
 type Token = { type: TokenType; text: string }
 
-const TOKEN_CSS = `
-  .cb-keyword  { color: #d6336c }
-  .cb-tag      { color: #1864ab }
-  .cb-htmltag  { color: #16a34a }
-  .cb-attr     { color: #6741d9 }
-  .cb-string   { color: #2f9e44 }
-  .cb-number   { color: #1971c2 }
-  .cb-comment  { color: #868e96 }
-  .cb-operator { color: #d6336c }
-  .cb-brace    { color: #d08700 }
-  .cb-punct    { color: #343a40 }
-  .cb-plain    { color: #1c1c1c }
-  .dark .cb-keyword  { color: #F97583 }
-  .dark .cb-tag      { color: #79B8FF }
-  .dark .cb-htmltag  { color: #86efac }
-  .dark .cb-attr     { color: #b392f0 }
-  .dark .cb-string   { color: #9ECBFF }
-  .dark .cb-number   { color: #79B8FF }
-  .dark .cb-comment  { color: #60666b }
-  .dark .cb-operator { color: #F97583 }
-  .dark .cb-brace    { color: #facc15 }
-  .dark .cb-punct    { color: #ffffff }
-  .dark .cb-plain    { color: #e1e4e8 }
-`
+// Token colour rules (.cb-*) and code-block scrollbar resets live in
+// src/index.css. Inlining a <style> block here would duplicate ~30 lines of
+// CSS into the prerendered HTML once per code sample, inflating the page
+// body and breaking AFDocs's markdown/HTML content-parity check.
 
 function tokenizeCss(code: string): Token[] {
   const tokens: Token[] = []
@@ -324,48 +304,41 @@ export function CodeBlock({
   }
 
   return (
-    <>
-      <style>{`
-        .code-block::-webkit-scrollbar { display: none; }
-        .code-block { scrollbar-width: none; }
-        ${TOKEN_CSS}
-      `}</style>
-      <div className="flex bg-neutral-200 dark:bg-neutral-900 border border-black/10 dark:border-white/10">
-        <pre className="code-block flex-1 min-w-0 overflow-x-auto py-4 font-mono text-sm leading-relaxed whitespace-pre">
-          <code>
-            {isTerminal
-              ? lines.map((line, i) => (
-                  <span key={i} className="flex">
-                    <span className="shrink-0 w-14 pl-4 text-right pr-6 select-none text-neutral-400 dark:text-neutral-600">
-                      $
-                    </span>
-                    <span className="cb-plain">{line}</span>
-                    {i < lines.length - 1 && "\n"}
+    <div className="flex bg-neutral-200 dark:bg-neutral-900 border border-black/10 dark:border-white/10">
+      <pre className="code-block flex-1 min-w-0 overflow-x-auto py-4 font-mono text-sm leading-relaxed whitespace-pre">
+        <code>
+          {isTerminal
+            ? lines.map((line, i) => (
+                <span key={i} className="flex">
+                  <span className="shrink-0 w-14 pl-4 text-right pr-6 select-none text-neutral-400 dark:text-neutral-600">
+                    $
                   </span>
-                ))
-              : lines.map((line, i) => (
-                  <span key={i} className="flex">
-                    <span className="shrink-0 w-14 pl-4 text-right pr-6 select-none text-neutral-400 dark:text-neutral-600">
-                      {i + 1}
-                    </span>
-                    <span>
-                      <HighlightedCode code={line} language={language} />
-                    </span>
-                    {i < lines.length - 1 && "\n"}
+                  <span className="cb-plain">{line}</span>
+                  {i < lines.length - 1 && "\n"}
+                </span>
+              ))
+            : lines.map((line, i) => (
+                <span key={i} className="flex">
+                  <span className="shrink-0 w-14 pl-4 text-right pr-6 select-none text-neutral-400 dark:text-neutral-600">
+                    {i + 1}
                   </span>
-                ))}
-          </code>
-        </pre>
-        <div className="shrink-0 pt-3 pr-3 ml-3">
-          <button
-            onClick={handleCopy}
-            className="p-1.5 rounded-md text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 bg-neutral-300/50 hover:bg-neutral-300 dark:bg-white/10 dark:hover:bg-white/20 transition-colors cursor-pointer"
-            aria-label="Copy code"
-          >
-            {copied ? <FaCheck size={14} /> : <IoCopy size={14} />}
-          </button>
-        </div>
+                  <span>
+                    <HighlightedCode code={line} language={language} />
+                  </span>
+                  {i < lines.length - 1 && "\n"}
+                </span>
+              ))}
+        </code>
+      </pre>
+      <div className="shrink-0 pt-3 pr-3 ml-3">
+        <button
+          onClick={handleCopy}
+          className="p-1.5 rounded-md text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 bg-neutral-300/50 hover:bg-neutral-300 dark:bg-white/10 dark:hover:bg-white/20 transition-colors cursor-pointer"
+          aria-label="Copy code"
+        >
+          {copied ? <FaCheck size={14} /> : <IoCopy size={14} />}
+        </button>
       </div>
-    </>
+    </div>
   )
 }

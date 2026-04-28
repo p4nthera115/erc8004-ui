@@ -30,7 +30,6 @@ export default defineConfig(async () => {
           "/docs/concepts",
           "/docs/api-keys",
           "/docs/components",
-          "/docs/recipes",
           "/docs/theming",
           "/docs/components/erc8004-provider",
           "/docs/components/agent-provider",

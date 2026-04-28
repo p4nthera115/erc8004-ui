@@ -29,7 +29,7 @@ export function DocsPagination() {
           </Link>
         ) : (
           <Link
-            to={prev.to as "/docs/introduction" | "/docs/installation" | "/docs/concepts" | "/docs/api-keys" | "/docs/components" | "/docs/recipes" | "/docs/theming"}
+            to={prev.to as "/docs/introduction" | "/docs/installation" | "/docs/concepts" | "/docs/api-keys" | "/docs/components" | "/docs/theming"}
             className="group px-4 min-w-0 max-w-[45%] text-neutral-500 dark:text-white/70 hover:text-neutral-900 dark:hover:text-white"
           >
             <span className="text-xl inline-block mr-2">←</span>
@@ -56,7 +56,7 @@ export function DocsPagination() {
           </Link>
         ) : (
           <Link
-            to={next.to as "/docs/introduction" | "/docs/installation" | "/docs/concepts" | "/docs/api-keys" | "/docs/components" | "/docs/recipes" | "/docs/theming"}
+            to={next.to as "/docs/introduction" | "/docs/installation" | "/docs/concepts" | "/docs/api-keys" | "/docs/components" | "/docs/theming"}
             className="group px-4 min-w-0 max-w-[45%] text-neutral-500 dark:text-white/70 hover:text-neutral-900 dark:hover:text-white"
           >
             <span className="text-sm transition-colors truncate">

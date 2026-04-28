@@ -3,7 +3,6 @@ export type NavItem =
   | { label: string; to: "/docs/installation" }
   | { label: string; to: "/docs/concepts" }
   | { label: string; to: "/docs/api-keys" }
-  | { label: string; to: "/docs/recipes" }
   | { label: string; to: "/docs/theming" }
   | { label: string; to: "/docs/components" }
   | { label: string; to: "/docs/components/$slug"; slug: string }
@@ -127,10 +126,6 @@ export const NAV: NavGroup[] = [
         slug: "activity-log",
       },
     ],
-  },
-  {
-    title: "GUIDES",
-    items: [{ label: "Recipes", to: "/docs/recipes" }],
   },
 ]
 

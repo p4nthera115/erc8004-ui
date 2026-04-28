@@ -299,18 +299,6 @@ function App() {
               — browse all available components with live previews
             </span>
           </li>
-          <li>
-            <Link
-              to="/docs/recipes"
-              className="text-sm text-neutral-900 dark:text-white hover:text-neutral-700 dark:hover:text-white transition-colors underline underline-offset-2"
-            >
-              Recipes
-            </Link>
-            <span className="text-sm text-neutral-400 dark:text-white/40">
-              {" "}
-              — see full page-level examples ready to copy
-            </span>
-          </li>
         </ul>
       </section>
     </div>

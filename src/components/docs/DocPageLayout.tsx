@@ -79,9 +79,16 @@ function SubHeading({ children }: { children: React.ReactNode }) {
 }
 
 function PreviewBox({ children }: { children: React.ReactNode }) {
+  // data-markdown-ignore: live React preview. Renders ephemeral on-chain data
+  // (addresses, timestamps, scores) that has no counterpart in the markdown
+  // twin — the authored CodeBlock example sits outside this wrapper. Excluding
+  // it keeps AFDocs's content-parity comparison stable across every component
+  // page; ActivityLog's preview in particular renders enough text to push the
+  // page over the "substantive drift" threshold otherwise.
   return (
     <div
       data-toc-exclude
+      data-markdown-ignore
       className="rounded border border-black/60 dark:border-white/10 bg-neutral-50 dark:bg-white/2 p-8 flex items-center justify-center min-h-32"
     >
       {children}

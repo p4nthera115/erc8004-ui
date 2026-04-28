@@ -303,36 +303,28 @@ export function CodeBlock({
     setTimeout(() => setCopied(false), 1500)
   }
 
+  // The line-number gutter is rendered via CSS counters (see src/index.css ::before
+  // on .code-line). Reason: node-html-parser — used by AFDocs for the markdown/HTML
+  // content-parity check — treats <pre> innerHTML as raw text and ignores the DOM
+  // tree inside, so a [data-markdown-ignore] gutter <span> isn't actually stripped
+  // from the extracted text and bleeds the line numbers ("1import { ... }") into
+  // the parity comparison. CSS-generated content lives outside the text tree, so
+  // the gutter stays visually present but invisible to text extraction.
   return (
     <div className="flex bg-neutral-200 dark:bg-neutral-900 border border-black/10 dark:border-white/10">
-      <pre className="code-block flex-1 min-w-0 overflow-x-auto py-4 font-mono text-sm leading-relaxed whitespace-pre">
+      <pre
+        className={`code-block ${isTerminal ? "code-block-terminal " : ""}flex-1 min-w-0 overflow-x-auto py-4 font-mono text-sm leading-relaxed whitespace-pre`}
+      >
         <code>
           {isTerminal
             ? lines.map((line, i) => (
-                <span key={i} className="flex">
-                  {/*
-                    data-markdown-ignore: line-number gutter is presentation
-                    chrome — the markdown twin doesn't carry it, and including
-                    it skews AFDocs's content-parity comparison.
-                  */}
-                  <span
-                    data-markdown-ignore
-                    className="shrink-0 w-14 pl-4 text-right pr-6 select-none text-neutral-400 dark:text-neutral-600"
-                  >
-                    $
-                  </span>
+                <span key={i} className="code-line">
                   <span className="cb-plain">{line}</span>
                   {i < lines.length - 1 && "\n"}
                 </span>
               ))
             : lines.map((line, i) => (
-                <span key={i} className="flex">
-                  <span
-                    data-markdown-ignore
-                    className="shrink-0 w-14 pl-4 text-right pr-6 select-none text-neutral-400 dark:text-neutral-600"
-                  >
-                    {i + 1}
-                  </span>
+                <span key={i} className="code-line">
                   <span>
                     <HighlightedCode code={line} language={language} />
                   </span>

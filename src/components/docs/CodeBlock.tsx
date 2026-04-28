@@ -310,9 +310,21 @@ export function CodeBlock({
   // from the extracted text and bleeds the line numbers ("1import { ... }") into
   // the parity comparison. CSS-generated content lives outside the text tree, so
   // the gutter stays visually present but invisible to text extraction.
+  //
+  // data-markdown-ignore on the wrapper: code content lives in the markdown twin
+  // verbatim (as a fenced block from `usage`/`previewCode`/`examples`), so agents
+  // reading the markdown still see the code. The HTML side is opaque to AFDocs
+  // because <pre> innerHTML is treated as raw text — entity-decoded `<` chars
+  // from the syntax highlighter (e.g. `<span class="cb-punct">&lt;/</span>` in
+  // a JSX closing tag) get smashed together with surrounding `</span>` tags by
+  // the parity check's tag-stripping regexes, leaking spurious fragments like
+  // "QueryClientProvider>" into the comparison. Excluding the rendered <pre>
+  // from parity sidesteps every code-highlighter-induced false positive while
+  // preserving full code coverage on the markdown side.
   return (
     <div className="flex bg-neutral-200 dark:bg-neutral-900 border border-black/10 dark:border-white/10">
       <pre
+        data-markdown-ignore
         className={`code-block ${isTerminal ? "code-block-terminal " : ""}flex-1 min-w-0 overflow-x-auto py-4 font-mono text-sm leading-relaxed whitespace-pre`}
       >
         <code>

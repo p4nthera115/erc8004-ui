@@ -198,7 +198,7 @@ function App() {
         type: "string",
         required: false,
         description:
-          "Optional CSS classes merged onto the `.erc8004` wrapper. Use for scoping dark mode (`dark`) or custom layout.",
+          "Optional CSS classes merged onto the .erc8004 wrapper. Use for scoping dark mode (.dark) or custom layout.",
       },
       {
         name: "children",

@@ -149,7 +149,7 @@ function Theming() {
         {/* 1. CSS Variable Overrides */}
         <div className="flex flex-col gap-3 mt-2">
           <p className="font-mono text-base text-neutral-800 dark:text-white/90">
-            1. CSS Variable Overrides — retheme everything
+            Option 1 — CSS Variable Overrides — retheme everything
           </p>
           <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
             Override the variables in your own stylesheet. Every component picks
@@ -168,8 +168,8 @@ function Theming() {
         {/* 2. Provider className */}
         <div className="flex flex-col gap-3 mt-2">
           <p className="font-mono text-base text-neutral-800 dark:text-white/90">
-            2. Provider <InlineCode>className</InlineCode> — scope a theme to a
-            subtree
+            Option 2 — Provider <InlineCode>className</InlineCode> — scope a
+            theme to a subtree
           </p>
           <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
             The provider accepts a <InlineCode>className</InlineCode> prop that
@@ -215,7 +215,8 @@ function Theming() {
         {/* 3. Component className */}
         <div className="flex flex-col gap-3 mt-2">
           <p className="font-mono text-base text-neutral-800 dark:text-white/90">
-            3. Component <InlineCode>className</InlineCode> — one-off tweaks
+            Option 3 — Component <InlineCode>className</InlineCode> — one-off
+            tweaks
           </p>
           <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
             Every component accepts a <InlineCode>className</InlineCode> prop.
@@ -296,7 +297,7 @@ function Theming() {
 </body>`}
         />
         <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
-          Either class can go on <InlineCode>{"<body>"}</InlineCode>, a
+          Either class can go on the <InlineCode>body</InlineCode> tag, a
           container <InlineCode>div</InlineCode>, or directly on{" "}
           <InlineCode>ERC8004Provider</InlineCode> via the{" "}
           <InlineCode>className</InlineCode> prop. If your app already handles

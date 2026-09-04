@@ -41,6 +41,14 @@ function baseHeaders(extra?: Record<string, string>): Record<string, string> {
     "Access-Control-Allow-Methods": "GET, POST, HEAD, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Accept, Mcp-Session-Id, MCP-Protocol-Version",
     "X-Robots-Tag": "all",
+    // /api/components/{slug}, /api/guides/{slug} and /api/types answer the
+    // same URL as either JSON or markdown depending on Accept, and are cached
+    // at the edge for an hour. Without Vary a CDN hands whichever variant it
+    // cached first to the next caller — JSON to an agent asking for markdown,
+    // or markdown to a browser. Declared on every response rather than only
+    // the negotiated ones so that an endpoint growing an Accept branch later
+    // cannot silently lose the header.
+    Vary: "Accept, Accept-Encoding",
     Link: `<${OPENAPI_URL}>; rel="service-desc"`,
     ...extra,
   }
@@ -62,7 +70,6 @@ export function markdown(body: string, init: { status?: number } = {}): Response
     headers: baseHeaders({
       "Content-Type": "text/markdown; charset=utf-8",
       "Cache-Control": CACHE_CONTROL,
-      Vary: "Accept, Accept-Encoding",
     }),
   })
 }

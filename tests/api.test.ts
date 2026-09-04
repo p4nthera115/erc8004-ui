@@ -133,11 +133,18 @@ describe("GET /api/components/{slug}", () => {
     expect(byAccept.headers.get("content-type")).toContain("text/markdown")
   })
 
-  it("marks negotiated responses as varying on Accept", async () => {
-    const response = await get(component, "/api/components/agent-card", {
+  it("marks both variants of a negotiated URL as varying on Accept", async () => {
+    // Both branches, not just the markdown one: these responses are cached at
+    // the edge, so a JSON reply without Vary is the variant a CDN would go on
+    // to serve to an agent that asked for markdown.
+    const asMarkdown = await get(component, "/api/components/agent-card", {
       headers: { Accept: "text/markdown" },
     })
-    expect(response.headers.get("vary")).toContain("Accept")
+    expect(asMarkdown.headers.get("vary")).toContain("Accept")
+
+    const asJson = await get(component, "/api/components/agent-card")
+    expect(asJson.headers.get("content-type")).toContain("application/json")
+    expect(asJson.headers.get("vary")).toContain("Accept")
   })
 
   it("404s an unknown slug with JSON and the list of valid slugs", async () => {
@@ -177,6 +184,15 @@ describe("GET /api/guides", () => {
     expect(markdown.headers.get("content-type")).toContain("text/markdown")
   })
 
+  it("marks both variants as varying on Accept", async () => {
+    for (const url of [
+      "/api/guides/installation",
+      "/api/guides/installation?format=markdown",
+    ]) {
+      expect((await get(guide, url)).headers.get("vary"), url).toContain("Accept")
+    }
+  })
+
   it("404s an unknown guide with JSON", async () => {
     const response = await get(guide, "/api/guides/nope")
     expect(response.status).toBe(404)
@@ -203,6 +219,7 @@ describe("GET /api/chains and /api/types", () => {
 
     const markdown = await get(types, "/api/types?format=markdown")
     expect(await markdown.text()).toContain("```ts")
+    expect(markdown.headers.get("vary")).toContain("Accept")
   })
 })
 

@@ -65,18 +65,36 @@ Full docs, live previews, and props tables:
 
 ## For AI coding agents
 
-The docs are published in machine-readable form and as an MCP server.
+The docs are published in four machine-readable forms, all public, all
+unauthenticated.
 
-- [`/llms.txt`](https://erc8004-ui.vercel.app/llms.txt) — indexed component list
-- [`/llms-full.txt`](https://erc8004-ui.vercel.app/llms-full.txt) — everything in one fetch
-- Any docs page returns Markdown by appending `.md` to its URL
+| | |
+| --- | --- |
+| [`/agents.md`](https://erc8004-ui.vercel.app/agents.md) | When to use this library, when not to, how to call it |
+| [`/llms.txt`](https://erc8004-ui.vercel.app/llms.txt) | Indexed component list |
+| [`/llms-full.txt`](https://erc8004-ui.vercel.app/llms-full.txt) | Everything in one fetch |
+| [`/openapi.json`](https://erc8004-ui.vercel.app/openapi.json) | OpenAPI 3.1 description of the JSON docs API |
+| [`/api`](https://erc8004-ui.vercel.app/api) | The JSON docs API itself |
+| [`/api/mcp`](https://erc8004-ui.vercel.app/api/mcp) | Hosted MCP endpoint, Streamable HTTP |
+| [`/.well-known/mcp`](https://erc8004-ui.vercel.app/.well-known/mcp) | MCP discovery manifest |
 
-The **MCP server** ([`packages/mcp-server`](packages/mcp-server)) serves the same
-documentation as tools, plus two things static docs can't: `check_chain_support`
-introspects a chain's deployed subgraph to report which components actually work
-there, and `check_agent` reports which components will render real data for a
-specific agent rather than an empty state. See
+Any docs page also returns Markdown — append `.md` to its URL, or send
+`Accept: text/markdown` to the HTML URL. Unknown paths return a real 404 with a
+markdown body pointing at these entry points.
+
+**MCP, two ways.** The hosted endpoint at `/api/mcp` needs no install and no
+key and serves the four documentation tools. The stdio server
+([`packages/mcp-server`](packages/mcp-server)) serves those plus two things
+static docs can't: `check_chain_support` introspects a chain's deployed subgraph
+to report which components actually work there, and `check_agent` reports which
+components will render real data for a specific agent rather than an empty
+state. Those two stay local because they spend a Graph API key. See
 [docs/mcp](https://erc8004-ui.vercel.app/docs/mcp).
+
+**JSON API.** `GET /api` lists every endpoint. Components, guides, chains and
+types are available as JSON or (with `?format=markdown`) as markdown. Errors are
+JSON with a stable `error.code`, a `hint` saying what to do next, and an
+`allowed` list when an identifier was wrong.
 
 ## Current chain support
 
@@ -105,10 +123,19 @@ src/
   lib/                     subgraph client, registry parsing, shared utils
   components/docs/registry.tsx    canonical component docs — SOURCE OF TRUTH
   routes/                  the docs site (TanStack Router)
+  content/site-pages.ts    /about, /contact, /privacy content (HTML + markdown)
+  server/negotiation.ts    markdown content negotiation and 404 resolution
+  generated/               route manifest (committed; the app imports it)
+api/                       Vercel functions: the JSON docs API and MCP endpoint
+  _lib/                    shared HTTP helpers, registry lookups, MCP protocol
+middleware.ts              edge middleware: Accept negotiation, agent-friendly 404s
 scripts/
-  generate-llms.ts         registry -> llms.txt, per-page markdown, MCP snapshot
+  generate-llms.ts         registry -> llms.txt, markdown, OpenAPI, sitemap, robots
   guides-registry.ts       canonical guide content
-packages/mcp-server/       the MCP server
+  lib/                     openapi, agents.md, sitemap and YAML builders
+  generate-og-image.mjs    regenerates public/og.png (not part of the build)
+packages/mcp-server/       the stdio MCP server
+tests/                     vitest: routing, API, MCP protocol, published files
 ```
 
 `src/components/docs/registry.tsx` and `scripts/guides-registry.ts` are the
@@ -129,6 +156,7 @@ pnpm install
 pnpm dev              # docs site at localhost:5173
 pnpm build            # regenerates docs, then builds the site
 pnpm build:mcp        # regenerates the snapshot, then builds the MCP server
+pnpm test             # vitest — routing, API, MCP protocol, published files
 pnpm lint
 ```
 

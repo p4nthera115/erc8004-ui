@@ -25,6 +25,9 @@ export default defineConfig(async () => {
         routes: [
           "/",
           "/404",
+          "/about",
+          "/contact",
+          "/privacy",
           "/docs/introduction",
           "/docs/installation",
           "/docs/concepts",

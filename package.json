@@ -12,7 +12,10 @@
     "build:packages": "pnpm build:mcp",
     "lint": "eslint .",
     "preview": "vite preview",
-    "gen:registry": "tsx --tsconfig tsconfig.app.json scripts/generate-llms.ts"
+    "gen:registry": "tsx --tsconfig tsconfig.app.json scripts/generate-llms.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "pretest": "pnpm gen:registry"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.2",
@@ -39,6 +42,7 @@
     "@prerenderer/rollup-plugin": "^0.3.12",
     "@sparticuz/chromium": "^147.0.0",
     "@tanstack/router-plugin": "^1.167.9",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.12.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -47,10 +51,12 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "js-yaml": "^5.4.1",
     "puppeteer-core": "^24.40.0",
     "tsx": "^4.21.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.57.0",
-    "vite": "^6.4.1"
+    "vite": "^6.4.1",
+    "vitest": "^5.0.0"
   }
 }

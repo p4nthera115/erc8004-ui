@@ -9,7 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as DocsRouteImport } from './routes/docs'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as R404RouteImport } from './routes/404'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsIndexRouteImport } from './routes/docs/index'
@@ -22,9 +25,24 @@ import { Route as DocsApiKeysRouteImport } from './routes/docs/api-keys'
 import { Route as DocsComponentsIndexRouteImport } from './routes/docs/components/index'
 import { Route as DocsComponentsSlugRouteImport } from './routes/docs/components/$slug'
 
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
   path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const R404Route = R404RouteImport.update({
@@ -86,7 +104,10 @@ const DocsComponentsSlugRoute = DocsComponentsSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/404': typeof R404Route
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
   '/docs': typeof DocsRouteWithChildren
+  '/privacy': typeof PrivacyRoute
   '/docs/api-keys': typeof DocsApiKeysRoute
   '/docs/concepts': typeof DocsConceptsRoute
   '/docs/installation': typeof DocsInstallationRoute
@@ -100,6 +121,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/404': typeof R404Route
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/privacy': typeof PrivacyRoute
   '/docs/api-keys': typeof DocsApiKeysRoute
   '/docs/concepts': typeof DocsConceptsRoute
   '/docs/installation': typeof DocsInstallationRoute
@@ -114,7 +138,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/404': typeof R404Route
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
   '/docs': typeof DocsRouteWithChildren
+  '/privacy': typeof PrivacyRoute
   '/docs/api-keys': typeof DocsApiKeysRoute
   '/docs/concepts': typeof DocsConceptsRoute
   '/docs/installation': typeof DocsInstallationRoute
@@ -130,7 +157,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/404'
+    | '/about'
+    | '/contact'
     | '/docs'
+    | '/privacy'
     | '/docs/api-keys'
     | '/docs/concepts'
     | '/docs/installation'
@@ -144,6 +174,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/404'
+    | '/about'
+    | '/contact'
+    | '/privacy'
     | '/docs/api-keys'
     | '/docs/concepts'
     | '/docs/installation'
@@ -157,7 +190,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/404'
+    | '/about'
+    | '/contact'
     | '/docs'
+    | '/privacy'
     | '/docs/api-keys'
     | '/docs/concepts'
     | '/docs/installation'
@@ -172,16 +208,40 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   R404Route: typeof R404Route
+  AboutRoute: typeof AboutRoute
+  ContactRoute: typeof ContactRoute
   DocsRoute: typeof DocsRouteWithChildren
+  PrivacyRoute: typeof PrivacyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/docs': {
       id: '/docs'
       path: '/docs'
       fullPath: '/docs'
       preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/404': {
@@ -293,7 +353,10 @@ const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   R404Route: R404Route,
+  AboutRoute: AboutRoute,
+  ContactRoute: ContactRoute,
   DocsRoute: DocsRouteWithChildren,
+  PrivacyRoute: PrivacyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

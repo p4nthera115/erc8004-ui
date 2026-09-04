@@ -2,51 +2,93 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
+    { "source": "/docs/components/:slug.md", "destination": "/llms/:slug.md" },
+    { "source": "/docs/:slug.md", "destination": "/llms/_guides/:slug.md" },
+    { "source": "/docs.md", "destination": "/llms.txt" },
+
+    { "source": "/about.md", "destination": "/llms/_pages/about.md" },
+    { "source": "/contact.md", "destination": "/llms/_pages/contact.md" },
+    { "source": "/privacy.md", "destination": "/llms/_pages/privacy.md" },
+
+    { "source": "/AGENTS.md", "destination": "/agents.md" },
     {
-      "source": "/docs/components/:slug.md",
-      "destination": "/llms/:slug.md"
+      "source": "/.well-known/agent-instructions.md",
+      "destination": "/agents.md"
     },
-    {
-      "source": "/docs/:slug.md",
-      "destination": "/llms/_guides/:slug.md"
-    },
-    {
-      "source": "/docs.md",
-      "destination": "/llms.txt"
-    }
+
+    { "source": "/.well-known/mcp", "destination": "/api/mcp-manifest" },
+    { "source": "/.well-known/mcp.json", "destination": "/api/mcp-manifest" },
+
+    { "source": "/api/openapi.json", "destination": "/openapi.json" },
+    { "source": "/api/openapi.yaml", "destination": "/openapi.yaml" },
+    { "source": "/.well-known/openapi.json", "destination": "/openapi.json" },
+
+    { "source": "/api/(.*)", "destination": "/api/not-found" }
   ],
   "headers": [
     {
-      "source": "/(llms.txt|llms-full.txt)",
+      "source": "/(llms.txt|llms-full.txt|agents.md)",
       "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/markdown; charset=utf-8"
-        },
+        { "key": "Content-Type", "value": "text/markdown; charset=utf-8" },
         {
           "key": "Cache-Control",
           "value": "public, max-age=300, s-maxage=600"
         },
-        {
-          "key": "X-Robots-Tag",
-          "value": "all"
-        }
+        { "key": "Vary", "value": "Accept, Accept-Encoding" },
+        { "key": "X-Robots-Tag", "value": "all" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
       ]
     },
     {
       "source": "/llms/(.*).md",
       "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/markdown; charset=utf-8"
-        },
+        { "key": "Content-Type", "value": "text/markdown; charset=utf-8" },
         {
           "key": "Cache-Control",
           "value": "public, max-age=300, s-maxage=600"
         },
+        { "key": "Vary", "value": "Accept, Accept-Encoding" },
+        { "key": "X-Robots-Tag", "value": "all" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    },
+    {
+      "source": "/openapi.json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json; charset=utf-8" },
         {
-          "key": "X-Robots-Tag",
-          "value": "all"
+          "key": "Cache-Control",
+          "value": "public, max-age=300, s-maxage=3600"
+        },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "X-Robots-Tag", "value": "all" }
+      ]
+    },
+    {
+      "source": "/openapi.yaml",
+      "headers": [
+        { "key": "Content-Type", "value": "application/yaml; charset=utf-8" },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=300, s-maxage=3600"
+        },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "X-Robots-Tag", "value": "all" }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        { "key": "Content-Type", "value": "application/xml; charset=utf-8" },
+        { "key": "X-Robots-Tag", "value": "all" }
+      ]
+    },
+    {
+      "source": "/og.png",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, s-maxage=604800"
         }
       ]
     }

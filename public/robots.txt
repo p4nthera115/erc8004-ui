@@ -1,0 +1,12 @@
+# Every page here is public documentation. Crawl all of it.
+User-agent: *
+Allow: /
+
+Sitemap: https://erc8004-ui.vercel.app/sitemap.xml
+
+# Machine-readable entry points, in rough order of usefulness:
+#   https://erc8004-ui.vercel.app/agents.md      when to use this library and how to call it
+#   https://erc8004-ui.vercel.app/llms.txt       documentation index
+#   https://erc8004-ui.vercel.app/llms-full.txt  full documentation in one fetch
+#   https://erc8004-ui.vercel.app/openapi.json   OpenAPI 3.1 description of the JSON docs API
+#   https://erc8004-ui.vercel.app/api/mcp        Model Context Protocol endpoint (Streamable HTTP)

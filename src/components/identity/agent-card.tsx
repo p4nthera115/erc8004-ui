@@ -220,7 +220,7 @@ export function AgentCard({
   if (layout === "vertical") {
     const avatarSize = 80
     return (
-      <Card shadow className={cn("p-6 max-w-sm w-fit", className)}>
+      <Card shadow className={cn("p-6 max-w-sm w-full", className)}>
         <div className="flex flex-col justify-center items-center text-center">
           {/* Avatar */}
           <div
@@ -278,7 +278,7 @@ export function AgentCard({
   }
 
   return (
-    <Card shadow className={cn("w-fit p-6", className)}>
+    <Card shadow className={cn("w-full p-6", className)}>
       {/* Top row: avatar + name + address + protocol tags */}
       <div className="flex gap-4">
         <div className="h-12 w-12 aspect-square shrink-0 overflow-hidden rounded-erc8004-md border border-erc8004-border">

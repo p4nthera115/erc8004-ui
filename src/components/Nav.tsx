@@ -9,9 +9,9 @@ interface NavProps {
 
 export function Nav({ isDark, onToggle }: NavProps) {
   return (
-    <header className="sticky top-0 z-50 p-4 px-8 border-b border-black/60 dark:border-white/25 bg-surface">
+    <header className="sticky top-0 z-50 p-4 px-4 md:px-8 border-b border-black/60 dark:border-white/25 bg-surface">
       <div className="flex items-center justify-between font-mono">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2 md:gap-6">
           <NavLogo />
           <Link
             to="/docs/introduction"
@@ -26,18 +26,18 @@ export function Nav({ isDark, onToggle }: NavProps) {
             Components
           </Link>
         </div>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3 md:gap-6">
           <a
             href="https://eips.ethereum.org/EIPS/eip-8004"
             target="_blank"
-            className="hover:underline p-2 hover:cursor-pointer"
+            className="hidden lg:block hover:underline p-2 hover:cursor-pointer"
           >
             ERC-8004
           </a>
           <a
             href="https://docs.sdk.ag0.xyz"
             target="_blank"
-            className="hover:underline p-2 mr-2 hover:cursor-pointer"
+            className="hidden lg:block hover:underline p-2 mr-2 hover:cursor-pointer"
           >
             Agent0 SDK
           </a>

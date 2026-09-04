@@ -219,3 +219,33 @@ html.dark .cb-plain {
     #181818 50%
   );
 }
+
+/*
+  Hero component wall (src/components/landing/component-wall.tsx).
+  Each column duplicates its tile list and translates the track by exactly
+  half its height, so the loop is seamless. Duration and direction are set
+  per column via inline style.
+*/
+@keyframes erc-marquee {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+.marquee-track {
+  animation-name: erc-marquee;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+/* Pause the column being read so its tiles (and their docs links) hold still. */
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}

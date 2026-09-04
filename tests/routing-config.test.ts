@@ -170,6 +170,8 @@ describe("middleware", () => {
   it("hands an unknown path back to the styled 404 page for a browser", () => {
     const response = run("/some-path-that-does-not-exist", "text/html")
     expect(response.headers.get("x-middleware-next")).toBe("1")
+    // Both 404 branches are negotiated responses for the same URL.
+    expect(response.headers.get("vary")).toBe("Accept, Accept-Encoding")
   })
 })
 

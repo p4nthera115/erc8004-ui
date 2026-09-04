@@ -125,7 +125,10 @@ describe("negotiate", () => {
   })
 
   it("lets a browser fall through to the styled 404 page", () => {
-    expect(negotiate("/nope", BROWSER_ACCEPT)).toEqual({ kind: "pass" })
+    // `vary`, not `pass` — the platform still serves 404.html, but the same
+    // URL answers markdown to a different Accept, so the response has to say
+    // it varies or a CDN can hand one audience the other's variant.
+    expect(negotiate("/nope", BROWSER_ACCEPT)).toEqual({ kind: "vary" })
   })
 
   it("answers a non-HTML client with a recoverable markdown 404", () => {

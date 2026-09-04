@@ -166,6 +166,9 @@ export function negotiate(
 
   // Unknown path. A browser gets the styled 404 page the platform already
   // serves with a 404 status; everything else gets markdown it can act on.
-  if (acceptsHtml(accept)) return { kind: "pass" }
+  // The HTML branch is `vary`, not `pass`: this URL answers with two different
+  // content types depending on Accept, so the 404 has to be marked as
+  // negotiated exactly like a page that exists.
+  if (acceptsHtml(accept)) return { kind: "vary" }
   return { kind: "not-found-markdown", body: notFoundMarkdown(path) }
 }

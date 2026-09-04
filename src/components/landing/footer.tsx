@@ -27,7 +27,15 @@ const EXTERNAL = [
 const AGENT_FILES = [
   { label: "llms.txt", href: "/llms.txt" },
   { label: "llms-full.txt", href: "/llms-full.txt" },
+  { label: "agents.md", href: "/agents.md" },
+  { label: "openapi.json", href: "/openapi.json" },
   { label: "sitemap.xml", href: "/sitemap.xml" },
+]
+
+const PROJECT = [
+  { label: "About", to: "/about" as const },
+  { label: "Contact", to: "/contact" as const },
+  { label: "Privacy", to: "/privacy" as const },
 ]
 
 function Column({
@@ -92,9 +100,16 @@ export function Footer() {
         </Column>
       </div>
       <div
-        className={`flex flex-col gap-2 border-t px-6 py-6 text-xs text-text-secondary md:flex-row md:items-center md:justify-between md:px-8 ${RULE}`}
+        className={`flex flex-col gap-3 border-t px-6 py-6 text-xs text-text-secondary md:flex-row md:items-center md:justify-between md:px-8 ${RULE}`}
       >
         <span>@erc8004/ui — component library for ERC-8004 agent data.</span>
+        <nav className="flex gap-4">
+          {PROJECT.map((item) => (
+            <Link key={item.to} to={item.to} className="hover:underline">
+              {item.label}
+            </Link>
+          ))}
+        </nav>
         <span>Data indexed by The Graph. Not affiliated with the ERC-8004 authors.</span>
       </div>
     </footer>

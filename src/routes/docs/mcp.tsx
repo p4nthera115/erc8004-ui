@@ -87,6 +87,16 @@ const LIVE_TOOLS = [
   },
 ]
 
+/** Hosted endpoint vs local server — mirrors the table in the markdown twin. */
+const CONNECT_ROWS: Array<[string, string, string]> = [
+  ["Endpoint", "/api/mcp", "npx -y @erc8004/ui-mcp"],
+  ["Transport", "Streamable HTTP", "stdio"],
+  ["Install", "none", "npm"],
+  ["Graph API key", "not used", "optional"],
+  ["Documentation tools", "yes", "yes"],
+  ["Live subgraph tools", "no", "yes, with a key"],
+]
+
 function ToolList({
   tools,
 }: {
@@ -141,9 +151,60 @@ function Mcp() {
         on-chain state.
       </p>
 
+      {/* Two ways to connect */}
+      <section className="flex flex-col gap-4">
+        <SectionHeading>Two ways to connect</SectionHeading>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm font-mono border-collapse">
+            <thead>
+              <tr className="text-left text-neutral-500 dark:text-white/50">
+                <th className="py-2 pr-6 font-normal" />
+                <th className="py-2 pr-6 font-normal">Hosted HTTP</th>
+                <th className="py-2 font-normal">Local stdio</th>
+              </tr>
+            </thead>
+            <tbody className="text-neutral-700 dark:text-white">
+              {CONNECT_ROWS.map(([label, hosted, local]) => (
+                <tr
+                  key={label}
+                  className="border-t border-black/10 dark:border-white/10"
+                >
+                  <td className="py-2 pr-6 text-neutral-500 dark:text-white/50">
+                    {label}
+                  </td>
+                  <td className="py-2 pr-6">{hosted}</td>
+                  <td className="py-2">{local}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className={PROSE}>
+          The hosted endpoint is the fastest way in: no install, no key, open
+          CORS, and a discovery manifest at{" "}
+          <a href="/.well-known/mcp" className="text-neutral-600 dark:text-white/80 underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white transition-colors">
+            /.well-known/mcp
+          </a>
+          . It serves the four documentation tools only. The live tools stay
+          local because they spend a Graph API key, and a public endpoint should
+          not spend someone else&apos;s quota.
+        </p>
+        <CodeBlock
+          code={`claude mcp add --transport http erc8004-ui https://erc8004-ui.vercel.app/api/mcp`}
+        />
+        <p className={PROSE}>
+          It is a stateless dual-era server: it answers the current
+          per-request-metadata revision (<InlineCode>2026-07-28</InlineCode>,
+          including the mandatory <InlineCode>server/discover</InlineCode>) and
+          the <InlineCode>initialize</InlineCode> handshake used by{" "}
+          <InlineCode>2025-11-25</InlineCode> and earlier, so any current client
+          works.
+        </p>
+      </section>
+
       {/* Setup */}
       <section className="flex flex-col gap-4">
-        <SectionHeading>Setup</SectionHeading>
+        <SectionHeading>Local server</SectionHeading>
         <p className={PROSE}>
           Add the server to your MCP client configuration. For Claude Code:
         </p>
@@ -210,6 +271,48 @@ function Mcp() {
           live tools answer <em>will it show anything</em>. Static documentation
           can only answer the first — the second depends on chain state that
           changes independently of this library.
+        </p>
+      </section>
+
+      {/* Plain HTTP alternative */}
+      <section className="flex flex-col gap-4">
+        <SectionHeading>If you would rather not use MCP</SectionHeading>
+        <p className={PROSE}>
+          The same documentation is published as a plain read-only JSON API,
+          described by an OpenAPI 3.1 document. No key, no client library, open
+          CORS:
+        </p>
+        <CodeBlock
+          code={`curl https://erc8004-ui.vercel.app/api                        # endpoint index
+curl https://erc8004-ui.vercel.app/api/components             # every component
+curl https://erc8004-ui.vercel.app/api/components/agent-card  # one component, in full
+curl https://erc8004-ui.vercel.app/api/guides/installation
+curl https://erc8004-ui.vercel.app/api/chains`}
+        />
+        <p className={PROSE}>
+          Add <InlineCode>?format=markdown</InlineCode> to{" "}
+          <InlineCode>/api/components/{"{slug}"}</InlineCode>,{" "}
+          <InlineCode>/api/guides/{"{slug}"}</InlineCode> or{" "}
+          <InlineCode>/api/types</InlineCode> to get the markdown rendering
+          instead of JSON. Errors are JSON with a stable{" "}
+          <InlineCode>error.code</InlineCode>, a <InlineCode>hint</InlineCode>{" "}
+          saying what to do next, and an <InlineCode>allowed</InlineCode> list
+          when the failure was an unknown identifier.
+        </p>
+        <p className={PROSE}>
+          The specification is at{" "}
+          <a href="/openapi.json" className="text-neutral-600 dark:text-white/80 underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white transition-colors">
+            /openapi.json
+          </a>{" "}
+          (YAML at{" "}
+          <a href="/openapi.yaml" className="text-neutral-600 dark:text-white/80 underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white transition-colors">
+            /openapi.yaml
+          </a>
+          ), and{" "}
+          <a href="/agents.md" className="text-neutral-600 dark:text-white/80 underline underline-offset-2 hover:text-neutral-900 dark:hover:text-white transition-colors">
+            /agents.md
+          </a>{" "}
+          covers when to reach for this library at all.
         </p>
       </section>
     </div>

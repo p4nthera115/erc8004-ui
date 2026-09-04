@@ -1,8 +1,12 @@
-import { createRootRoute, Outlet, Link } from "@tanstack/react-router"
-import { useState, useEffect } from "react"
+import { createRootRoute, Outlet, useRouterState } from "@tanstack/react-router"
+import { useState, useEffect, useLayoutEffect } from "react"
 import { Nav } from "../components/Nav"
+import { NotFoundPage } from "../components/NotFoundPage"
+import { applyPageMeta } from "../lib/page-meta"
 
 function RootComponent() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+
   const [isDark, setIsDark] = useState(() => {
     const stored = localStorage.getItem("theme")
     return stored ? stored === "dark" : true
@@ -12,6 +16,14 @@ function RootComponent() {
     document.documentElement.classList.toggle("dark", isDark)
     localStorage.setItem("theme", isDark ? "dark" : "light")
   }, [isDark])
+
+  // Title, description, canonical and og:url for the current route. Declared
+  // before the app-rendered effect below so the prerenderer's snapshot already
+  // has them; a layout effect so a client-side navigation updates the tab
+  // title in the same frame as the content.
+  useLayoutEffect(() => {
+    applyPageMeta(pathname)
+  }, [pathname])
 
   useEffect(() => {
     // Tell the prerenderer the page is ready to be snapshotted
@@ -26,30 +38,7 @@ function RootComponent() {
   )
 }
 
-function RootNotFound() {
-  return (
-    <main className="max-w-2xl mx-auto py-24 px-6 font-mono">
-      <h1 className="text-3xl font-bold mb-4 text-neutral-900 dark:text-white">
-        404 — Page not found
-      </h1>
-      <p className="mb-8 text-neutral-600 dark:text-white/60 leading-relaxed">
-        That page doesn&apos;t exist. The agent-readable index is at{" "}
-        <a className="underline" href="/llms.txt">
-          /llms.txt
-        </a>
-        .
-      </p>
-      <Link
-        to="/docs/introduction"
-        className="underline text-neutral-700 dark:text-white/80 hover:text-neutral-900 dark:hover:text-white"
-      >
-        Back to documentation →
-      </Link>
-    </main>
-  )
-}
-
 export const Route = createRootRoute({
   component: RootComponent,
-  notFoundComponent: RootNotFound,
+  notFoundComponent: NotFoundPage,
 })

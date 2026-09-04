@@ -33,3 +33,5 @@ packages/mcp-server/src/generated/
 # Environment variables
 .env
 .env.*
+# Documentation snapshot compiled for the Vercel functions under /api
+api/_generated/

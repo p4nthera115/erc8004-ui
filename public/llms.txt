@@ -4,6 +4,12 @@
 
 **NOTE — provisional package name.** This library is not yet published to npm. `@erc8004/ui` is a placeholder used in code examples — the final package name has not been chosen and will likely differ. Until publication, install directly from GitHub: https://github.com/p4nthera115/erc8004-ui. Once published, this notice will disappear and all code examples will reflect the real package name.
 
+**When to use this:** reach for these components when a task involves showing ERC-8004 agent data in a React UI — an agent profile or directory page, a reputation or verification badge beside an agent's name, a feedback or validation list, or any surface where the number on screen has to come from the chain rather than from the surrounding app. Each component takes only an `agentRegistry` and an `agentId` and fetches its own verified data, so there is no subgraph plumbing to write and no way for the host app to fake a score.
+
+**When not to use it:** it is React-only, read-only and ERC-8004-only. It cannot register agents, leave feedback or submit validations (use the Agent0 SDK for writes), and it cannot render agents described by your own API — no component accepts display data as a prop.
+
+Full agent instructions, including how to call the MCP endpoint and the JSON API: https://erc8004-ui.vercel.app/agents.md
+
 ## Setup
 
 - [Introduction](https://erc8004-ui.vercel.app/docs/introduction.md): Why this library exists and what problems it solves.
@@ -48,6 +54,21 @@
 
 - [LastActivity](https://erc8004-ui.vercel.app/docs/components/last-activity.md): Cross-registry relative timestamp showing when the agent was last active (e.g.
 - [ActivityLog](https://erc8004-ui.vercel.app/docs/components/activity-log.md): Chronological feed of all on-chain events across all registries — feedback and validations merged and sorted by time.
+
+## Developer resources
+
+- [Agent instructions](https://erc8004-ui.vercel.app/agents.md): When to use this library, when not to, how to call it, and the subgraph rules that are easy to get wrong.
+- [OpenAPI specification](https://erc8004-ui.vercel.app/openapi.json): OpenAPI 3.1 document for the read-only JSON documentation API. YAML at https://erc8004-ui.vercel.app/openapi.yaml.
+- [JSON documentation API](https://erc8004-ui.vercel.app/api): Endpoint index. Components, props, guides and chain support as JSON, with structured JSON errors.
+- [MCP endpoint](https://erc8004-ui.vercel.app/api/mcp): Hosted Model Context Protocol server, Streamable HTTP transport, no key required.
+- [MCP manifest](https://erc8004-ui.vercel.app/.well-known/mcp): Transport, supported protocol versions and tool list for the MCP endpoint.
+- [MCP server guide](https://erc8004-ui.vercel.app/docs/mcp.md): Installing the stdio server, which adds live subgraph and agent checks.
+
+## About this project
+
+- [About @erc8004/ui](https://erc8004-ui.vercel.app/about.md): What @erc8004/ui is, who maintains it, how it is funded, and the guarantees it makes about the data it renders.
+- [Contact](https://erc8004-ui.vercel.app/contact.md): How to report a bug, request a component, ask a question, or disclose a security issue in @erc8004/ui.
+- [Privacy](https://erc8004-ui.vercel.app/privacy.md): What this documentation site collects, what the component library collects, and what leaves your users' browsers when you ship it.
 
 ## Optional
 

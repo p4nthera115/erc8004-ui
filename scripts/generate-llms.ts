@@ -31,6 +31,16 @@ import {
 } from "../src/components/docs/registry"
 import { GUIDE_REGISTRY, GUIDE_ORDER } from "./guides-registry"
 import { SUBGRAPH_IDS } from "../src/lib/constants"
+import { SITE_PAGES, SITE_PAGE_ORDER } from "../src/content/site-pages"
+import { buildAgentsMd } from "./lib/agents-md"
+import { buildOpenApiDocument } from "./lib/openapi"
+import {
+  renderRouteManifest,
+  renderSitemap,
+  type ManifestRoute,
+} from "./lib/route-manifest"
+import { sitePageMarkdown } from "./lib/site-pages-markdown"
+import { toYaml } from "./lib/yaml"
 import { writeFileSync, readFileSync, mkdirSync, rmSync, existsSync } from "node:fs"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -59,6 +69,11 @@ const GITHUB_URL = "https://github.com/p4nthera115/erc8004-ui"
 const PACKAGE_NAME = "@erc8004/ui"
 const IS_PUBLISHED = false
 
+// Version of the published API contract, not of the build. Bump it when an
+// endpoint's response shape changes in a way a caller could notice; leaving the
+// build timestamp here would churn /openapi.json on every deploy for no signal.
+const OPENAPI_VERSION = "1.0.0"
+
 const TAGLINE =
   "Drop-in React components for displaying verified ERC-8004 AI agent identity, reputation, and validation data. Self-contained, trustless, and designed to be consumed by AI coding agents."
 
@@ -77,11 +92,19 @@ const REPO_ROOT = join(__dirname, "..")
 const PUBLIC_DIR = join(REPO_ROOT, "public")
 const LLMS_DIR = join(PUBLIC_DIR, "llms")
 const GUIDES_DIR = join(LLMS_DIR, "_guides")
+// Markdown twins of the standalone /about, /contact and /privacy pages. Kept
+// beside the guides so one `headers` rule in vercel.json covers every .md file.
+const PAGES_DIR = join(LLMS_DIR, "_pages")
+const GENERATED_SRC_DIR = join(REPO_ROOT, "src", "generated")
 // The MCP server consumes a JSON snapshot of the same registries rather than
 // importing registry.tsx directly — that would pull React and every component
 // into a server-side bundle. Emitting it here keeps the snapshot regenerating
 // on exactly the same cadence as llms.txt, so the two can never drift.
 const MCP_GENERATED_DIR = join(REPO_ROOT, "packages", "mcp-server", "src", "generated")
+// The same snapshot, as a TypeScript module, for the Vercel functions under
+// /api. A `.ts` module rather than a JSON import so the platform's bundler
+// traces it like any other source file.
+const API_GENERATED_DIR = join(REPO_ROOT, "api", "_generated")
 
 // ---------------------------------------------------------------------------
 // Component grouping — mirrors the categories shown on /docs/components
@@ -371,6 +394,32 @@ function buildLlmsTxt(): string {
     lines.push(PROVISIONAL_NAME_NOTICE)
     lines.push("")
   }
+
+  // When-to-use guidance, before the first H2. llms.txt allows free markdown
+  // here but not headings, so this stays as prose and a bullet list; the full
+  // version lives in /agents.md, linked below and in Developer resources.
+  lines.push(
+    "**When to use this:** reach for these components when a task involves showing " +
+      "ERC-8004 agent data in a React UI — an agent profile or directory page, a " +
+      "reputation or verification badge beside an agent's name, a feedback or " +
+      "validation list, or any surface where the number on screen has to come from " +
+      "the chain rather than from the surrounding app. Each component takes only an " +
+      "`agentRegistry` and an `agentId` and fetches its own verified data, so there " +
+      "is no subgraph plumbing to write and no way for the host app to fake a score."
+  )
+  lines.push("")
+  lines.push(
+    "**When not to use it:** it is React-only, read-only and ERC-8004-only. It " +
+      "cannot register agents, leave feedback or submit validations (use the Agent0 " +
+      "SDK for writes), and it cannot render agents described by your own API — no " +
+      "component accepts display data as a prop."
+  )
+  lines.push("")
+  lines.push(
+    `Full agent instructions, including how to call the MCP endpoint and the JSON ` +
+      `API: ${SITE_URL}/agents.md`
+  )
+  lines.push("")
   lines.push("## Setup")
   lines.push("")
   for (const g of GUIDES) {
@@ -401,6 +450,34 @@ function buildLlmsTxt(): string {
     }
     lines.push("")
   }
+  lines.push("## Developer resources")
+  lines.push("")
+  lines.push(
+    `- [Agent instructions](${SITE_URL}/agents.md): When to use this library, when not to, how to call it, and the subgraph rules that are easy to get wrong.`
+  )
+  lines.push(
+    `- [OpenAPI specification](${SITE_URL}/openapi.json): OpenAPI 3.1 document for the read-only JSON documentation API. YAML at ${SITE_URL}/openapi.yaml.`
+  )
+  lines.push(
+    `- [JSON documentation API](${SITE_URL}/api): Endpoint index. Components, props, guides and chain support as JSON, with structured JSON errors.`
+  )
+  lines.push(
+    `- [MCP endpoint](${SITE_URL}/api/mcp): Hosted Model Context Protocol server, Streamable HTTP transport, no key required.`
+  )
+  lines.push(
+    `- [MCP manifest](${SITE_URL}/.well-known/mcp): Transport, supported protocol versions and tool list for the MCP endpoint.`
+  )
+  lines.push(
+    `- [MCP server guide](${SITE_URL}/docs/mcp.md): Installing the stdio server, which adds live subgraph and agent checks.`
+  )
+  lines.push("")
+  lines.push("## About this project")
+  lines.push("")
+  for (const slug of SITE_PAGE_ORDER) {
+    const page = SITE_PAGES[slug]
+    lines.push(`- [${page.title}](${SITE_URL}/${page.slug}.md): ${page.description}`)
+  }
+  lines.push("")
   lines.push("## Optional")
   lines.push("")
   lines.push(
@@ -619,6 +696,93 @@ function buildRegistrySnapshot() {
 }
 
 // ---------------------------------------------------------------------------
+// The route manifest — every URL the site serves
+//
+// Emitted to src/generated/route-manifest.ts and consumed by the edge
+// middleware (content negotiation and markdown 404s), by the page <head>
+// manager (title, description, canonical) and by the sitemap below.
+// ---------------------------------------------------------------------------
+
+/** Guides that are entry points get a higher sitemap priority than the rest. */
+const PRIMARY_GUIDES = new Set(["introduction", "components"])
+
+/**
+ * Every <title> names the product, so a search for it by name has something to
+ * match — but a page whose own name already contains it is left alone rather
+ * than reading "About @erc8004/ui — @erc8004/ui".
+ */
+function titled(name: string): string {
+  return name.includes(PACKAGE_NAME) ? name : `${name} — ${PACKAGE_NAME}`
+}
+
+function buildRouteManifest(): ManifestRoute[] {
+  const routes: ManifestRoute[] = [
+    {
+      path: "/",
+      title: `${PACKAGE_NAME} — React components for ERC-8004 agent data`,
+      description: TAGLINE,
+      // The index is the closest markdown equivalent of the landing page: it
+      // is what an agent asking the site "what are you" should be handed.
+      markdown: "/llms.txt",
+      kind: "home",
+      priority: 1,
+    },
+    {
+      // Redirects to /docs/introduction for browsers; markdown callers get the
+      // index. Priority 0 keeps it out of the sitemap — it is not canonical.
+      path: "/docs",
+      title: titled("Documentation"),
+      description: "Documentation index.",
+      markdown: "/llms.txt",
+      kind: "index",
+      priority: 0,
+    },
+  ]
+
+  for (const slug of GUIDE_ORDER) {
+    const guide = GUIDE_REGISTRY[slug]
+    if (!guide) continue
+    routes.push({
+      path: `/docs/${slug}`,
+      title: titled(guide.name),
+      description: guide.description,
+      markdown: `/llms/_guides/${slug}.md`,
+      kind: "guide",
+      priority: PRIMARY_GUIDES.has(slug) ? 0.8 : 0.64,
+    })
+  }
+
+  for (const group of GROUPS) {
+    for (const slug of group.slugs) {
+      const doc = COMPONENT_REGISTRY[slug]
+      if (!doc) continue
+      routes.push({
+        path: `/docs/components/${slug}`,
+        title: titled(doc.name),
+        description: doc.description.split(/(?<=\.)\s/)[0],
+        markdown: `/llms/${slug}.md`,
+        kind: "component",
+        priority: 0.64,
+      })
+    }
+  }
+
+  for (const slug of SITE_PAGE_ORDER) {
+    const page = SITE_PAGES[slug]
+    routes.push({
+      path: `/${page.slug}`,
+      title: titled(page.title),
+      description: page.description,
+      markdown: `/llms/_pages/${page.slug}.md`,
+      kind: "page",
+      priority: 0.5,
+    })
+  }
+
+  return routes
+}
+
+// ---------------------------------------------------------------------------
 // Write everything out
 // ---------------------------------------------------------------------------
 
@@ -664,13 +828,131 @@ function main() {
     `[generate-llms] wrote ${GUIDE_ORDER.length} guide markdown files into ${GUIDES_DIR}`
   )
 
-  // 5. MCP registry snapshot
+  // 5. Standalone page markdown — /about.md, /contact.md, /privacy.md
+  mkdirSync(PAGES_DIR, { recursive: true })
+  for (const slug of SITE_PAGE_ORDER) {
+    const page = SITE_PAGES[slug]
+    writeFileSync(
+      join(PAGES_DIR, `${page.slug}.md`),
+      sitePageMarkdown(page, SITE_URL),
+      "utf8"
+    )
+  }
+  console.log(
+    `[generate-llms] wrote ${SITE_PAGE_ORDER.length} page markdown files into ${PAGES_DIR}`
+  )
+
+  // 6. MCP registry snapshot (stdio server) and its TypeScript twin (/api)
   mkdirSync(MCP_GENERATED_DIR, { recursive: true })
   const snapshotFile = join(MCP_GENERATED_DIR, "registry.json")
   const snapshot = buildRegistrySnapshot()
   writeFileSync(snapshotFile, JSON.stringify(snapshot, null, 2), "utf8")
   console.log(
     `[generate-llms] wrote ${snapshotFile} (${snapshot.components.length} components, ${snapshot.guides.length} guides, ${snapshot.chains.length} chains)`
+  )
+
+  mkdirSync(API_GENERATED_DIR, { recursive: true })
+  const apiSnapshotFile = join(API_GENERATED_DIR, "registry.ts")
+  writeFileSync(
+    apiSnapshotFile,
+    "// AUTO-GENERATED by scripts/generate-llms.ts — do not edit by hand.\n" +
+      "// Regenerate with `pnpm gen:registry`.\n\n" +
+      'import type { RegistrySnapshot } from "../_lib/registry-types"\n\n' +
+      `export const REGISTRY: RegistrySnapshot = ${JSON.stringify(snapshot, null, 2)}\n`,
+    "utf8"
+  )
+  console.log(`[generate-llms] wrote ${apiSnapshotFile}`)
+
+  // 7. Route manifest — the list every URL-aware consumer reads
+  const routes = buildRouteManifest()
+  mkdirSync(GENERATED_SRC_DIR, { recursive: true })
+  const manifestFile = join(GENERATED_SRC_DIR, "route-manifest.ts")
+  writeFileSync(manifestFile, renderRouteManifest(routes), "utf8")
+  console.log(`[generate-llms] wrote ${manifestFile} (${routes.length} routes)`)
+
+  // 8. Sitemap — canonical HTML pages plus the machine-readable entry points
+  const lastmod = new Date().toISOString().replace(/\.\d{3}Z$/, "+00:00")
+  const sitemapFile = join(PUBLIC_DIR, "sitemap.xml")
+  writeFileSync(
+    sitemapFile,
+    renderSitemap(
+      routes.filter((route) => route.priority > 0),
+      SITE_URL,
+      lastmod,
+      [
+        { loc: `${SITE_URL}/llms.txt`, priority: 0.8 },
+        { loc: `${SITE_URL}/llms-full.txt`, priority: 0.8 },
+        { loc: `${SITE_URL}/agents.md`, priority: 0.8 },
+        { loc: `${SITE_URL}/openapi.json`, priority: 0.6 },
+      ]
+    ),
+    "utf8"
+  )
+  console.log(`[generate-llms] wrote ${sitemapFile}`)
+
+  // 9. robots.txt — points crawlers at the sitemap and the agent files
+  writeFileSync(
+    join(PUBLIC_DIR, "robots.txt"),
+    [
+      "# Every page here is public documentation. Crawl all of it.",
+      "User-agent: *",
+      "Allow: /",
+      "",
+      `Sitemap: ${SITE_URL}/sitemap.xml`,
+      "",
+      "# Machine-readable entry points, in rough order of usefulness:",
+      `#   ${SITE_URL}/agents.md      when to use this library and how to call it`,
+      `#   ${SITE_URL}/llms.txt       documentation index`,
+      `#   ${SITE_URL}/llms-full.txt  full documentation in one fetch`,
+      `#   ${SITE_URL}/openapi.json   OpenAPI 3.1 description of the JSON docs API`,
+      `#   ${SITE_URL}/api/mcp        Model Context Protocol endpoint (Streamable HTTP)`,
+      "",
+    ].join("\n"),
+    "utf8"
+  )
+  console.log(`[generate-llms] wrote ${join(PUBLIC_DIR, "robots.txt")}`)
+
+  // 10. Agent instructions — /agents.md
+  const agentsFile = join(PUBLIC_DIR, "agents.md")
+  writeFileSync(
+    agentsFile,
+    buildAgentsMd({
+      siteUrl: SITE_URL,
+      githubUrl: GITHUB_URL,
+      packageName: PACKAGE_NAME,
+      isPublished: IS_PUBLISHED,
+      tagline: TAGLINE,
+      componentCount: snapshot.components.length,
+      chains: snapshot.chains,
+      guides: GUIDES.map((guide) => ({
+        slug: guide.slug,
+        name: guide.name,
+        description: guide.description,
+      })),
+    }),
+    "utf8"
+  )
+  console.log(`[generate-llms] wrote ${agentsFile}`)
+
+  // 11. OpenAPI document, in both serialisations
+  const openapi = buildOpenApiDocument({
+    siteUrl: SITE_URL,
+    packageName: PACKAGE_NAME,
+    tagline: TAGLINE,
+    githubUrl: GITHUB_URL,
+    apiVersion: OPENAPI_VERSION,
+    groupTitles: GROUPS.map((group) => group.title),
+    componentSlugs: snapshot.components.map((component) => component.slug),
+    guideSlugs: snapshot.guides.map((guide) => guide.slug),
+  })
+  writeFileSync(
+    join(PUBLIC_DIR, "openapi.json"),
+    JSON.stringify(openapi, null, 2) + "\n",
+    "utf8"
+  )
+  writeFileSync(join(PUBLIC_DIR, "openapi.yaml"), toYaml(openapi), "utf8")
+  console.log(
+    `[generate-llms] wrote ${join(PUBLIC_DIR, "openapi.json")} and openapi.yaml`
   )
 
   console.log("[generate-llms] Done.")

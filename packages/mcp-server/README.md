@@ -3,6 +3,21 @@
 MCP server for [`@erc8004/ui`](../../README.md) — component documentation plus
 live subgraph checks for ERC-8004 agent UIs.
 
+## Hosted alternative
+
+If you only need the documentation tools, there is nothing to install — the
+docs site hosts them over Streamable HTTP:
+
+```bash
+claude mcp add --transport http erc8004-ui https://erc8004-ui.vercel.app/api/mcp
+```
+
+No key, open CORS, discovery manifest at
+<https://erc8004-ui.vercel.app/.well-known/mcp>. It serves `list_components`,
+`get_component`, `get_setup_guide` and `get_types`. The two live tools below are
+stdio-only: they spend a Graph API key, and a public endpoint should not spend
+someone else's quota.
+
 ## Install
 
 ```bash
@@ -36,6 +51,9 @@ and the live tools return setup instructions instead of results.
 | `get_types` | no | Exported TypeScript definitions |
 | `check_chain_support` | yes | Which components work on a given chain's deployed subgraph |
 | `check_agent` | yes | Which components will render data for a specific agent |
+
+The four documentation tools are also served over HTTP by `api/mcp.ts` in the
+repo root, against the same snapshot. The two live tools are not.
 
 ## Local development
 

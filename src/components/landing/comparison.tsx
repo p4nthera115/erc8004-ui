@@ -21,26 +21,40 @@ function useReputation(agentRegistry: string, agentId: number) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            query: \`query ($id: ID!) {
-              agentStats(id: $id) {
-                averageFeedbackValue
-                totalFeedback
+            query: \`query ($agent: String!) {
+              // no precomputed average exists; rows are cumulative totals
+              stats: agentFeedbackStats_collection(
+                interval: day
+                where: { agent: $agent }
+                orderBy: timestamp
+                orderDirection: desc
+                first: 1
+              ) {
+                feedbackCreated
+                feedbackRevoked
+                valueDeltaSum
               }
             }\`,
             // the entity id is chainId:agentId — not the registry string
-            variables: { id: \`\${chainId}:\${agentId}\` },
+            variables: { agent: \`\${chainId}:\${agentId}\` },
           }),
         }
       )
 
       const json = await res.json()
       if (json.errors?.length) throw new Error(json.errors[0].message)
-      if (!json.data?.agentStats) return null // agent exists, no stats yet
 
-      // BigInt and BigDecimal arrive as strings
+      const row = json.data?.stats?.[0]
+      if (!row) return null // agent exists, no feedback yet
+
+      // BigInt and BigDecimal arrive as strings; derive the average yourself.
+      // valueDeltaSum excludes revoked feedback — valueSum does not, and
+      // pairing it with this denominator would inflate the score.
+      const total =
+        parseInt(row.feedbackCreated, 10) - parseInt(row.feedbackRevoked, 10)
       return {
-        total: parseInt(json.data.agentStats.totalFeedback, 10),
-        average: parseFloat(json.data.agentStats.averageFeedbackValue),
+        total,
+        average: total > 0 ? parseFloat(row.valueDeltaSum) / total : 0,
       }
     },
   })
@@ -53,7 +67,7 @@ const LIBRARY_CODE = `import { ReputationScore } from "@erc8004/ui"
 
 <ReputationScore
   agentRegistry="eip155:8453:0x8004...a432"
-  agentId={2290}
+  agentId={888}
 />`
 
 const HANDLED = [

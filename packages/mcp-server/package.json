@@ -1,16 +1,20 @@
 {
-  "name": "@erc8004-ui/mcp-server",
-  "version": "0.0.1",
+  "name": "@erc8004/ui-mcp",
+  "version": "0.2.0",
+  "description": "MCP server for @erc8004/ui — component documentation plus live subgraph checks for ERC-8004 agent UIs.",
   "type": "module",
   "bin": {
     "erc8004-ui-mcp": "./dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm --clean"
+    "build": "tsup src/index.ts --format esm --clean --platform node --target node20",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.28.0",
-    "@erc8004-ui/registry": "workspace:*",
     "zod": "^4.0.0"
   },
   "devDependencies": {

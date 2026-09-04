@@ -44,7 +44,7 @@ function Profile() {
   return (
     <AgentProvider
       agentRegistry="eip155:8453:0x8004...a432"
-      agentId={2290}
+      agentId={888}
     >
       <AgentCard />
       <ReputationScore />

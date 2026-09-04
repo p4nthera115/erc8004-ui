@@ -165,16 +165,25 @@ export function ReputationTimeline({
 
   const { data, isLoading, error } = useFeedbackTimeline(agentRegistry, agentId)
 
+  // "Now" is external, mutable state, so reading it during render is impure —
+  // and reading it *inside* the memo was also a bug: the cutoff was frozen
+  // until `data` or `range` changed, so the window silently failed to move
+  // with the clock. Capturing it once per mount makes the window an explicit,
+  // stable input instead.
+  const [nowSeconds] = useState(() => Math.floor(Date.now() / 1000))
+
+  const feedbacks = data?.feedbacks
+
   // Sort ascending (oldest first) so the line flows left-to-right, then filter
   // by time range. Subgraph returns newest-first so we reverse via sort.
   const sorted = useMemo(() => {
-    if (!data?.feedbacks) return []
-    const all = [...data.feedbacks].sort((a, b) => a.createdAt - b.createdAt)
+    if (!feedbacks) return []
+    const all = [...feedbacks].sort((a, b) => a.createdAt - b.createdAt)
     if (range === "all") return all
     const days = range === "7d" ? 7 : range === "30d" ? 30 : 90
-    const cutoff = Math.floor(Date.now() / 1000) - days * 86400
+    const cutoff = nowSeconds - days * 86400
     return all.filter((fb) => fb.createdAt >= cutoff)
-  }, [data?.feedbacks, range])
+  }, [feedbacks, range, nowSeconds])
 
   const plot = getPlotArea()
   const minTime = sorted[0]?.createdAt ?? 0

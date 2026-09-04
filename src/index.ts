@@ -23,8 +23,10 @@ export { ActivityLog } from "./components/activity/activity-log"
 
 // Provider
 export { ERC8004Provider } from "./provider/ERC8004Provider"
+export { AgentProvider } from "./provider/AgentProvider"
 
 // Component prop types
+export type { AgentProviderProps } from "./provider/AgentProvider"
 export type { FeedbackListProps } from "./components/reputation/feedback-list"
 export type { ReputationScoreProps } from "./components/reputation/reputation-score"
 export type {

@@ -123,7 +123,7 @@ function getPresetCss(preset: Preset): string {
 
 const MOCK_AGENT_REGISTRY =
   "eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
-const MOCK_AGENT_ID = 2290
+const MOCK_AGENT_ID = 888
 
 // Approximates ReputationDistribution's 5-bucket histogram
 function MockMiniChart() {

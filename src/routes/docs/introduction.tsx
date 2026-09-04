@@ -86,14 +86,9 @@ function Introduction() {
                   "Each chain has a different Subgraph deployment ID, and every request needs your API key injected into the URL.",
               },
               {
-                label: "Validation Registry isn't on mainnet yet",
+                label: "The Validation Registry isn't deployed anywhere yet",
                 detail:
-                  "The smart contracts are only deployed on testnets (Sepolia confirmed). The subgraph schema supports validation entities across all deployments, so VerificationBadge, ValidationScore, and ValidationList will build and test end-to-end on Sepolia. On mainnet, validation queries return empty by design, not because something is broken. Components must render an informative empty state rather than an error.",
-              },
-              {
-                label: "AgentStats isn't present on every subgraph",
-                detail:
-                  "AgentStats is a pre-computed summary entity (totals, averages, last activity) that the subgraph maintains as events come in. It's confirmed on Ethereum Sepolia but may be absent on other deployments. Four components rely on it exclusively — ReputationScore, VerificationBadge, ValidationScore, and LastActivity. These components treat a missing entity as an empty state rather than an error, so they'll fall back gracefully on chains without it.",
+                  "The Validation Registry contract is recorded at the zero address on every chain checked, testnets included, so no validation can exist anywhere yet. The schema still exposes validations, so these queries succeed and return nothing — VerificationBadge, ValidationScore, ValidationList and ValidationDisplay render their empty state everywhere. A query root existing is not evidence the registry is live.",
               },
               {
                 label: "Four states per component",

@@ -12,6 +12,7 @@
 - [API Keys](https://erc8004-ui.vercel.app/docs/api-keys.md): How to get a Graph API key and why it's safe to use in frontend code.
 - [Components](https://erc8004-ui.vercel.app/docs/components.md): All components in the library, grouped by registry.
 - [Theming](https://erc8004-ui.vercel.app/docs/theming.md): Styling, dark mode, and customisation patterns.
+- [MCP Server](https://erc8004-ui.vercel.app/docs/mcp.md): MCP server giving AI coding agents component docs plus live subgraph and agent checks.
 
 ## Components
 

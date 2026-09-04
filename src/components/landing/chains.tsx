@@ -9,7 +9,9 @@ const MAINNETS = [
   { name: "Monad", chainId: 143 },
 ]
 
-const TESTNETS = ["Sepolia", "Base Sepolia", "BSC Chapel", "Monad Testnet"]
+// Mirrors the testnets in SUBGRAPH_IDS (src/lib/constants.ts). Ethereum
+// Sepolia was removed — its subgraph is dead and on the old schema.
+const TESTNETS = ["Base Sepolia", "BSC Chapel", "Monad Testnet"]
 
 export function ChainStrip() {
   return (

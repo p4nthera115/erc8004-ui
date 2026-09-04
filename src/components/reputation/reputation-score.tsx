@@ -2,34 +2,62 @@ import { useQuery } from "@tanstack/react-query"
 import { useERC8004Config } from "@/provider/ERC8004Provider"
 import { parseAgentRegistry } from "@/lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
-import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
+import {
+  useAgentIdentity,
+  type AgentIdentityProps,
+} from "@/lib/useAgentIdentity"
 import { cn } from "@/lib/cn"
 import { Skeleton } from "@/components/_internal"
-import type { AgentStats } from "@/types"
 import * as v from "valibot"
 
 type ReputationStatsResponse = {
-  agentStats: Pick<AgentStats, "averageFeedbackValue" | "totalFeedback">
+  stats: {
+    feedbackCreated: number
+    feedbackRevoked: number
+    valueDeltaSum: number
+  }[]
 }
 
 const reputationStatsSchema = v.object({
-  agentStats: v.pipe(
-    v.object({
-      averageFeedbackValue: v.string(),
-      totalFeedback: v.string(),
-    }),
-    v.transform((raw) => ({
-      totalFeedback: parseInt(raw.totalFeedback, 10),
-      averageFeedbackValue: parseFloat(raw.averageFeedbackValue),
-    }))
+  stats: v.array(
+    v.pipe(
+      v.object({
+        feedbackCreated: v.string(),
+        feedbackRevoked: v.string(),
+        valueDeltaSum: v.string(),
+      }),
+      v.transform((raw) => ({
+        feedbackCreated: parseInt(raw.feedbackCreated, 10),
+        feedbackRevoked: parseInt(raw.feedbackRevoked, 10),
+        valueDeltaSum: parseFloat(raw.valueDeltaSum),
+      }))
+    )
   ),
 })
 
+// The `agentStats` entity this used to read no longer exists on any deployed
+// subgraph. Aggregates now live in a timeseries collection whose rows are
+// CUMULATIVE, so the newest row already holds the all-time totals — take one
+// row, newest first, rather than summing.
+//
+// Use `valueDeltaSum`, NOT `valueSum`: `valueSum` includes revoked feedback
+// while the denominator excludes it, so mixing them inflates the score for any
+// agent with revocations (agent 8453:2205 reads 72.13 instead of 71.44).
+// `valueDeltaSum` is the sum over non-revoked feedback only.
+//
+// `interval` is required and accepts only `hour` or `day`.
 const REPUTATION_STATS_QUERY = `#graphql
-  query ($id: ID!) {
-    agentStats(id: $id) {
-      averageFeedbackValue
-      totalFeedback
+  query ($agent: String!) {
+    stats: agentFeedbackStats_collection(
+      interval: day
+      where: { agent: $agent }
+      orderBy: timestamp
+      orderDirection: desc
+      first: 1
+    ) {
+      feedbackCreated
+      feedbackRevoked
+      valueDeltaSum
     }
   }
 `
@@ -42,7 +70,7 @@ function useReputationStats(agentRegistry: string, agentId: number) {
     queryFn: async (): Promise<ReputationStatsResponse> => {
       const { chainId } = parseAgentRegistry(agentRegistry)
       const url = getSubgraphUrl(chainId, apiKey, subgraphOverrides)
-      const variables = { id: `${chainId}:${agentId}` }
+      const variables = { agent: `${chainId}:${agentId}` }
 
       const data = await subgraphFetch<ReputationStatsResponse>(
         url,
@@ -93,16 +121,26 @@ export function ReputationScore({
     )
   }
 
-  if (error || !data?.agentStats) {
+  const summary = data?.stats?.[0]
+  // No aggregate row means the agent has never received feedback.
+  const reviewCount = summary
+    ? summary.feedbackCreated - summary.feedbackRevoked
+    : 0
+
+  if (error || !summary || reviewCount <= 0) {
     return (
       <div className={cn("inline-flex items-center gap-3", className)}>
-        <span className="text-2xl font-semibold tabular-nums text-erc8004-muted-fg">--</span>
+        <span className="text-2xl font-semibold tabular-nums text-erc8004-muted-fg">
+          --
+        </span>
       </div>
     )
   }
 
-  const { averageFeedbackValue, totalFeedback } = data.agentStats
-  const score = averageFeedbackValue.toFixed(precision)
+  // The subgraph no longer precomputes an average; derive it from the running
+  // sum over the same net count used for display so the two always agree.
+  const totalFeedback = reviewCount
+  const score = (summary.valueDeltaSum / reviewCount).toFixed(precision)
 
   return (
     <div

@@ -12,7 +12,7 @@ import { RULE, Section } from "./section"
 
 /** Same agent the component docs preview against. */
 const DEMO_REGISTRY = "eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
-const DEMO_AGENT_ID = 2290
+const DEMO_AGENT_ID = 888
 
 function Cell({
   name,

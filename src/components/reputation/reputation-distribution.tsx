@@ -207,13 +207,15 @@ export function ReputationDistribution({
 
   // useMemo ensures we only re-compute buckets when the underlying
   // feedback array actually changes — not on every render.
+  const feedbacks = data?.feedbacks
+
   const bucketCounts = useMemo(() => {
-    if (!data?.feedbacks) return null
+    if (!feedbacks) return null
     return bucketFeedback(
-      data.feedbacks.map((f) => f.value),
+      feedbacks.map((f) => f.value),
       buckets
     )
-  }, [data?.feedbacks, buckets])
+  }, [feedbacks, buckets])
 
   // The "max count" is the highest number of reviews in any single bucket.
   // We use it to calculate each bar's width as a percentage:

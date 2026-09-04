@@ -139,10 +139,15 @@ export function TagCloud({
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useTagCloud(agentRegistry, agentId)
 
+  // Alias before the memo so the dependency is the array itself. An optional
+  // chain in the dependency list reads as a different expression to the React
+  // Compiler than the one used in the body, which blocks it from optimising.
+  const feedbacks = data?.feedbacks
+
   const tags = useMemo(() => {
-    if (!data?.feedbacks) return []
-    return computeTagFrequency(data.feedbacks, maxTags, minOccurrences)
-  }, [data?.feedbacks, maxTags, minOccurrences])
+    if (!feedbacks) return []
+    return computeTagFrequency(feedbacks, maxTags, minOccurrences)
+  }, [feedbacks, maxTags, minOccurrences])
 
   if (isLoading) {
     return (

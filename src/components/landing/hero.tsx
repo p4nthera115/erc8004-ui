@@ -35,12 +35,14 @@ export function HeroSection() {
           it. Positioned rather than flowed so it ignores the column padding.
         */}
         <div className="absolute bottom-4 right-5 hidden items-center gap-2.5 text-[11px] text-text-secondary md:flex">
-          <span className="relative flex h-1.5 w-1.5">
+          <span className="relative flex h-2.5 w-2.5 justify-center items-center">
             <span className="absolute inline-flex h-full w-full rounded-full bg-green opacity-75 motion-safe:animate-ping" />
-            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-green" />
           </span>
           Live agent data from Base
-          <span aria-hidden>→</span>
+          <span aria-hidden className="text-xl mb-0.5">
+            →
+          </span>
         </div>
       </div>
       <div className="col-span-1 diagonal-lines relative hidden md:block overflow-hidden">

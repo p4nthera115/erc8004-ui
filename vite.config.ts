@@ -31,6 +31,7 @@ export default defineConfig(async () => {
           "/docs/api-keys",
           "/docs/components",
           "/docs/theming",
+          "/docs/mcp",
           "/docs/components/erc8004-provider",
           "/docs/components/agent-provider",
           "/docs/components/agent-name",

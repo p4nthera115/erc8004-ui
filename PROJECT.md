@@ -229,27 +229,27 @@ These render data from the `Agent` and `AgentRegistrationFile` subgraph entities
 
 ### Reputation Components (Reputation Registry)
 
-These render data from the `AgentStats`, `Feedback`, `FeedbackFile`, and `FeedbackResponse` subgraph entities — what others think of the agent based on their experiences using it.
+These render data from the `agentFeedbackStats_collection`, `Feedback`, `FeedbackFile`, and `FeedbackResponse` subgraph entities — what others think of the agent based on their experiences using it.
 
 **Atomic:**
 
-8. **ReputationScore** — compact badge showing the aggregate average score + total review count. Fetches only `agentStats` (2 fields). Designed for marketplace cards, search results, compact listings. Smallest footprint. ✓
-9. **ReputationChart** — visual score distribution histogram. Fetches only feedback `value` + `createdAt`. For developers who want to show rating trends. ✓
+8. **ReputationScore** — compact badge showing the aggregate average score + total review count. Fetches the newest cumulative row from `agentFeedbackStats_collection` and derives the average as `valueDeltaSum / (feedbackCreated - feedbackRevoked)` — the subgraph precomputes no average, and `valueSum` must not be used because it includes revoked feedback. Designed for marketplace cards, search results, compact listings. Smallest footprint. ✓
+9. **ReputationTimeline** / **ReputationDistribution** — a sparkline of scores over time and a score distribution histogram. Both fetch only feedback `value` + `createdAt`. For developers who want to show rating trends. ✓
 10. **FeedbackList** — scrollable list of individual feedback entries, each showing value, tags (as pills), reviewer address (truncated), timestamp, review text (if available from feedbackFile), and agent responses. Fetches full feedback detail with pagination via Subgraph `first`/`skip`. Like a reviews section on Amazon. ✓
 11. **TagCloud** — compact visualization of an agent's most frequently received feedback tags. Fetches all feedback entries but only the `tag1` and `tag2` fields, counts frequencies client-side, and renders the top tags as weighted pills. Answers "what does this agent specialise in, according to the people who've actually used it?" — a fundamentally different question from score (quality) or reviews (individual opinions). Use case: marketplace cards, search filters, agent comparison.
 
 **Composed:**
 
-12. **ReputationDisplay** — composed convenience component combining ReputationScore + ReputationChart + FeedbackList into a single well-laid-out view. For developers who want a complete reputation section without assembling pieces.
+12. _(A composed reputation view was planned but is not shipped — compose the atomic pieces directly.)_
 
 ### Validation Components (Validation Registry)
 
-These render data from the `Validation` subgraph entity and the validation-related fields on `AgentStats` — independent third-party verification of the agent by validators (auditors, testing services, oracle systems). Each validation has a score (0-100), a status (PENDING, COMPLETED, EXPIRED), and a tag describing what was assessed. The Validation Registry is the newest and least mature — not yet deployed to mainnet — but the subgraph schema already supports it.
+These render data from the `Validation` subgraph entity and `agentValidationStats_collection` — independent third-party verification of the agent by validators (auditors, testing services, oracle systems). Each validation has a score (0-100), a status (PENDING, COMPLETED, EXPIRED), and a tag describing what was assessed. The Validation Registry is the newest and least mature. As of 2026-09-04 it is **not deployed on any chain** — the subgraph's `Protocol` entity records `validationRegistry` as the zero address everywhere, testnets included — but the schema already supports it, so these queries succeed and return nothing.
 
 **Atomic:**
 
-13. **VerificationBadge** — compact visual verification indicator (like a checkmark icon) with embedded metadata reflecting the strength of verification. Queries only 3 fields from `AgentStats`: `totalValidations`, `completedValidations`, `averageValidationScore`. Visually communicates the degree of verification (unverified → partially verified → fully verified) rather than a binary yes/no. Use case: placed next to any agent name or avatar to signal trustworthiness at a glance.
-14. **ValidationScore** — compact stats badge showing aggregate average validation score + completed validations count. Equivalent of ReputationScore but for validations. Fetches only the validation fields from `AgentStats`.
+13. **VerificationBadge** — compact visual verification indicator (like a checkmark icon) with embedded metadata reflecting the strength of verification. Queries `validationRequests`, `validationResponses` and `scoreSum` from `agentValidationStats_collection`, deriving the average as `scoreSum / validationResponses`. Visually communicates the degree of verification (unverified → partially verified → fully verified) rather than a binary yes/no. Use case: placed next to any agent name or avatar to signal trustworthiness at a glance.
+14. **ValidationScore** — compact stats badge showing aggregate average validation score + completed validations count. Equivalent of ReputationScore but for validations. Fetches the validation fields from `agentValidationStats_collection`.
 15. **ValidationList** — scrollable list of individual validation entries, each showing: validator address (truncated), score (0-100), tag (what was assessed), status (pending/completed/expired), and timestamp. Paginated via Subgraph `first`/`skip`. Equivalent of FeedbackList but for validations.
 
 **Composed:**
@@ -258,7 +258,7 @@ These render data from the `Validation` subgraph entity and the validation-relat
 
 ### Standalone Components (Cross-Registry)
 
-17. **LastActivity** — renders a single relative timestamp like "Active 3 hours ago" or "Last seen 14 days ago". Fetches exactly one field from `AgentStats`: `lastActivity`. Cross-registry by nature — the timestamp reflects the most recent on-chain event of any kind (feedback received, validation completed, registration updated). Use case: any listing, card, or sidebar where you want to signal whether an agent is actively being used or has gone dormant. Like how GitHub shows "last commit 2 days ago" on a repository.
+17. **LastActivity** — renders a single relative timestamp like "Active 3 hours ago" or "Last seen 14 days ago". Fetches exactly one field from `Agent`: `lastActivity`. Cross-registry by nature — the timestamp reflects the most recent on-chain event of any kind (feedback received, validation completed, registration updated). Use case: any listing, card, or sidebar where you want to signal whether an agent is actively being used or has gone dormant. Like how GitHub shows "last commit 2 days ago" on a repository.
 18. **ActivityLog** — chronological feed of all on-chain events for an agent across all three registries: registration, feedback, validations, updates. Fetches from the `Agent` entity and its relationships. The timeline view that ties everything together. Most complex component — build last.
 
 ---

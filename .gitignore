@@ -27,6 +27,9 @@ dist-ssr
 public/llms/
 public/llms-full.txt
 
+# MCP registry snapshot (rebuilt by the same script)
+packages/mcp-server/src/generated/
+
 # Environment variables
 .env
 .env.*

@@ -1,73 +1,140 @@
-# React + TypeScript + Vite
+# @erc8004/ui
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Drop-in React components for displaying verified AI agent identity, reputation,
+and validation data from the [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004)
+standard.
 
-Currently, two official plugins are available:
+You pass an agent's on-chain identifier. The component fetches and renders the
+verified data itself. Components never accept display data as props, so what you
+see is always what the chain says.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+> **Not yet published to npm.** `@erc8004/ui` is a provisional name used in all
+> examples — the final name hasn't been chosen. Until then, install from source.
 
-## React Compiler
+## Quick start
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install react react-dom @tanstack/react-query
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+```tsx
+import { ERC8004Provider, AgentCard, ReputationScore } from "@erc8004/ui"
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+function App() {
+  return (
+    <ERC8004Provider apiKey="your-graph-api-key">
+      <AgentCard
+        agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
+        agentId={888}
+      />
+    </ERC8004Provider>
+  )
+}
 ```
+
+Get a free Graph API key at [thegraph.com/studio](https://thegraph.com/studio/).
+It's a read-only query key, safe to ship in frontend code.
+
+Rendering several components for the same agent? Wrap them in `AgentProvider` to
+set the identifiers once:
+
+```tsx
+<AgentProvider agentRegistry="eip155:8453:0x8004…a432" agentId={888}>
+  <AgentName />
+  <ReputationScore />
+  <FeedbackList />
+</AgentProvider>
+```
+
+## Components
+
+| Group | Components |
+| --- | --- |
+| Providers | `ERC8004Provider`, `AgentProvider` |
+| Identity | `AgentName`, `AgentImage`, `AgentDescription`, `AgentCard`, `EndpointStatus` |
+| Reputation | `ReputationScore`, `ReputationTimeline`, `ReputationDistribution`, `FeedbackList`, `TagCloud` |
+| Validation | `VerificationBadge`, `ValidationScore`, `ValidationList`, `ValidationDisplay` |
+| Activity | `LastActivity`, `ActivityLog` |
+
+Every component handles its own loading, error, empty, and not-found states.
+Data fetching is deduplicated by TanStack Query, so multiple components pointed
+at the same agent share one request.
+
+Full docs, live previews, and props tables:
+**https://erc8004-ui.vercel.app/docs/introduction**
+
+## For AI coding agents
+
+The docs are published in machine-readable form and as an MCP server.
+
+- [`/llms.txt`](https://erc8004-ui.vercel.app/llms.txt) — indexed component list
+- [`/llms-full.txt`](https://erc8004-ui.vercel.app/llms-full.txt) — everything in one fetch
+- Any docs page returns Markdown by appending `.md` to its URL
+
+The **MCP server** ([`packages/mcp-server`](packages/mcp-server)) serves the same
+documentation as tools, plus two things static docs can't: `check_chain_support`
+introspects a chain's deployed subgraph to report which components actually work
+there, and `check_agent` reports which components will render real data for a
+specific agent rather than an empty state. See
+[docs/mcp](https://erc8004-ui.vercel.app/docs/mcp).
+
+## Current chain support
+
+Ethereum (1), Base (8453), Polygon (137), BNB Smart Chain (56), Monad (143),
+Base Sepolia (84532), BNB Chapel (97), Monad Testnet (10143).
+
+Two caveats worth knowing before you build against them:
+
+- **The Validation Registry isn't deployed on any chain yet.** The subgraph
+  records `validationRegistry` as the zero address everywhere, testnets
+  included, so the four validation components render their empty state
+  everywhere. The queries succeed — there's simply nothing to return.
+- **Monad and Monad Testnet subgraphs are currently unreachable** (indexer
+  errors), and Ethereum Sepolia was removed entirely: its subgraph has been
+  halted since 2026-03-19 and never migrated to the current schema.
+
+Run `check_chain_support` from the MCP server for a live answer rather than
+trusting this list.
+
+## Repo layout
+
+```
+src/
+  components/{identity,reputation,validation,activity}/   the library
+  provider/                ERC8004Provider, AgentProvider
+  lib/                     subgraph client, registry parsing, shared utils
+  components/docs/registry.tsx    canonical component docs — SOURCE OF TRUTH
+  routes/                  the docs site (TanStack Router)
+scripts/
+  generate-llms.ts         registry -> llms.txt, per-page markdown, MCP snapshot
+  guides-registry.ts       canonical guide content
+packages/mcp-server/       the MCP server
+```
+
+`src/components/docs/registry.tsx` and `scripts/guides-registry.ts` are the
+single source of truth. The docs site, `llms.txt`, the per-component Markdown,
+and the MCP server all derive from them, so adding a component in one place
+propagates everywhere. Regenerate with `pnpm gen:registry` — it runs
+automatically as a `prebuild` hook.
+
+Note this guarantees every consumer says the *same* thing, not that the thing is
+*true*. Two agents in [`.claude/agents/`](.claude/agents) exist to check that:
+`subgraph-drift-auditor` verifies the docs against the live subgraphs, and
+`docs-parity-checker` verifies them against the code.
+
+## Development
+
+```bash
+pnpm install
+pnpm dev              # docs site at localhost:5173
+pnpm build            # regenerates docs, then builds the site
+pnpm build:mcp        # regenerates the snapshot, then builds the MCP server
+pnpm lint
+```
+
+The MCP server needs a build before the checked-in `.mcp.json` can start it, and
+`GRAPH_API_KEY` in the environment for its two live tools.
+
+## License
+
+Not yet chosen. A license must be added before publishing.

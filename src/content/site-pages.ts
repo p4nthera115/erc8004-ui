@@ -46,6 +46,7 @@ export type SitePage = {
 }
 
 const GITHUB_URL = "https://github.com/p4nthera115/erc8004-ui"
+const X_URL = "https://x.com/p4nthera_"
 
 // ---------------------------------------------------------------------------
 // About
@@ -116,7 +117,7 @@ const contact: SitePage = {
   description:
     "How to report a bug, request a component, ask a question, or disclose a security issue in @erc8004/ui.",
   intro:
-    "This is a single-maintainer open-source project, so every channel is public and asynchronous. GitHub is the only support channel — there is no support inbox, ticketing system or SLA, and nothing here should be read as a commitment to a response time.",
+    "This is a single-maintainer open-source project, so every channel is public and asynchronous. Anything that needs tracking — a bug, a feature request, a security report — belongs on GitHub, where the answer stays visible to the next person who hits the same thing. There is no support inbox, ticketing system or SLA, and nothing here should be read as a commitment to a response time.",
   sections: [
     {
       heading: "Where to go",
@@ -125,6 +126,7 @@ const contact: SitePage = {
         "Questions about usage — open a GitHub discussion. Check the documentation and /llms.txt first; most answers are already written down there.",
         "Documentation errors — open an issue against the docs. The pages are generated from a registry in the repository, so corrections land in the site, the markdown and the MCP server at the same time.",
         "Security issues — see the disclosure note below rather than opening a public issue.",
+        "Anything informal — @p4nthera_ on X. Fine for a quick question or a heads-up about how you are using the library. Not the place for a bug report: there is nowhere to attach a reproduction and nothing to track it against.",
       ],
       links: [
         {
@@ -136,6 +138,11 @@ const contact: SitePage = {
           label: "Start a discussion",
           href: `${GITHUB_URL}/discussions`,
           description: "Usage questions and component proposals",
+        },
+        {
+          label: "@p4nthera_ on X",
+          href: X_URL,
+          description: "The maintainer — informal contact and project updates",
         },
       ],
     },

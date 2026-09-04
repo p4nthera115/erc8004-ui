@@ -36,6 +36,7 @@ export type {
 export type {
   ReputationTimelineProps,
   ReputationTimelineRange,
+  ReputationTimelineCurve,
 } from "./components/reputation/reputation-timeline"
 export type { TagCloudProps } from "./components/reputation/tag-cloud"
 export type {
@@ -51,6 +52,7 @@ export type {
   ValidationStatusFilter,
 } from "./components/validation/validation-list"
 export type { ValidationScoreProps } from "./components/validation/validation-score"
+export type { ValidationDisplayProps } from "./components/validation/validation-display"
 export type {
   ActivityLogProps,
   ActivityEventType,

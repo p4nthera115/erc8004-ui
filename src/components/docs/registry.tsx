@@ -646,7 +646,7 @@ function App() {
         <div className="w-full max-w-sm space-y-3">
           <div className="flex items-center gap-3">
             <AgentImage />
-            <div>
+            <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
               <AgentName />
               <ReputationScore />
             </div>
@@ -657,7 +657,7 @@ function App() {
       code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={888}>
   <div className="flex items-center gap-3">
     <AgentImage />
-    <div>
+    <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
       <AgentName />
       <ReputationScore />
     </div>
@@ -695,11 +695,18 @@ function App() {
     usage: `<ReputationTimeline agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
-        name: "Last 30 Days",
+        name: "Smooth Curve",
         description:
-          "Filter the timeline to only show feedback from the last 30 days.",
-        preview: withAgent(<ReputationTimeline range="30d" />),
-        code: `<ReputationTimeline agentRegistry="eip155:8453:0x8004...a432" agentId={888} range="30d" />`,
+          "Draw a smooth monotone curve instead of straight segments. The curve never overshoots its data points, so it can't imply a score outside 0-100.",
+        preview: withAgent(<ReputationTimeline curve="monotone" />),
+        code: `<ReputationTimeline agentRegistry="eip155:8453:0x8004...a432" agentId={888} curve="monotone" />`,
+      },
+      {
+        name: "Last 90 Days",
+        description:
+          "Filter the timeline to only show feedback from the last 90 days.",
+        preview: withAgent(<ReputationTimeline range="90d" />),
+        code: `<ReputationTimeline agentRegistry="eip155:8453:0x8004...a432" agentId={888} range="90d" />`,
       },
       {
         name: "With Data Points",
@@ -742,11 +749,27 @@ function App() {
         description: "Time range filter for displayed feedback.",
       },
       {
+        name: "curve",
+        type: '"linear" | "monotone"',
+        required: false,
+        default: '"linear"',
+        description:
+          "Trend line shape. \"linear\" draws straight segments between points; \"monotone\" draws a smooth curve that never overshoots its data points.",
+      },
+      {
         name: "showTrendLine",
         type: "boolean",
         required: false,
         default: "true",
         description: "Show the connecting line between data points.",
+      },
+      {
+        name: "maxPoints",
+        type: "number",
+        required: false,
+        default: "40",
+        description:
+          "Maximum dots to plot. Longer series are evenly thinned to this many so points stay distinguishable and hoverable; the review count still reports the true total.",
       },
       {
         name: "showDataPoints",
@@ -983,7 +1006,7 @@ function App() {
         <div className="w-full max-w-sm space-y-3">
           <div className="flex items-center gap-3">
             <AgentImage />
-            <div>
+            <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
               <AgentName />
               <ReputationScore />
             </div>
@@ -994,7 +1017,7 @@ function App() {
       code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={888}>
   <div className="flex items-center gap-3">
     <AgentImage />
-    <div>
+    <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
       <AgentName />
       <ReputationScore />
     </div>
@@ -1278,7 +1301,17 @@ function App() {
 </AgentProvider>`,
     },
     states: DATA_COMPONENT_STATES,
-    props: AGENT_IDENTITY_PROPS,
+    props: [
+      ...AGENT_IDENTITY_PROPS,
+      {
+        name: "emptyMessage",
+        type: "string",
+        required: false,
+        default: '"No validations yet"',
+        description:
+          "Message shown when the agent has no validations. The composed view renders one consolidated empty state rather than letting each child render its own.",
+      },
+    ],
   },
 
   // =========================================================================

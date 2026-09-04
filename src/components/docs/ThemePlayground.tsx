@@ -7,7 +7,12 @@
  */
 
 import { useState } from "react"
-import { FingerprintBadge } from "@/components/identity/FingerprintBadge"
+import { AgentProvider } from "@/provider/AgentProvider"
+import { AgentCard } from "@/components/identity/agent-card"
+import { ReputationScore } from "@/components/reputation/reputation-score"
+import { ReputationDistribution } from "@/components/reputation/reputation-distribution"
+import { TagCloud } from "@/components/reputation/tag-cloud"
+import { LastActivity } from "@/components/activity/last-activity"
 import { cn } from "@/lib/cn"
 import { CodeBlock } from "./CodeBlock"
 
@@ -20,21 +25,21 @@ type PresetVars = Record<string, string>
 interface Preset {
   name: string
   vars: PresetVars
-}
-
-/** Dark theme base values (matches the .dark .erc8004 block in tokens.css). */
-const DARK_BASE: PresetVars = {
-  "--erc8004-bg": "0.145 0 0",
-  "--erc8004-fg": "0.985 0 0",
-  "--erc8004-card": "0.205 0 0",
-  "--erc8004-card-fg": "0.985 0 0",
-  "--erc8004-muted": "0.269 0 0",
-  "--erc8004-muted-fg": "0.708 0 0",
-  "--erc8004-positive": "0.6 0.17 145",
-  "--erc8004-positive-fg": "0.985 0 0",
-  "--erc8004-negative": "0.6 0.2 25",
-  "--erc8004-negative-fg": "0.985 0 0",
-  "--erc8004-border": "0.3 0 0",
+  /**
+   * Pins the preset to a full light or dark token set via the `.light` / `.dark`
+   * class on the `.erc8004` element.
+   *
+   * A preset that only overrides *surface* colours (bg, card, muted, border)
+   * inherits its *text* colours from the surrounding page theme. Inside this
+   * dark-mode docs site that means light surfaces with near-white text —
+   * unreadable. Pinning the theme establishes a consistent base first; the
+   * preset's own vars then layer on top via inline style, which outranks any
+   * class.
+   *
+   * Presets that only tweak accent or radius leave this unset on purpose, so
+   * they follow whatever theme the reader is using.
+   */
+  theme?: "light" | "dark"
 }
 
 const PRESETS: Preset[] = [
@@ -59,6 +64,7 @@ const PRESETS: Preset[] = [
   },
   {
     name: "Warm",
+    theme: "light",
     vars: {
       "--erc8004-bg": "0.98 0.008 80",
       "--erc8004-card": "0.96 0.012 80",
@@ -70,16 +76,16 @@ const PRESETS: Preset[] = [
   },
   {
     name: "Dark",
+    theme: "dark",
     vars: {
-      ...DARK_BASE,
       "--erc8004-accent": "0.65 0.22 260",
       "--erc8004-ring": "0.65 0.22 260",
     },
   },
   {
     name: "Dark teal",
+    theme: "dark",
     vars: {
-      ...DARK_BASE,
       "--erc8004-accent": "0.65 0.18 175",
       "--erc8004-ring": "0.65 0.18 175",
       "--erc8004-positive": "0.6 0.18 175",
@@ -104,134 +110,62 @@ const PRESETS: Preset[] = [
 // ─────────────────────────────────────────────────────────────────────────────
 
 function getPresetCss(preset: Preset): string {
-  if (Object.keys(preset.vars).length === 0) {
+  if (Object.keys(preset.vars).length === 0 && !preset.theme) {
     return (
       `// Default — no overrides needed.\n` +
       `// Import the stylesheet and you're done:\n\n` +
       `import "@erc8004/ui/styles.css"`
     )
   }
+
   const lines = Object.entries(preset.vars)
     .map(([k, v]) => `  ${k}: ${v};`)
     .join("\n")
+
+  // A themed preset needs the matching class on the wrapper, otherwise the
+  // surrounding page theme still supplies the text colours.
+  if (preset.theme) {
+    const note =
+      `/* Add the .${preset.theme} class so the full ${preset.theme} token set applies,\n` +
+      `   regardless of the surrounding page theme. */\n` +
+      `<div className="erc8004 ${preset.theme}"> … </div>\n\n`
+    return lines
+      ? `${note}.erc8004.${preset.theme} {\n${lines}\n}`
+      : `${note}/* No other overrides needed. */`
+  }
+
   return `.erc8004 {\n${lines}\n}`
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Mock components — use the exact same erc8004 token classes as real components
+// Preview content — the real library components, not mocks.
+//
+// These fetch live on-chain data through the ERC8004Provider mounted in
+// main.tsx, so what you retheme here is exactly what ships. Mock markup could
+// drift from the components it imitated; this cannot.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const MOCK_AGENT_REGISTRY =
+const DEMO_AGENT_REGISTRY =
   "eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
-const MOCK_AGENT_ID = 888
+const DEMO_AGENT_ID = 888
 
-// Approximates ReputationDistribution's 5-bucket histogram
-function MockMiniChart() {
-  const bars = [
-    { label: "81–100", pct: 82, cls: "bg-erc8004-positive" },
-    { label: "61–80", pct: 55, cls: "bg-erc8004-chart-2" },
-    { label: "41–60", pct: 28, cls: "bg-erc8004-chart-5" },
-    { label: "21–40", pct: 14, cls: "bg-erc8004-chart-3" },
-    { label: "0–20", pct: 9, cls: "bg-erc8004-negative" },
-  ]
+function PreviewContent() {
   return (
-    <div className="flex items-end gap-1 h-10 mt-2">
-      {bars.map(({ label, pct, cls }) => (
-        <div
-          key={label}
-          className="flex-1 flex flex-col justify-end h-full"
-          title={label}
-        >
-          <div
-            className={cn(
-              "rounded-t-erc8004-sm transition-all duration-200",
-              cls
-            )}
-            style={{ height: `${pct}%` }}
-          />
+    <AgentProvider agentRegistry={DEMO_AGENT_REGISTRY} agentId={DEMO_AGENT_ID}>
+      <div className="flex flex-col gap-4 lg:flex-row">
+        <div className="flex min-w-0 flex-1 flex-col gap-4">
+          <AgentCard />
+          <TagCloud maxTags={6} />
         </div>
-      ))}
-    </div>
-  )
-}
-
-function MockReputationBlock() {
-  const tags = ["reliability", "speed", "code quality", "api design", "docs"]
-  return (
-    <div className="rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5 transition-colors duration-200">
-      <div className="flex items-baseline justify-between gap-2 mb-1">
-        <div className="flex items-center gap-2">
-          <div className="h-2.5 w-2.5 rounded-full bg-erc8004-positive" />
-          <span className="font-mono text-2xl font-semibold text-erc8004-card-fg">
-            4.7
-          </span>
-        </div>
-        <span className="text-xs text-erc8004-muted-fg">128 reviews</span>
-      </div>
-      <MockMiniChart />
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {tags.map((tag) => (
-          <span
-            key={tag}
-            className="rounded-full bg-erc8004-muted px-2.5 py-0.5 text-xs text-erc8004-muted-fg transition-colors duration-200"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function MockAgentCard() {
-  return (
-    <div className="rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5 transition-colors duration-200">
-      <div className="flex gap-4">
-        {/* FingerprintBadge — actual library component */}
-        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full">
-          <FingerprintBadge
-            agentRegistry={MOCK_AGENT_REGISTRY}
-            agentId={MOCK_AGENT_ID}
-            size={64}
-          />
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <h3 className="truncate text-base font-semibold text-erc8004-card-fg">
-            DataSift Agent
-          </h3>
-          <p className="mt-1 text-sm text-erc8004-muted-fg line-clamp-2">
-            Real-time data pipelines and stream processing. Supports MCP for
-            tool orchestration.
-          </p>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="font-mono text-xs text-erc8004-muted-fg">
-              0x742d…dE23
-            </span>
-            <span className="text-erc8004-border">·</span>
-            {["MCP", "A2A", "Web"].map((p) => (
-              <span
-                key={p}
-                className="rounded-full bg-erc8004-muted px-2 py-0.5 text-xs font-medium text-erc8004-muted-fg transition-colors duration-200"
-              >
-                {p}
-              </span>
-            ))}
+        <div className="flex min-w-0 flex-1 flex-col gap-4">
+          <div className="flex items-center justify-between gap-3 rounded-erc8004-xl border border-erc8004-border bg-erc8004-card px-5 py-4">
+            <ReputationScore />
+            <LastActivity />
           </div>
+          <ReputationDistribution />
         </div>
       </div>
-
-      {/* VerificationBadge row */}
-      <div className="mt-4 pt-4 border-t border-erc8004-border flex items-center gap-1.5">
-        <div className="h-2 w-2 rounded-full bg-erc8004-positive" />
-        <span className="text-xs font-medium text-erc8004-positive">
-          Highly Verified
-        </span>
-        <span className="ml-auto font-mono text-xs text-erc8004-muted-fg">
-          12 validations
-        </span>
-      </div>
-    </div>
+    </AgentProvider>
   )
 }
 
@@ -310,15 +244,13 @@ export function ThemePlayground() {
       {/* Preview surface — the .erc8004 class provides default variable values,
           inline styles override specific variables for the active preset. */}
       <div
-        className="erc8004 bg-erc8004-bg rounded-lg border border-black/60 dark:border-white/10 p-6"
+        className={cn(
+          "erc8004 bg-erc8004-bg rounded-lg border border-black/60 dark:border-white/10 p-6",
+          activePreset.theme
+        )}
         style={activePreset.vars as React.CSSProperties}
       >
-        <div className="flex flex-col">
-          <div className="flex flex-row gap-4">
-            <MockReputationBlock />
-            <MockAgentCard />
-          </div>
-        </div>
+        <PreviewContent />
 
         {/* Swatch row */}
         <SwatchRow />

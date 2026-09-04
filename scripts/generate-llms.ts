@@ -172,12 +172,18 @@ function propsTable(props: PropDef[]): string {
   if (props.length === 0) return "_No props._\n"
   const header =
     "| Prop | Type | Required | Default | Description |\n| --- | --- | --- | --- | --- |"
+  // Every cell must escape pipes, not just the description. Union types like
+  // `"linear" | "monotone"` are common here, and an unescaped pipe silently
+  // splits the row into extra columns — the rendered table then shows the type
+  // truncated at the first pipe with the rest smeared across the wrong headings.
+  const cell = (value: string) => value.replace(/\|/g, "\\|")
+
   const rows = props.map((p) => {
     const req = p.required ? "yes" : "no"
-    const def = p.default ? `\`${p.default}\`` : "—"
-    // Escape pipes inside descriptions so the table doesn't break
-    const desc = p.description.replace(/\|/g, "\\|")
-    return `| \`${p.name}\` | \`${p.type}\` | ${req} | ${def} | ${desc} |`
+    const def = p.default ? `\`${cell(p.default)}\`` : "—"
+    return `| \`${cell(p.name)}\` | \`${cell(p.type)}\` | ${req} | ${def} | ${cell(
+      p.description
+    )} |`
   })
   return [header, ...rows].join("\n") + "\n"
 }

@@ -188,51 +188,113 @@ function scoreColorVar(score: number): string {
 
 function FeedbackRow({ item, options }: { item: FeedbackItem; options: FeedbackRowOptions }) {
   const tags = options.showTags ? ([item.tag1, item.tag2].filter(Boolean) as string[]) : []
+  const text = item.feedbackFile?.text
+  const responses = options.showResponses ? item.responses : []
+  const hasMeta = options.showReviewerAddress || options.showTimestamp
 
-  return (
-    <div className="px-4 py-3">
-      <div className="flex items-center gap-2 min-w-0">
-        <span
-          className={cn(
-            "font-mono text-base font-semibold tabular-nums",
-            !options.coloredScores && "text-erc8004-card-fg"
+  // With tags, address and timestamp all hidden there is nothing to fill the
+  // row, and a lone number stranded beside a card-width of dead space reads as
+  // broken rather than minimal. Derived from props alone, so every row in a
+  // given list agrees — no per-row branching on whether data happens to exist.
+  const scoreOnly = !options.showTags && !hasMeta
+
+  const score = (
+    <span
+      className={cn(
+        "font-mono text-base font-semibold tabular-nums text-right leading-6",
+        !options.coloredScores && "text-erc8004-card-fg"
+      )}
+      style={options.coloredScores ? { color: scoreColorVar(item.value) } : undefined}
+    >
+      {item.value.toFixed(1)}
+    </span>
+  )
+
+  if (scoreOnly) {
+    return (
+      <div className="grid grid-cols-[3.25rem_minmax(0,1fr)] items-center gap-x-3 px-4 py-2">
+        {score}
+        <div className="min-w-0">
+          {/* The bar turns the empty width into the one thing still on show:
+              how the scores compare to each other down the list. */}
+          <div
+            className="h-1.5 w-full overflow-hidden rounded-erc8004-sm bg-erc8004-muted"
+            role="presentation"
+          >
+            <div
+              className="h-full rounded-erc8004-sm"
+              style={{
+                width: `${Math.max(0, Math.min(100, item.value))}%`,
+                backgroundColor: scoreColorVar(item.value),
+              }}
+            />
+          </div>
+          {text && (
+            <p className="mt-1.5 line-clamp-2 text-sm text-erc8004-card-fg">{text}</p>
           )}
-          style={
-            options.coloredScores
-              ? { color: scoreColorVar(item.value) }
-              : undefined
-          }
-        >
-          {item.value.toFixed(1)}
-        </span>
-        {tags.map((tag) => (
-          <Tag key={tag}>{tag}</Tag>
-        ))}
-        {options.showReviewerAddress && (
-          <Address address={item.clientAddress} className="ml-auto shrink-0" />
+        </div>
+      </div>
+    )
+  }
+
+  // A three-column grid rather than a flex row with `ml-auto`. Scores vary in
+  // width ("1.0" vs "100.0"), so an auto-width first column pushed every row's
+  // tags to a different x. Fixing the column keeps tags, text and metadata on
+  // the same vertical lines down the whole list.
+  return (
+    <div
+      className={cn(
+        "grid items-start gap-x-3 px-4 py-3",
+        hasMeta
+          ? "grid-cols-[3.25rem_minmax(0,1fr)_auto]"
+          : "grid-cols-[3.25rem_minmax(0,1fr)]"
+      )}
+    >
+      {score}
+
+      <div className="min-w-0">
+        {tags.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 leading-6">
+            {tags.map((tag) => (
+              <Tag key={tag} className="max-w-full" title={tag}>
+                <span className="truncate">{tag}</span>
+              </Tag>
+            ))}
+          </div>
         )}
-        {options.showTimestamp && (
-          <span className="text-xs text-erc8004-muted-fg shrink-0">
-            {formatRelativeTime(item.createdAt)}
-          </span>
+
+        {text && (
+          <p
+            className={cn(
+              "text-sm text-erc8004-card-fg line-clamp-3",
+              tags.length > 0 ? "mt-1.5" : "leading-6"
+            )}
+          >
+            {text}
+          </p>
+        )}
+
+        {responses.length > 0 && (
+          <div className="mt-2 space-y-1 border-l border-erc8004-border pl-3">
+            {responses.map((response) => (
+              <div key={response.id} className="text-xs text-erc8004-muted-fg">
+                <Address address={response.responder} />
+                {" \u00b7 "}
+                <span>{formatRelativeTime(response.createdAt)}</span>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
-      {item.feedbackFile?.text && (
-        <p className="mt-2 text-sm text-erc8004-card-fg line-clamp-3">
-          {item.feedbackFile.text}
-        </p>
-      )}
-
-      {options.showResponses && item.responses.length > 0 && (
-        <div className="mt-3 space-y-2 pl-4 border-l border-erc8004-border ml-2">
-          {item.responses.map((response) => (
-            <div key={response.id} className="text-xs text-erc8004-muted-fg">
-              <Address address={response.responder} />
-              {" · "}
-              <span>{formatRelativeTime(response.createdAt)}</span>
-            </div>
-          ))}
+      {hasMeta && (
+        <div className="flex shrink-0 items-center gap-2 leading-6">
+          {options.showReviewerAddress && <Address address={item.clientAddress} />}
+          {options.showTimestamp && (
+            <span className="text-xs text-erc8004-muted-fg tabular-nums">
+              {formatRelativeTime(item.createdAt)}
+            </span>
+          )}
         </div>
       )}
     </div>

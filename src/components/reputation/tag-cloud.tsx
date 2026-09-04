@@ -196,9 +196,13 @@ export function TagCloud({
         {tags.map(({ tag, count, weight }) => (
           <Tag
             key={tag}
-            className={tagSizeClass(weight)}
+            // Tags are free-form on-chain strings — some agents write whole
+            // sentences into tag1/tag2. Without a cap those wrap to six lines
+            // and stop reading as pills at all.
+            className={cn(tagSizeClass(weight), "max-w-full")}
+            title={`${tag} \u2014 ${count} mention${count === 1 ? "" : "s"}`}
           >
-            <span title={`${count} mention${count === 1 ? "" : "s"}`}>{tag}</span>
+            <span className="truncate">{tag}</span>
           </Tag>
         ))}
       </div>

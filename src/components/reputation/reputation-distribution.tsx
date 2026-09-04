@@ -23,6 +23,13 @@ const distributionSchema = v.object({
   ),
 })
 
+/**
+ * Offset pagination makes an exact total expensive, so the histogram samples
+ * up to this many entries. When the cap is hit the header says "N+" rather
+ * than reporting the sample size as the true total.
+ */
+const COUNT_QUERY_LIMIT = 1000
+
 const DISTRIBUTION_QUERY = `#graphql
   query ($id: ID!, $first: Int!) {
     feedbacks(
@@ -44,7 +51,7 @@ function useFeedbackDistribution(agentRegistry: string, agentId: number) {
     queryFn: async (): Promise<DistributionResponse> => {
       const { chainId } = parseAgentRegistry(agentRegistry)
       const url = getSubgraphUrl(chainId, apiKey, subgraphOverrides)
-      const variables = { id: `${chainId}:${agentId}`, first: 1000 }
+      const variables = { id: `${chainId}:${agentId}`, first: COUNT_QUERY_LIMIT }
 
       const data = await subgraphFetch<DistributionResponse>(
         url,
@@ -233,6 +240,10 @@ export function ReputationDistribution({
     return bucketCounts.reduce((sum, b) => sum + b.count, 0)
   }, [bucketCounts])
 
+  // At the cap the sample is not the total; saying "1000 reviews" next to a
+  // ReputationScore reading "1200 reviews" reads as a bug.
+  const countCapped = totalReviews >= COUNT_QUERY_LIMIT
+
   if (isLoading) {
     return (
       <Card className={cn("w-full p-4", className)}>
@@ -291,7 +302,8 @@ export function ReputationDistribution({
           Score Distribution
         </h3>
         <span className="text-xs text-erc8004-muted-fg">
-          {totalReviews} review{totalReviews === 1 ? "" : "s"}
+          {totalReviews}
+          {countCapped ? "+" : ""} review{totalReviews === 1 ? "" : "s"}
         </span>
       </div>
 

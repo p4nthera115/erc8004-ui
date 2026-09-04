@@ -127,6 +127,87 @@ function formatFullDate(timestamp: number): string {
   })
 }
 
+/**
+ * Evenly thins a series down to `max` entries, always keeping the first and
+ * last so the trend still spans the full time range.
+ *
+ * An agent with 1200 reviews puts ~0.4 units between adjacent points on a
+ * 508-unit plot, which renders as an unreadable solid band and makes hover
+ * targeting meaningless. Every retained dot is still a real review — this
+ * thins the series, it does not average it.
+ */
+function thin<T>(items: T[], max: number): T[] {
+  if (items.length <= max || max < 2) return items
+  const step = (items.length - 1) / (max - 1)
+  const out: T[] = []
+  for (let i = 0; i < max; i++) out.push(items[Math.round(i * step)])
+  return out
+}
+
+type Pt = { x: number; y: number }
+
+/** Straight segments between points. */
+function linearPath(pts: Pt[]): string {
+  if (pts.length < 2) return ""
+  return `M${pts[0].x},${pts[0].y}` + pts.slice(1).map((p) => `L${p.x},${p.y}`).join("")
+}
+
+/**
+ * Monotone cubic interpolation (Fritsch–Carlson), the same curve shadcn/Recharts
+ * use for `type="monotone"`.
+ *
+ * Deliberately not Catmull-Rom: that overshoots around sharp changes, which on a
+ * 0–100 score axis would draw the line above 100 or below 0 and imply readings
+ * that never happened. Monotone keeps every segment within its endpoints.
+ */
+function monotonePath(pts: Pt[]): string {
+  const n = pts.length
+  if (n < 2) return ""
+  if (n === 2) return `M${pts[0].x},${pts[0].y}L${pts[1].x},${pts[1].y}`
+
+  const dx: number[] = []
+  const slope: number[] = []
+  for (let i = 0; i < n - 1; i++) {
+    dx[i] = pts[i + 1].x - pts[i].x
+    slope[i] = dx[i] === 0 ? 0 : (pts[i + 1].y - pts[i].y) / dx[i]
+  }
+
+  // Tangents, flattened to 0 at local extrema so the curve can't overshoot.
+  const m: number[] = [slope[0]]
+  for (let i = 1; i < n - 1; i++) {
+    if (slope[i - 1] * slope[i] <= 0) {
+      m[i] = 0
+    } else {
+      const w1 = 2 * dx[i] + dx[i - 1]
+      const w2 = dx[i] + 2 * dx[i - 1]
+      m[i] = (w1 + w2) / (w1 / slope[i - 1] + w2 / slope[i])
+    }
+  }
+  m[n - 1] = slope[n - 2]
+
+  let d = `M${pts[0].x},${pts[0].y}`
+  for (let i = 0; i < n - 1; i++) {
+    const t = dx[i] / 3
+    d +=
+      `C${pts[i].x + t},${pts[i].y + m[i] * t} ` +
+      `${pts[i + 1].x - t},${pts[i + 1].y - m[i + 1] * t} ` +
+      `${pts[i + 1].x},${pts[i + 1].y}`
+  }
+  return d
+}
+
+/** Tooltip card geometry. Width is driven by the widest row — the date. */
+const TOOLTIP = { height: 38, padX: 9, gap: 6 } as const
+
+function tooltipWidthFor(dateLabel: string): number {
+  const dateRow = dateLabel.length * 5.4
+  const valueRow = 3 * 2 + 6 + 30 + 24 // dot + gap + "Score" + value
+  return Math.min(
+    LAYOUT.width - 8,
+    Math.max(112, Math.max(dateRow, valueRow) + TOOLTIP.padX * 2)
+  )
+}
+
 /** Colour for a data point based on its score band. */
 function dotFillVar(score: number): string {
   if (score >= 81) return "oklch(var(--erc8004-positive))"
@@ -141,21 +222,35 @@ function dotFillVar(score: number): string {
 // ============================================================================
 
 export type ReputationTimelineRange = "7d" | "30d" | "90d" | "all"
+export type ReputationTimelineCurve = "linear" | "monotone"
 
 export interface ReputationTimelineProps extends AgentIdentityProps {
   /** Time range filter. Default `"all"`. */
   range?: ReputationTimelineRange
   /** Show connecting trend line between data points. Default `true`. */
   showTrendLine?: boolean
+  /**
+   * Trend line shape. `"linear"` draws straight segments between points;
+   * `"monotone"` draws a smooth curve that never overshoots its data points.
+   * Default `"linear"`.
+   */
+  curve?: ReputationTimelineCurve
   /** Show individual data point dots. Default `true`. */
   showDataPoints?: boolean
+  /**
+   * Maximum dots to plot. Longer series are evenly thinned to this many so the
+   * points stay distinguishable and hoverable. Default `40`.
+   */
+  maxPoints?: number
   className?: string
 }
 
 export function ReputationTimeline({
   range = "all",
   showTrendLine = true,
+  curve = "linear",
   showDataPoints = true,
+  maxPoints = 40,
   className,
   ...props
 }: ReputationTimelineProps) {
@@ -165,54 +260,92 @@ export function ReputationTimeline({
 
   const { data, isLoading, error } = useFeedbackTimeline(agentRegistry, agentId)
 
+  // "Now" is external, mutable state, so reading it during render is impure —
+  // and reading it *inside* the memo was also a bug: the cutoff was frozen
+  // until `data` or `range` changed, so the window silently failed to move
+  // with the clock. Capturing it once per mount makes the window an explicit,
+  // stable input instead.
+  const [nowSeconds] = useState(() => Math.floor(Date.now() / 1000))
+
+  const feedbacks = data?.feedbacks
+
   // Sort ascending (oldest first) so the line flows left-to-right, then filter
   // by time range. Subgraph returns newest-first so we reverse via sort.
   const sorted = useMemo(() => {
-    if (!data?.feedbacks) return []
-    const all = [...data.feedbacks].sort((a, b) => a.createdAt - b.createdAt)
+    if (!feedbacks) return []
+    const all = [...feedbacks].sort((a, b) => a.createdAt - b.createdAt)
     if (range === "all") return all
     const days = range === "7d" ? 7 : range === "30d" ? 30 : 90
-    const cutoff = Math.floor(Date.now() / 1000) - days * 86400
+    const cutoff = nowSeconds - days * 86400
     return all.filter((fb) => fb.createdAt >= cutoff)
-  }, [data?.feedbacks, range])
+  }, [feedbacks, range, nowSeconds])
 
   const plot = getPlotArea()
   const minTime = sorted[0]?.createdAt ?? 0
   const maxTime = sorted[sorted.length - 1]?.createdAt ?? 0
 
+  // Thin for rendering only — `sorted.length` still reports the true count.
+  const plotted = useMemo(() => thin(sorted, maxPoints), [sorted, maxPoints])
+
   const points = useMemo(
     () =>
-      sorted.map((fb) => ({
+      plotted.map((fb) => ({
         x: scaleX(fb.createdAt, minTime, maxTime, plot),
         y: scaleY(fb.value, plot),
         value: fb.value,
         createdAt: fb.createdAt,
       })),
-    [sorted, minTime, maxTime, plot]
+    [plotted, minTime, maxTime, plot]
   )
 
-  const polylinePoints = points.map((p) => `${p.x},${p.y}`).join(" ")
+  const linePath = useMemo(
+    () => (curve === "monotone" ? monotonePath(points) : linearPath(points)),
+    [points, curve]
+  )
   const yTicks = [0, 25, 50, 75, 100]
 
   const xLabels = useMemo(() => {
-    if (sorted.length <= 1) {
-      return sorted.map((fb) => ({
-        timestamp: fb.createdAt,
-        x: scaleX(fb.createdAt, minTime, maxTime, plot),
-      }))
+    if (sorted.length === 0) return []
+    if (sorted.length === 1) {
+      return [
+        {
+          timestamp: sorted[0].createdAt,
+          x: scaleX(sorted[0].createdAt, minTime, maxTime, plot),
+        },
+      ]
     }
+
+    // Candidates are evenly spaced by INDEX, but reviews cluster in time — so
+    // several can land within a few units of each other and render as an
+    // unreadable smear. Pick by index, then keep only those that clear a
+    // minimum horizontal gap.
     const count = Math.min(5, sorted.length)
     const step = (sorted.length - 1) / (count - 1)
-    const labels: { timestamp: number; x: number }[] = []
+    const candidates: { timestamp: number; x: number }[] = []
     for (let i = 0; i < count; i++) {
-      const idx = Math.round(i * step)
-      const fb = sorted[idx]
-      labels.push({
+      const fb = sorted[Math.round(i * step)]
+      candidates.push({
         timestamp: fb.createdAt,
         x: scaleX(fb.createdAt, minTime, maxTime, plot),
       })
     }
-    return labels
+
+    const MIN_GAP = 58
+    const kept: typeof candidates = []
+    for (const c of candidates) {
+      if (kept.length === 0 || c.x - kept[kept.length - 1].x >= MIN_GAP) {
+        kept.push(c)
+      }
+    }
+
+    // Always end on the true final timestamp: either append it if it clears the
+    // gap, or swap it for the crowded one before it.
+    const last = candidates[candidates.length - 1]
+    if (kept[kept.length - 1] !== last) {
+      if (last.x - kept[kept.length - 1].x >= MIN_GAP) kept.push(last)
+      else if (kept.length > 1) kept[kept.length - 1] = last
+    }
+    return kept
   }, [sorted, minTime, maxTime, plot])
 
   const handleMouseMove = useCallback(
@@ -229,7 +362,11 @@ export function ReputationTimeline({
           closestIdx = i
         }
       }
-      setHoveredIndex(closestDist < 30 ? closestIdx : null)
+      // No distance threshold: snapping to the nearest point for as long as the
+      // pointer is over the chart keeps the tooltip mounted, so moving between
+      // points animates its position instead of unmounting and remounting it.
+      void closestDist
+      setHoveredIndex(closestIdx)
     },
     [points]
   )
@@ -313,7 +450,7 @@ export function ReputationTimeline({
         {xLabels.map((label, i) => (
           <text
             key={i}
-            x={label.x}
+            x={Math.max(24, Math.min(label.x, LAYOUT.width - 24))}
             y={LAYOUT.height - 4}
             textAnchor="middle"
             className="fill-erc8004-muted-fg text-[10px]"
@@ -324,8 +461,8 @@ export function ReputationTimeline({
 
         {/* Connecting trend line */}
         {showTrendLine && points.length > 1 && (
-          <polyline
-            points={polylinePoints}
+          <path
+            d={linePath}
             fill="none"
             stroke="currentColor"
             className="text-erc8004-border"
@@ -347,60 +484,120 @@ export function ReputationTimeline({
                 fill: dotFillVar(pt.value),
                 stroke: "oklch(var(--erc8004-card))",
                 transition: "r 150ms ease-out",
-                filter:
-                  hoveredIndex === i
-                    ? "drop-shadow(0 0 3px rgba(0,0,0,0.15))"
-                    : "none",
               }}
               strokeWidth={1.5}
             />
           ))}
 
-        {/* Hover tooltip */}
-        {hoveredIndex !== null &&
-          points[hoveredIndex] &&
-          (() => {
-            const pt = points[hoveredIndex]
-            const label = `Score: ${Math.round(pt.value)}  ·  ${formatFullDate(
-              pt.createdAt
-            )}`
-            const tooltipY = pt.y < 40 ? pt.y + 20 : pt.y - 14
-            const tooltipX = Math.max(
-              plot.x + 40,
-              Math.min(pt.x, plot.x + plot.width - 40)
-            )
-            return (
-              <g>
+        {/* Hover overlay — crosshair, halo and tooltip card.
+            Rendered as one group that stays mounted for the whole hover, so
+            moving between points animates its transform rather than tearing
+            the tooltip down and rebuilding it. `pointer-events: none` keeps it
+            from stealing the mouse from the SVG's own move handler. */}
+        {(() => {
+          const pt = hoveredIndex !== null ? points[hoveredIndex] : null
+          if (!pt) return null
+
+          const dateLabel = formatFullDate(pt.createdAt)
+          const boxW = tooltipWidthFor(dateLabel)
+          const half = boxW / 2
+          const { height: boxH, padX } = TOOLTIP
+
+          // Prefer above the point, flip below when there's no room, then clamp
+          // so the card can never leave the chart on any edge.
+          const wantAbove = pt.y - boxH - 14 >= 0
+          const rawY = wantAbove ? pt.y - boxH / 2 - 14 : pt.y + boxH / 2 + 14
+          const boxY = Math.max(
+            boxH / 2 + 2,
+            Math.min(rawY, LAYOUT.height - boxH / 2 - 2)
+          )
+          const boxX = Math.max(
+            half + 2,
+            Math.min(pt.x, LAYOUT.width - half - 2)
+          )
+
+          const glide = "transform 180ms cubic-bezier(0.22, 1, 0.36, 1)"
+
+          return (
+            <g style={{ pointerEvents: "none" }}>
+              {/* Crosshair — full plot height, so only X animates */}
+              <g style={{ transform: `translateX(${pt.x}px)`, transition: glide }}>
                 <line
-                  x1={pt.x}
-                  y1={pt.y}
-                  x2={pt.x}
+                  x1={0}
+                  y1={plot.y}
+                  x2={0}
                   y2={plot.y + plot.height}
                   stroke="currentColor"
                   className="text-erc8004-border"
                   strokeWidth={0.75}
                   strokeDasharray="2 2"
                 />
+              </g>
+
+              {/* Halo on the active point */}
+              <g
+                style={{
+                  transform: `translate(${pt.x}px, ${pt.y}px)`,
+                  transition: glide,
+                }}
+              >
+                <circle r={8} style={{ fill: dotFillVar(pt.value) }} opacity={0.18} />
+              </g>
+
+              {/* Tooltip card. Uses the card surface + border rather than the
+                  inverted foreground colour, so it reads as a raised panel in
+                  both themes instead of a white block on a dark chart. */}
+              <g
+                style={{
+                  transform: `translate(${boxX}px, ${boxY}px)`,
+                  transition: glide,
+                }}
+              >
                 <rect
-                  x={tooltipX - 68}
-                  y={tooltipY - 11}
-                  width={136}
-                  height={18}
-                  rx={4}
-                  className="fill-erc8004-fg"
-                  opacity={0.9}
+                  x={-half}
+                  y={-boxH / 2}
+                  width={boxW}
+                  height={boxH}
+                  rx={6}
+                  className="fill-erc8004-card stroke-erc8004-border"
+                  strokeWidth={1}
+                />
+                {/* Row 1 — date */}
+                <text
+                  x={-half + padX}
+                  y={-boxH / 2 + 14}
+                  textAnchor="start"
+                  className="fill-erc8004-muted-fg text-[9px]"
+                >
+                  {dateLabel}
+                </text>
+                {/* Row 2 — swatch, label, value */}
+                <circle
+                  cx={-half + padX + 3}
+                  cy={boxH / 2 - 10}
+                  r={3}
+                  style={{ fill: dotFillVar(pt.value) }}
                 />
                 <text
-                  x={tooltipX}
-                  y={tooltipY + 2}
-                  textAnchor="middle"
-                  className="fill-erc8004-bg text-[10px] font-medium"
+                  x={-half + padX + 12}
+                  y={boxH / 2 - 7}
+                  textAnchor="start"
+                  className="fill-erc8004-muted-fg text-[10px]"
                 >
-                  {label}
+                  Score
+                </text>
+                <text
+                  x={half - padX}
+                  y={boxH / 2 - 7}
+                  textAnchor="end"
+                  className="fill-erc8004-card-fg text-[10px] font-semibold tabular-nums"
+                >
+                  {Math.round(pt.value)}
                 </text>
               </g>
-            )
-          })()}
+            </g>
+          )
+        })()}
       </svg>
     </Card>
   )

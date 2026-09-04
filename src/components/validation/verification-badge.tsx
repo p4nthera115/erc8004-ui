@@ -5,36 +5,52 @@ import { getSubgraphUrl, subgraphFetch } from "@/lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "@/lib/useAgentIdentity"
 import { cn } from "@/lib/cn"
 import { Tag, Skeleton } from "@/components/_internal"
-import type { AgentStats } from "@/types"
 import * as v from "valibot"
 
 type ValidationStatsResponse = {
-  agentStats: Pick<AgentStats, "totalValidations" | "completedValidations" | "averageValidationScore"> | null
+  stats: {
+    validationRequests: number
+    validationResponses: number
+    scoreSum: number
+  }[]
 }
 
 const validationStatsSchema = v.object({
-  agentStats: v.nullable(
+  stats: v.array(
     v.pipe(
       v.object({
-        totalValidations: v.string(),
-        completedValidations: v.string(),
-        averageValidationScore: v.string(),
+        validationRequests: v.string(),
+        validationResponses: v.string(),
+        scoreSum: v.string(),
       }),
       v.transform((raw) => ({
-        totalValidations: parseInt(raw.totalValidations, 10),
-        completedValidations: parseInt(raw.completedValidations, 10),
-        averageValidationScore: parseFloat(raw.averageValidationScore),
+        validationRequests: parseInt(raw.validationRequests, 10),
+        validationResponses: parseInt(raw.validationResponses, 10),
+        scoreSum: parseFloat(raw.scoreSum),
       }))
     )
   ),
 })
 
+// The `agentStats` entity this used to read no longer exists on any deployed
+// subgraph. Validation aggregates now live in a timeseries collection whose
+// rows are CUMULATIVE, so the newest row holds the all-time totals.
+//
+// Note this returns an empty array on every chain today: the Validation
+// Registry contract is recorded at the zero address everywhere, so nothing can
+// emit a validation. That is an empty state, not an error.
 const VALIDATION_STATS_QUERY = `#graphql
-  query ($id: ID!) {
-    agentStats(id: $id) {
-      totalValidations
-      completedValidations
-      averageValidationScore
+  query ($agent: String!) {
+    stats: agentValidationStats_collection(
+      interval: day
+      where: { agent: $agent }
+      orderBy: timestamp
+      orderDirection: desc
+      first: 1
+    ) {
+      validationRequests
+      validationResponses
+      scoreSum
     }
   }
 `
@@ -47,7 +63,7 @@ function useValidationStats(agentRegistry: string, agentId: number) {
     queryFn: async (): Promise<ValidationStatsResponse> => {
       const { chainId } = parseAgentRegistry(agentRegistry)
       const url = getSubgraphUrl(chainId, apiKey, subgraphOverrides)
-      const variables = { id: `${chainId}:${agentId}` }
+      const variables = { agent: `${chainId}:${agentId}` }
 
       const data = await subgraphFetch<ValidationStatsResponse>(
         url,
@@ -91,7 +107,15 @@ export function VerificationBadge({ className, ...props }: VerificationBadgeProp
     )
   }
 
-  if (error || !data?.agentStats) {
+  const summary = data?.stats?.[0]
+  const completedValidations = summary?.validationResponses ?? 0
+  // Scores are 0-100; derive the average over completed responses only.
+  const averageValidationScore =
+    summary && completedValidations > 0
+      ? summary.scoreSum / completedValidations
+      : 0
+
+  if (error || !summary) {
     return (
       <Tag className={className}>
         <span className="h-1.5 w-1.5 rounded-full border border-erc8004-muted-fg" />
@@ -100,7 +124,6 @@ export function VerificationBadge({ className, ...props }: VerificationBadgeProp
     )
   }
 
-  const { completedValidations, averageValidationScore } = data.agentStats
   const tier = getTier(completedValidations, averageValidationScore)
 
   if (tier === "unverified") {

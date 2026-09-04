@@ -7,30 +7,33 @@ import {
   type AgentIdentityProps,
 } from "@/lib/useAgentIdentity"
 import { cn } from "@/lib/cn"
-import type { AgentStats } from "@/types"
 import * as v from "valibot"
 import { formatRelativeTime } from "@/lib/utils"
 
 type LastActivityResponse = {
-  agentStats: Pick<AgentStats, "lastActivity">
+  agent: { lastActivity: number } | null
 }
 
-const lastActivitySchema = v.pipe(
-  v.object({
-    agentStats: v.pipe(
+const lastActivitySchema = v.object({
+  // Nullable: the agent may not exist on this chain at all.
+  agent: v.nullable(
+    v.pipe(
       v.object({
         lastActivity: v.string(),
       }),
       v.transform((raw) => ({
         lastActivity: parseInt(raw.lastActivity, 10),
       }))
-    ),
-  })
-)
+    )
+  ),
+})
 
+// `lastActivity` lives on the Agent entity. The `agentStats` entity this used
+// to read is absent from every deployed subgraph — querying it fails outright
+// rather than returning null.
 const LAST_ACTIVITY_QUERY = `#graphql
   query ($id: ID!) {
-    agentStats(id: $id) {
+    agent(id: $id) {
       lastActivity
     }
   }
@@ -88,9 +91,16 @@ export function LastActivity({ className, ...props }: LastActivityProps) {
     return null
   }
 
+  // `agent` is null when the id doesn't exist on this chain. Falling back to 0
+  // would render the unix epoch as "20699 days ago" instead of nothing.
+  const lastActivity = data?.agent?.lastActivity
+  if (lastActivity == null) {
+    return null
+  }
+
   return (
     <span className={cn("text-sm text-erc8004-muted-fg", className)}>
-      {formatRelativeTime(data?.agentStats?.lastActivity ?? 0)}
+      {formatRelativeTime(lastActivity)}
     </span>
   )
 }

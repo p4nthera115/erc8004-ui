@@ -99,9 +99,6 @@ importers:
 
   packages/mcp-server:
     dependencies:
-      '@erc8004-ui/registry':
-        specifier: workspace:*
-        version: link:../registry
       '@modelcontextprotocol/sdk':
         specifier: ^1.28.0
         version: 1.28.0(zod@4.3.6)

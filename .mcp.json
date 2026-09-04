@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "erc8004-ui": {
+      "command": "node",
+      "args": ["packages/mcp-server/dist/index.js"],
+      "env": {
+        "GRAPH_API_KEY": "${GRAPH_API_KEY}"
+      }
+    }
+  }
+}

@@ -56,19 +56,39 @@ export interface AgentRegistrationFile {
 // === Reputation ===
 
 export interface ReputationData {
-  stats: AgentStats | null
+  stats: AgentFeedbackStats | null
   feedback: Feedback[]
 }
 
-export interface AgentStats {
-  id: string // "chainId:agentId"
-  totalFeedback: number
-  averageFeedbackValue: number // BigDecimal — parsed from string
-  totalValidations: number
-  completedValidations: number
-  averageValidationScore: number
-  lastActivity: number
-  updatedAt: number
+/**
+ * Cumulative feedback aggregates, from `agentFeedbackStats_collection`.
+ *
+ * Replaces the `AgentStats` entity on newer subgraph deployments. Two things
+ * differ from it: rows are running totals (the newest row holds all-time
+ * figures), and there is no precomputed average — derive it as
+ * `valueDeltaSum / (feedbackCreated - feedbackRevoked)`.
+ *
+ * Use `valueDeltaSum`, not `valueSum`: `valueSum` includes revoked feedback,
+ * so pairing it with a revocation-excluding denominator inflates the average.
+ */
+export interface AgentFeedbackStats {
+  feedbackCreated: number
+  feedbackRevoked: number
+  valueSum: number // BigDecimal — includes revoked feedback
+  valueDeltaSum: number // BigDecimal — non-revoked feedback only
+}
+
+/**
+ * Cumulative validation aggregates, from `agentValidationStats_collection`.
+ * Derive the average score as `scoreSum / validationResponses`.
+ *
+ * Empty on every chain today — the Validation Registry contract is recorded
+ * at the zero address everywhere, so nothing can emit a validation.
+ */
+export interface AgentValidationStats {
+  validationRequests: number
+  validationResponses: number
+  scoreSum: number // BigDecimal — parsed from string
 }
 
 export interface Feedback {

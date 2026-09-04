@@ -13,12 +13,15 @@ const variantClasses: Record<TagVariant, string> = {
 interface TagProps {
   variant?: TagVariant
   className?: string
+  /** Native tooltip — useful when the label is truncated. */
+  title?: string
   children: ReactNode
 }
 
-export function Tag({ variant = "default", className, children }: TagProps) {
+export function Tag({ variant = "default", className, title, children }: TagProps) {
   return (
     <span
+      title={title}
       className={cn(
         "inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-erc8004-sm",
         variantClasses[variant],

@@ -52,32 +52,19 @@ function Concepts() {
 
         <Callout
           variant="warning"
-          title="Validation Registry isn't on mainnet yet"
+          title="The Validation Registry isn't deployed anywhere yet"
         >
-          The smart contracts are only deployed on testnets (Sepolia confirmed).
-          The subgraph schema supports validation entities across all
-          deployments, so <InlineCode>VerificationBadge</InlineCode>,{" "}
-          <InlineCode>ValidationScore</InlineCode>, and{" "}
-          <InlineCode>ValidationList</InlineCode> will build and test end-to-end
-          on Sepolia. On mainnet, validation queries return empty by design, not
-          because something is broken. Components must render an informative
+          The subgraph records each chain's registry addresses, and{" "}
+          <InlineCode>validationRegistry</InlineCode> is the zero address on
+          every chain checked — testnets included. The schema still exposes{" "}
+          <InlineCode>validations</InlineCode>, so these queries succeed and
+          return nothing: <InlineCode>VerificationBadge</InlineCode>,{" "}
+          <InlineCode>ValidationScore</InlineCode>,{" "}
+          <InlineCode>ValidationList</InlineCode> and{" "}
+          <InlineCode>ValidationDisplay</InlineCode> render their empty state
+          everywhere. A query root existing is not evidence the registry is
+          live. Components must render an informative
           empty state rather than an error.
-        </Callout>
-
-        <Callout
-          variant="info"
-          title="AgentStats isn't present on every subgraph"
-        >
-          <InlineCode>AgentStats</InlineCode> is a pre-computed summary entity
-          (totals, averages, last activity) that the subgraph maintains as
-          events come in. It's confirmed on Ethereum Sepolia but may be absent
-          on other deployments. Four components rely on it exclusively —{" "}
-          <InlineCode>ReputationScore</InlineCode>,{" "}
-          <InlineCode>VerificationBadge</InlineCode>,{" "}
-          <InlineCode>ValidationScore</InlineCode>, and{" "}
-          <InlineCode>LastActivity</InlineCode>. These components treat a
-          missing entity as an empty state rather than an error, so they'll fall
-          back gracefully on chains without it.
         </Callout>
       </section>
 
@@ -132,8 +119,9 @@ function Concepts() {
             </p>
           </div>
           <Callout variant="warning">
-            Not yet deployed to any mainnet chain. Testnet (Sepolia) only.
-            Components return empty on mainnet.
+            Not deployed on any chain yet — <InlineCode>validationRegistry</InlineCode>{" "}
+            is the zero address everywhere, testnets included. These components
+            render their empty state on every chain.
           </Callout>
         </div>
       </section>
@@ -198,7 +186,7 @@ function Concepts() {
           <InlineCode>
             agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
           </InlineCode>{" "}
-          + <InlineCode>agentId={"{2290}"}</InlineCode> means "agent #2290 on
+          + <InlineCode>agentId={"{888}"}</InlineCode> means "agent #888 on
           the Base blockchain."
         </p>
       </section>
@@ -217,7 +205,7 @@ function Concepts() {
           — fine for a single component:
         </p>
         <CodeBlock
-          code={`<ReputationScore agentRegistry="eip155:8453:0x..." agentId={2290} />`}
+          code={`<ReputationScore agentRegistry="eip155:8453:0x..." agentId={888} />`}
         />
 
         <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
@@ -227,7 +215,7 @@ function Concepts() {
           — cleaner when rendering multiple components for the same agent:
         </p>
         <CodeBlock
-          code={`<AgentProvider agentRegistry="eip155:8453:0x..." agentId={2290}>
+          code={`<AgentProvider agentRegistry="eip155:8453:0x..." agentId={888}>
   <AgentCard />
   <ReputationScore />
   <FeedbackList />
@@ -278,7 +266,6 @@ function Concepts() {
             { name: "Polygon Mainnet", id: 137 },
             { name: "BSC Mainnet", id: 56 },
             { name: "Monad Mainnet", id: 143 },
-            { name: "Ethereum Sepolia", id: 11155111, note: "testnet" },
             { name: "Base Sepolia", id: 84532, note: "testnet" },
             { name: "BSC Chapel", id: 97, note: "testnet" },
             { name: "Monad Testnet", id: 10143, note: "testnet" },
@@ -301,15 +288,6 @@ function Concepts() {
             </div>
           ))}
         </div>
-        <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
-          Note: <InlineCode>AgentStats</InlineCode> — the entity that powers{" "}
-          <InlineCode>ReputationScore</InlineCode>,{" "}
-          <InlineCode>VerificationBadge</InlineCode>,{" "}
-          <InlineCode>ValidationScore</InlineCode>, and{" "}
-          <InlineCode>LastActivity</InlineCode> — is not present on every
-          chain's subgraph. It's confirmed on Ethereum Sepolia. Affected
-          components will render their empty state on chains without it.
-        </p>
       </section>
 
       {/* Where data comes from */}

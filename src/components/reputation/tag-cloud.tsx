@@ -139,10 +139,15 @@ export function TagCloud({
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useTagCloud(agentRegistry, agentId)
 
+  // Alias before the memo so the dependency is the array itself. An optional
+  // chain in the dependency list reads as a different expression to the React
+  // Compiler than the one used in the body, which blocks it from optimising.
+  const feedbacks = data?.feedbacks
+
   const tags = useMemo(() => {
-    if (!data?.feedbacks) return []
-    return computeTagFrequency(data.feedbacks, maxTags, minOccurrences)
-  }, [data?.feedbacks, maxTags, minOccurrences])
+    if (!feedbacks) return []
+    return computeTagFrequency(feedbacks, maxTags, minOccurrences)
+  }, [feedbacks, maxTags, minOccurrences])
 
   if (isLoading) {
     return (
@@ -191,9 +196,13 @@ export function TagCloud({
         {tags.map(({ tag, count, weight }) => (
           <Tag
             key={tag}
-            className={tagSizeClass(weight)}
+            // Tags are free-form on-chain strings — some agents write whole
+            // sentences into tag1/tag2. Without a cap those wrap to six lines
+            // and stop reading as pills at all.
+            className={cn(tagSizeClass(weight), "max-w-full")}
+            title={`${tag} \u2014 ${count} mention${count === 1 ? "" : "s"}`}
           >
-            <span title={`${count} mention${count === 1 ? "" : "s"}`}>{tag}</span>
+            <span className="truncate">{tag}</span>
           </Tag>
         ))}
       </div>

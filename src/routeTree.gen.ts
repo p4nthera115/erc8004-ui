@@ -14,6 +14,7 @@ import { Route as R404RouteImport } from './routes/404'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsIndexRouteImport } from './routes/docs/index'
 import { Route as DocsThemingRouteImport } from './routes/docs/theming'
+import { Route as DocsMcpRouteImport } from './routes/docs/mcp'
 import { Route as DocsIntroductionRouteImport } from './routes/docs/introduction'
 import { Route as DocsInstallationRouteImport } from './routes/docs/installation'
 import { Route as DocsConceptsRouteImport } from './routes/docs/concepts'
@@ -44,6 +45,11 @@ const DocsIndexRoute = DocsIndexRouteImport.update({
 const DocsThemingRoute = DocsThemingRouteImport.update({
   id: '/theming',
   path: '/theming',
+  getParentRoute: () => DocsRoute,
+} as any)
+const DocsMcpRoute = DocsMcpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => DocsRoute,
 } as any)
 const DocsIntroductionRoute = DocsIntroductionRouteImport.update({
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/docs/concepts': typeof DocsConceptsRoute
   '/docs/installation': typeof DocsInstallationRoute
   '/docs/introduction': typeof DocsIntroductionRoute
+  '/docs/mcp': typeof DocsMcpRoute
   '/docs/theming': typeof DocsThemingRoute
   '/docs/': typeof DocsIndexRoute
   '/docs/components/$slug': typeof DocsComponentsSlugRoute
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/docs/concepts': typeof DocsConceptsRoute
   '/docs/installation': typeof DocsInstallationRoute
   '/docs/introduction': typeof DocsIntroductionRoute
+  '/docs/mcp': typeof DocsMcpRoute
   '/docs/theming': typeof DocsThemingRoute
   '/docs': typeof DocsIndexRoute
   '/docs/components/$slug': typeof DocsComponentsSlugRoute
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/docs/concepts': typeof DocsConceptsRoute
   '/docs/installation': typeof DocsInstallationRoute
   '/docs/introduction': typeof DocsIntroductionRoute
+  '/docs/mcp': typeof DocsMcpRoute
   '/docs/theming': typeof DocsThemingRoute
   '/docs/': typeof DocsIndexRoute
   '/docs/components/$slug': typeof DocsComponentsSlugRoute
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '/docs/concepts'
     | '/docs/installation'
     | '/docs/introduction'
+    | '/docs/mcp'
     | '/docs/theming'
     | '/docs/'
     | '/docs/components/$slug'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/docs/concepts'
     | '/docs/installation'
     | '/docs/introduction'
+    | '/docs/mcp'
     | '/docs/theming'
     | '/docs'
     | '/docs/components/$slug'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/docs/concepts'
     | '/docs/installation'
     | '/docs/introduction'
+    | '/docs/mcp'
     | '/docs/theming'
     | '/docs/'
     | '/docs/components/$slug'
@@ -198,6 +210,13 @@ declare module '@tanstack/react-router' {
       path: '/theming'
       fullPath: '/docs/theming'
       preLoaderRoute: typeof DocsThemingRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/docs/mcp': {
+      id: '/docs/mcp'
+      path: '/mcp'
+      fullPath: '/docs/mcp'
+      preLoaderRoute: typeof DocsMcpRouteImport
       parentRoute: typeof DocsRoute
     }
     '/docs/introduction': {
@@ -250,6 +269,7 @@ interface DocsRouteChildren {
   DocsConceptsRoute: typeof DocsConceptsRoute
   DocsInstallationRoute: typeof DocsInstallationRoute
   DocsIntroductionRoute: typeof DocsIntroductionRoute
+  DocsMcpRoute: typeof DocsMcpRoute
   DocsThemingRoute: typeof DocsThemingRoute
   DocsIndexRoute: typeof DocsIndexRoute
   DocsComponentsSlugRoute: typeof DocsComponentsSlugRoute
@@ -261,6 +281,7 @@ const DocsRouteChildren: DocsRouteChildren = {
   DocsConceptsRoute: DocsConceptsRoute,
   DocsInstallationRoute: DocsInstallationRoute,
   DocsIntroductionRoute: DocsIntroductionRoute,
+  DocsMcpRoute: DocsMcpRoute,
   DocsThemingRoute: DocsThemingRoute,
   DocsIndexRoute: DocsIndexRoute,
   DocsComponentsSlugRoute: DocsComponentsSlugRoute,

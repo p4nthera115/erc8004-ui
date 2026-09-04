@@ -124,7 +124,7 @@ function App() {
     <ERC8004Provider apiKey="your-graph-api-key">
       <ReputationScore
         agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
-        agentId={2290}
+        agentId={888}
       />
     </ERC8004Provider>
   )
@@ -182,7 +182,7 @@ function App() {
       <ERC8004Provider apiKey="your-graph-api-key">
         <ReputationScore
           agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
-          agentId={2290}
+          agentId={888}
         />
       </ERC8004Provider>
     </QueryClientProvider>
@@ -204,7 +204,7 @@ function App() {
         <CodeBlock
           code={`import { AgentProvider, AgentCard, ReputationScore, FeedbackList } from "@erc8004/ui"
 
-<AgentProvider agentRegistry="eip155:8453:0x..." agentId={2290}>
+<AgentProvider agentRegistry="eip155:8453:0x..." agentId={888}>
   <AgentCard />
   <ReputationScore />
   <FeedbackList />

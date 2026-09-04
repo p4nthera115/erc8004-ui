@@ -195,9 +195,13 @@ function FeedbackRow({ event }: { event: FeedbackEvent }) {
 
   return (
     <div className="flex items-start gap-3">
-      {/* Icon */}
-      <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-erc8004-muted">
-        <svg className="h-3.5 w-3.5 text-erc8004-muted-fg" fill="none" viewBox="0 0 16 16" strokeWidth={1.5} stroke="currentColor">
+      {/* Icon — carries the event type, so the row text doesn't have to */}
+      <div
+        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-erc8004-muted"
+        title="Feedback"
+      >
+        <span className="sr-only">Feedback</span>
+        <svg aria-hidden="true" className="h-3.5 w-3.5 text-erc8004-muted-fg" fill="none" viewBox="0 0 16 16" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M14 8c0 3.314-2.686 6-6 6a5.98 5.98 0 01-3.5-1.125L2 13.5l.625-2.5A5.98 5.98 0 012 8c0-3.314 2.686-6 6-6s6 2.686 6 6z" />
         </svg>
       </div>
@@ -205,17 +209,19 @@ function FeedbackRow({ event }: { event: FeedbackEvent }) {
       {/* Content */}
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className={`font-mono text-sm font-semibold tabular-nums ${scoreColor(event.value)}`}>
+          {/* Fixed width: scores range from "1.0" to "100.0", and an auto-width
+              column pushed every row's address to a different x. */}
+          <span className={`w-11 shrink-0 text-right font-mono text-sm font-semibold tabular-nums ${scoreColor(event.value)}`}>
             {event.value.toFixed(1)}
           </span>
-          <span className="text-xs text-erc8004-muted-fg">
-            feedback from{" "}
-            <span className="font-mono" title={event.clientAddress}>{truncateAddress(event.clientAddress)}</span>
+          <span className="font-mono text-xs text-erc8004-muted-fg" title={event.clientAddress}>
+            {truncateAddress(event.clientAddress)}
           </span>
           {tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-erc8004-muted px-2 py-0.5 text-xs text-erc8004-muted-fg"
+              title={tag}
+              className="max-w-[14rem] truncate rounded-erc8004-sm bg-erc8004-muted px-2 py-0.5 text-xs text-erc8004-muted-fg"
             >
               {tag}
             </span>
@@ -252,9 +258,13 @@ function ValidationRow({ event }: { event: ValidationEvent }) {
 
   return (
     <div className="flex items-start gap-3">
-      {/* Icon */}
-      <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-erc8004-muted">
-        <svg className="h-3.5 w-3.5 text-erc8004-muted-fg" fill="none" viewBox="0 0 16 16" strokeWidth={1.5} stroke="currentColor">
+      {/* Icon — carries the event type, so the row text doesn't have to */}
+      <div
+        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-erc8004-muted"
+        title="Validation"
+      >
+        <span className="sr-only">Validation</span>
+        <svg aria-hidden="true" className="h-3.5 w-3.5 text-erc8004-muted-fg" fill="none" viewBox="0 0 16 16" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M13 5l-6 6-3-3" />
         </svg>
       </div>
@@ -262,21 +272,29 @@ function ValidationRow({ event }: { event: ValidationEvent }) {
       {/* Content */}
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          {event.response !== null ? (
-            <span className={`font-mono text-sm font-semibold tabular-nums ${scoreColor(event.response)}`}>
-              {event.response}
-              <span className="text-xs font-normal text-erc8004-muted-fg">/100</span>
-            </span>
-          ) : null}
+          {/* Same fixed width as the feedback row so the two event types line
+              up with each other in a mixed feed. */}
+          <span className={`w-11 shrink-0 text-right font-mono text-sm font-semibold tabular-nums ${event.response !== null ? scoreColor(event.response) : "text-erc8004-muted-fg"}`}>
+            {event.response !== null ? (
+              <>
+                {event.response}
+                <span className="text-xs font-normal text-erc8004-muted-fg">/100</span>
+              </>
+            ) : (
+              "\u2014"
+            )}
+          </span>
           <span className={`text-xs font-medium ${statusColor(event.status)}`}>
             {event.status.charAt(0) + event.status.slice(1).toLowerCase()}
           </span>
-          <span className="text-xs text-erc8004-muted-fg">
-            validation by{" "}
-            <span className="font-mono" title={event.validatorAddress}>{truncateAddress(event.validatorAddress)}</span>
+          <span className="font-mono text-xs text-erc8004-muted-fg" title={event.validatorAddress}>
+            {truncateAddress(event.validatorAddress)}
           </span>
           {event.tag && (
-            <span className="rounded-full bg-erc8004-muted px-2 py-0.5 text-xs text-erc8004-muted-fg">
+            <span
+              title={event.tag}
+              className="max-w-[14rem] truncate rounded-erc8004-sm bg-erc8004-muted px-2 py-0.5 text-xs text-erc8004-muted-fg"
+            >
               {event.tag}
             </span>
           )}
@@ -374,7 +392,7 @@ export function ActivityLog({
           <span className="text-xs text-erc8004-muted-fg">{events.length} events</span>
         </div>
       </div>
-      <div className="divide-y divide-erc8004-border">
+      <div className="max-h-[32rem] divide-y divide-erc8004-border overflow-y-auto">
         {events.map((event) => (
           <div key={event.id} className="px-5 py-3.5">
             {event.kind === "feedback" ? (

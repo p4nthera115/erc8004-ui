@@ -100,9 +100,16 @@ All data comes from The Graph's Subgraph via direct GraphQL fetch calls. No SDK 
 
 - Chain `1` (Ethereum): `FV6RR6y13rsnCxBAicKuQEwDp8ioEGiNaWaZUmvr1F8k`
 - Chain `8453` (Base): `43s9hQRurMGjuYnC1r2ZwS6xSQktbFyXMPMqGKUFJojb`
-- Chain `11155111` (Sepolia): `6wQRC7geo9XYAhckfmfo8kbMRLeWU8KQd3XsJqFKmZLT`
-- Chain `84532` (Base Sepolia): `4yYAvQLFjBhBtdRCY7eUWo181VNoTSLLFd5M7FXQAi6u`
 - Chain `137` (Polygon): `9q16PZv1JudvtnCAf44cBoxg82yK9SSsFvrjCY9xnneF`
+- Chain `56` (BNB Smart Chain): `D6aWqowLkWqBgcqmpNKXuNikPkob24ADXCciiP8Hvn1K`
+- Chain `143` (Monad): `4tvLxkczjhSaMiqRrCV1EyheYHyJ7Ad8jub1UUyukBjg`
+- Chain `84532` (Base Sepolia): `4yYAvQLFjBhBtdRCY7eUWo181VNoTSLLFd5M7FXQAi6u`
+- Chain `97` (BNB Chapel): `BTjind17gmRZ6YhT9peaCM13SvWuqztsmqyfjpntbg3Z`
+- Chain `10143` (Monad Testnet): `8iiMH9sj471jbp7AwUuuyBXvPJqCEsobuHBeUEKQSxhU`
+
+`src/lib/constants.ts` is the source of truth for this map. Ethereum Sepolia
+(11155111) was removed deliberately — its subgraph has been halted with a fatal
+indexing error since 2026-03-19 and still runs the old schema.
 
 URL format: `https://gateway.thegraph.com/api/{API_KEY}/subgraphs/id/{SUBGRAPH_ID}`
 
@@ -127,18 +134,39 @@ Parse this to determine chain, contract address, and subgraph endpoint.
 
 The Subgraph provides two key entities for reputation:
 
-#### AgentStats (aggregate)
+#### Aggregates (`agentFeedbackStats_collection` / `agentValidationStats_collection`)
+
+The `AgentStats` entity described in the Agent0 docs **does not exist on the
+deployed subgraphs** — querying it fails with ``Type `Query` has no field
+`agentStats` ``. Aggregates live in timeseries collections instead:
 
 ```graphql
-type AgentStats {
-  totalFeedback: BigInt!
-  averageFeedbackValue: BigDecimal!
-  totalValidations: BigInt!
-  completedValidations: BigInt!
-  averageValidationScore: BigDecimal!
-  lastActivity: BigInt!
+type AgentFeedbackStats {
+  feedbackCreated: BigInt!
+  feedbackRevoked: BigInt!
+  valueSum: BigDecimal!      # INCLUDES revoked feedback
+  valueDeltaSum: BigDecimal! # non-revoked only — use this one
+}
+
+type AgentValidationStats {
+  validationRequests: BigInt!
+  validationResponses: BigInt!
+  scoreSum: BigDecimal!
 }
 ```
+
+Three rules that are easy to get wrong:
+
+1. **Rows are cumulative running totals**, not per-interval deltas. Take the
+   newest row (`orderBy: timestamp, orderDirection: desc, first: 1`) — never sum.
+2. **`interval` is required** and accepts only `hour` or `day`.
+3. **Derive averages from `valueDeltaSum`, not `valueSum`.** `valueSum` includes
+   revoked feedback while the natural denominator
+   (`feedbackCreated - feedbackRevoked`) excludes it; mixing them inflates the
+   score. There is no precomputed average.
+
+Per-agent totals also live directly on `Agent`: `totalFeedback` (excludes
+revoked) and `lastActivity`.
 
 #### Feedback (individual entries)
 
@@ -168,7 +196,7 @@ Note: `value` has no universal scale — different agents may receive scores on 
 
 ### Validation Data
 
-The Subgraph stores independent third-party verification results. Aggregate stats are on `AgentStats` (see above). Individual entries use the `Validation` entity:
+The Subgraph stores independent third-party verification results. Aggregate stats are in `agentValidationStats_collection` (see above). Individual entries use the `Validation` entity:
 
 ```graphql
 type Validation {
@@ -222,27 +250,27 @@ Data source: `Agent` + `AgentRegistrationFile` subgraph entities.
 
 ### Reputation Components (Reputation Registry)
 
-Data source: `AgentStats`, `Feedback`, `FeedbackFile`, `FeedbackResponse` subgraph entities.
+Data source: `agentFeedbackStats_collection`, `Feedback`, `FeedbackFile`, `FeedbackResponse` subgraph entities.
 
 **Atomic:**
 
 8. **ReputationScore** — compact badge: average score + total review count. Fetches only `agentStats`. ✓
-9. **ReputationChart** — score distribution histogram. Fetches feedback `value` + `createdAt` only. ✓
+9. **ReputationTimeline** / **ReputationDistribution** — sparkline of scores over time, and a score distribution histogram. Both fetch feedback `value` + `createdAt` only. ✓
 10. **FeedbackList** — scrollable individual reviews: value, tag pills, truncated reviewer address, timestamp, review text (from feedbackFile), agent responses. Paginated via Subgraph `first`/`skip`. ✓
 11. **TagCloud** — weighted tag pills showing most frequent feedback tags. Fetches only `tag1` + `tag2` from all feedback, counts frequencies client-side. Answers "what does this agent specialise in?"
 
 **Composed:**
 
-12. **ReputationDisplay** — ReputationScore + ReputationChart + FeedbackList combined. ✓
+12. _(No composed reputation view is shipped — compose the atomic pieces directly.)_
 
 ### Validation Components (Validation Registry)
 
-Data source: `Validation` entity + validation fields on `AgentStats`.
+Data source: `Validation` entity + `agentValidationStats_collection`.
 
 **Atomic:**
 
-13. **VerificationBadge** — compact visual verification indicator (checkmark-style icon) with tier metadata. Fetches 3 fields from `AgentStats`: `totalValidations`, `completedValidations`, `averageValidationScore`. Place next to any agent name/avatar.
-14. **ValidationScore** — aggregate average validation score + completed count badge. Fetches validation fields from `AgentStats`.
+13. **VerificationBadge** — compact visual verification indicator (checkmark-style icon) with tier metadata. Fetches `validationRequests`, `validationResponses` and `scoreSum` from `agentValidationStats_collection`. Place next to any agent name/avatar.
+14. **ValidationScore** — aggregate average validation score + completed count badge. Fetches validation fields from `agentValidationStats_collection`.
 15. **ValidationList** — scrollable individual validation entries: validator address, score (0-100), tag, status, timestamp. Paginated via Subgraph `first`/`skip`.
 
 **Composed:**
@@ -251,7 +279,7 @@ Data source: `Validation` entity + validation fields on `AgentStats`.
 
 ### Standalone Components (Cross-Registry)
 
-17. **LastActivity** — relative timestamp ("Active 3 hours ago"). Fetches 1 field from `AgentStats`: `lastActivity`. Cross-registry — reflects most recent event of any kind.
+17. **LastActivity** — relative timestamp ("Active 3 hours ago"). Fetches 1 field from `Agent`: `lastActivity`. Cross-registry — reflects most recent event of any kind.
 18. **ActivityLog** — chronological feed of all on-chain events across all registries. Most complex component — build last.
 
 ---
@@ -278,14 +306,14 @@ Category-specific utilities live in their component directories (e.g., `componen
 4. ERC8004Provider — lightweight context for API key + Subgraph URL resolution ✓
 5. Subgraph client + shared utilities — GraphQL fetcher, chain resolver, address truncation, time formatting ✓
 6. ReputationScore — simplest data component, validates the data layer ✓
-7. ReputationChart — score distribution histogram ✓
+7. ReputationTimeline + ReputationDistribution — sparkline and histogram ✓
 8. FeedbackList — individual reviews with tags, text, responses, pagination ✓
-9. ReputationDisplay — composed component combining 6 + 7 + 8 ✓
+9. _(composed reputation view: not shipped)_
 10. AgentName — atomic, fetches one field, validates identity data layer
 11. AgentImage — atomic, IPFS/HTTPS/base64 handling + FingerprintBadge fallback
 12. AgentDescription — atomic, fetches one field
 13. TagCloud — tag frequency aggregation from feedback data
-14. LastActivity — atomic, fetches one field from AgentStats
+14. LastActivity — atomic, fetches `Agent.lastActivity`
 15. AgentCard — composed identity card from atomic pieces
 16. EndpointStatus — endpoint listing + optional health check logic
 17. IdentityDisplay — composed identity view
@@ -324,10 +352,10 @@ The public API stays flat — developers import `{ ReputationScore }` from `'@er
 │   │   │   └── IdentityDisplay.tsx      # composes AgentCard + EndpointStatus
 │   │   ├── reputation/
 │   │   │   ├── ReputationScore.tsx      # owns its own query (agentStats only)
-│   │   │   ├── ReputationChart.tsx      # owns its own query (feedback value + createdAt)
+│   │   │   ├── reputation-timeline.tsx     # owns its own query (feedback value + createdAt)
+│   │   │   ├── reputation-distribution.tsx # owns its own query (feedback value)
 │   │   │   ├── FeedbackList.tsx         # owns its own query (full feedback detail + pagination)
 │   │   │   ├── TagCloud.tsx             # owns its own query (tag1 + tag2 only)
-│   │   │   ├── ReputationDisplay.tsx    # composes Score + Chart + FeedbackList
 │   │   │   └── utils.ts                # tag frequency calc, score formatting
 │   │   ├── validation/
 │   │   │   ├── VerificationBadge.tsx    # compact verification indicator
@@ -335,7 +363,7 @@ The public API stays flat — developers import `{ ReputationScore }` from `'@er
 │   │   │   ├── ValidationList.tsx       # individual validation entries + pagination
 │   │   │   └── ValidationDisplay.tsx    # composes Badge + Score + List
 │   │   └── activity/
-│   │       ├── LastActivity.tsx         # single timestamp from AgentStats
+│   │       ├── last-activity.tsx         # single timestamp from Agent.lastActivity
 │   │       └── ActivityLog.tsx          # cross-registry event feed
 │   ├── lib/                             # globally shared utilities
 │   │   ├── subgraph-client.ts
@@ -364,10 +392,10 @@ export { IdentityDisplay } from "./components/identity/IdentityDisplay"
 
 // Reputation Components
 export { ReputationScore } from "./components/reputation/ReputationScore"
-export { ReputationChart } from "./components/reputation/ReputationChart"
+export { ReputationTimeline } from "./components/reputation/reputation-timeline"
+export { ReputationDistribution } from "./components/reputation/reputation-distribution"
 export { FeedbackList } from "./components/reputation/FeedbackList"
 export { TagCloud } from "./components/reputation/TagCloud"
-export { ReputationDisplay } from "./components/reputation/ReputationDisplay"
 
 // Validation Components
 export { VerificationBadge } from "./components/validation/VerificationBadge"
@@ -389,7 +417,8 @@ export type {
   AgentData,
   AgentRegistrationFile,
   ReputationData,
-  AgentStats,
+  AgentFeedbackStats,
+  AgentValidationStats,
   Feedback,
   FeedbackFile,
   FeedbackResponse,

@@ -23,8 +23,10 @@ export { ActivityLog } from "./components/activity/activity-log"
 
 // Provider
 export { ERC8004Provider } from "./provider/ERC8004Provider"
+export { AgentProvider } from "./provider/AgentProvider"
 
 // Component prop types
+export type { AgentProviderProps } from "./provider/AgentProvider"
 export type { FeedbackListProps } from "./components/reputation/feedback-list"
 export type { ReputationScoreProps } from "./components/reputation/reputation-score"
 export type {
@@ -34,6 +36,7 @@ export type {
 export type {
   ReputationTimelineProps,
   ReputationTimelineRange,
+  ReputationTimelineCurve,
 } from "./components/reputation/reputation-timeline"
 export type { TagCloudProps } from "./components/reputation/tag-cloud"
 export type {
@@ -49,6 +52,7 @@ export type {
   ValidationStatusFilter,
 } from "./components/validation/validation-list"
 export type { ValidationScoreProps } from "./components/validation/validation-score"
+export type { ValidationDisplayProps } from "./components/validation/validation-display"
 export type {
   ActivityLogProps,
   ActivityEventType,

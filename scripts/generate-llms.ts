@@ -30,7 +30,8 @@ import {
   type PropDef,
 } from "../src/components/docs/registry"
 import { GUIDE_REGISTRY, GUIDE_ORDER } from "./guides-registry"
-import { writeFileSync, mkdirSync, rmSync, existsSync } from "node:fs"
+import { SUBGRAPH_IDS } from "../src/lib/constants"
+import { writeFileSync, readFileSync, mkdirSync, rmSync, existsSync } from "node:fs"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -76,6 +77,11 @@ const REPO_ROOT = join(__dirname, "..")
 const PUBLIC_DIR = join(REPO_ROOT, "public")
 const LLMS_DIR = join(PUBLIC_DIR, "llms")
 const GUIDES_DIR = join(LLMS_DIR, "_guides")
+// The MCP server consumes a JSON snapshot of the same registries rather than
+// importing registry.tsx directly — that would pull React and every component
+// into a server-side bundle. Emitting it here keeps the snapshot regenerating
+// on exactly the same cadence as llms.txt, so the two can never drift.
+const MCP_GENERATED_DIR = join(REPO_ROOT, "packages", "mcp-server", "src", "generated")
 
 // ---------------------------------------------------------------------------
 // Component grouping — mirrors the categories shown on /docs/components
@@ -122,6 +128,23 @@ const GROUPS: Array<{ title: string; slugs: string[] }> = [
 ]
 
 // ---------------------------------------------------------------------------
+// Chain metadata — display names for the chain IDs in src/lib/constants.ts.
+// The IDs themselves stay in constants.ts (the library's own source of truth);
+// only the human-readable labels live here, since they're documentation.
+// ---------------------------------------------------------------------------
+
+const CHAIN_META: Record<number, { name: string; testnet: boolean }> = {
+  1: { name: "Ethereum", testnet: false },
+  8453: { name: "Base", testnet: false },
+  137: { name: "Polygon", testnet: false },
+  56: { name: "BNB Smart Chain", testnet: false },
+  143: { name: "Monad", testnet: false },
+  84532: { name: "Base Sepolia", testnet: true },
+  97: { name: "BNB Chapel", testnet: true },
+  10143: { name: "Monad Testnet", testnet: true },
+}
+
+// ---------------------------------------------------------------------------
 // Guide pages — content lives in `scripts/guides-registry.ts`, the canonical
 // source. Each guide's body is hand-authored markdown converted from the
 // corresponding `src/routes/docs/{slug}.tsx` route file. The script imports
@@ -149,12 +172,18 @@ function propsTable(props: PropDef[]): string {
   if (props.length === 0) return "_No props._\n"
   const header =
     "| Prop | Type | Required | Default | Description |\n| --- | --- | --- | --- | --- |"
+  // Every cell must escape pipes, not just the description. Union types like
+  // `"linear" | "monotone"` are common here, and an unescaped pipe silently
+  // splits the row into extra columns — the rendered table then shows the type
+  // truncated at the first pipe with the rest smeared across the wrong headings.
+  const cell = (value: string) => value.replace(/\|/g, "\\|")
+
   const rows = props.map((p) => {
     const req = p.required ? "yes" : "no"
-    const def = p.default ? `\`${p.default}\`` : "—"
-    // Escape pipes inside descriptions so the table doesn't break
-    const desc = p.description.replace(/\|/g, "\\|")
-    return `| \`${p.name}\` | \`${p.type}\` | ${req} | ${def} | ${desc} |`
+    const def = p.default ? `\`${cell(p.default)}\`` : "—"
+    return `| \`${cell(p.name)}\` | \`${cell(p.type)}\` | ${req} | ${def} | ${cell(
+      p.description
+    )} |`
   })
   return [header, ...rows].join("\n") + "\n"
 }
@@ -447,7 +476,7 @@ function buildLlmsFull(): string {
   lines.push(
     '        agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"'
   )
-  lines.push("        agentId={2290}")
+  lines.push("        agentId={888}")
   lines.push("      />")
   lines.push("    </ERC8004Provider>")
   lines.push("  )")
@@ -481,6 +510,112 @@ function buildLlmsFull(): string {
     }
   }
   return lines.join("\n")
+}
+
+// ---------------------------------------------------------------------------
+// File 5: the MCP registry snapshot
+//
+// A plain-JSON projection of COMPONENT_REGISTRY + GUIDE_REGISTRY that the MCP
+// server reads at build time. Two things are deliberately true of it:
+//
+//   1. The React `preview` fields are stripped. They're live JSX elements —
+//      not serialisable, and meaningless outside a browser.
+//   2. Each entry carries its fully-rendered `markdown` alongside the
+//      structured fields. `get_component` can then return byte-identical
+//      content to what the docs site and llms.txt serve, while tools like
+//      `list_components` still get typed fields to filter on.
+// ---------------------------------------------------------------------------
+
+type SnapshotProp = Omit<PropDef, never>
+
+function snapshotComponent(doc: ComponentDoc, group: string) {
+  return {
+    slug: doc.slug,
+    name: doc.name,
+    group,
+    description: doc.description,
+    notes: doc.notes ?? [],
+    importLine: doc.importLine,
+    usage: doc.usage,
+    examples: (doc.examples ?? []).map((e) => ({
+      name: e.name,
+      description: e.description,
+      code: e.code,
+    })),
+    inContext: doc.inContext
+      ? { description: doc.inContext.description, code: doc.inContext.code }
+      : null,
+    states: doc.states ?? null,
+    props: doc.props as SnapshotProp[],
+    docsUrl: `${SITE_URL}/docs/components/${doc.slug}`,
+    markdown: componentMarkdown(doc),
+  }
+}
+
+function buildRegistrySnapshot() {
+  const groupOf = new Map<string, string>()
+  for (const g of GROUPS) {
+    for (const slug of g.slugs) groupOf.set(slug, g.title)
+  }
+
+  const components = []
+  for (const group of GROUPS) {
+    for (const slug of group.slugs) {
+      const doc = COMPONENT_REGISTRY[slug]
+      if (!doc) continue
+      components.push(snapshotComponent(doc, group.title))
+    }
+  }
+
+  // Anything in the registry that isn't in a GROUP still ships, ungrouped —
+  // the generator already warns about these when building llms.txt.
+  for (const doc of Object.values(COMPONENT_REGISTRY)) {
+    if (groupOf.has(doc.slug)) continue
+    console.warn(`[generate-llms] Ungrouped component in snapshot: ${doc.slug}`)
+    components.push(snapshotComponent(doc, "Other"))
+  }
+
+  const guides = GUIDE_ORDER.map((slug) => {
+    const g = GUIDE_REGISTRY[slug]!
+    return {
+      slug: g.slug,
+      name: g.name,
+      description: g.description,
+      docsUrl: `${SITE_URL}/docs/${g.slug}`,
+      markdown: guideMarkdown(slug),
+    }
+  })
+
+  const chains = Object.entries(SUBGRAPH_IDS)
+    .map(([id, subgraphId]) => {
+      const chainId = Number(id)
+      const meta = CHAIN_META[chainId]
+      return {
+        chainId,
+        name: meta?.name ?? `Chain ${chainId}`,
+        testnet: meta?.testnet ?? false,
+        subgraphId,
+      }
+    })
+    .sort((a, b) => Number(a.testnet) - Number(b.testnet) || a.chainId - b.chainId)
+
+  return {
+    generatedAt: new Date().toISOString(),
+    packageName: PACKAGE_NAME,
+    isPublished: IS_PUBLISHED,
+    provisionalNameNotice: IS_PUBLISHED ? null : PROVISIONAL_NAME_NOTICE,
+    tagline: TAGLINE,
+    siteUrl: SITE_URL,
+    githubUrl: GITHUB_URL,
+    subgraphBaseUrl: "https://gateway.thegraph.com/api",
+    chains,
+    groups: GROUPS,
+    components,
+    guides,
+    // src/types.ts verbatim — the public data-model surface. Inlined so the
+    // MCP server needs no filesystem access to the repo at runtime.
+    types: readFileSync(join(REPO_ROOT, "src", "types.ts"), "utf8"),
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -527,6 +662,15 @@ function main() {
   }
   console.log(
     `[generate-llms] wrote ${GUIDE_ORDER.length} guide markdown files into ${GUIDES_DIR}`
+  )
+
+  // 5. MCP registry snapshot
+  mkdirSync(MCP_GENERATED_DIR, { recursive: true })
+  const snapshotFile = join(MCP_GENERATED_DIR, "registry.json")
+  const snapshot = buildRegistrySnapshot()
+  writeFileSync(snapshotFile, JSON.stringify(snapshot, null, 2), "utf8")
+  console.log(
+    `[generate-llms] wrote ${snapshotFile} (${snapshot.components.length} components, ${snapshot.guides.length} guides, ${snapshot.chains.length} chains)`
   )
 
   console.log("[generate-llms] Done.")

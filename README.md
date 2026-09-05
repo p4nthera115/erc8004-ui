@@ -1,4 +1,4 @@
-# @erc8004/ui
+# @p4n/erc8004-ui
 
 Drop-in React components for displaying verified AI agent identity, reputation,
 and validation data from the [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004)
@@ -11,19 +11,24 @@ see is always what the chain says.
 Documentation: **https://erc8004-ui.vercel.app** — every page also available as
 Markdown, plus a JSON API at `/api` and an MCP endpoint at `/api/mcp`.
 
+> **Unofficial library.** This is an independent, community-built project.
+> It is not affiliated with, maintained by, or endorsed by the authors of
+> ERC-8004. It renders the standard's on-chain data through public
+> subgraphs; it does not speak for the standard.
+
 This repo is a pnpm workspace holding three things: the component library
-([`packages/ui`](packages/ui), published as `@erc8004/ui`), the stdio MCP server
-([`packages/mcp-server`](packages/mcp-server), published as `@erc8004/ui-mcp`),
+([`packages/ui`](packages/ui), published as `@p4n/erc8004-ui`), the stdio MCP server
+([`packages/mcp-server`](packages/mcp-server), published as `@p4n/erc8004-ui-mcp`),
 and the docs site that consumes both.
 
 ## Quick start
 
 ```bash
-npm install @erc8004/ui react react-dom @tanstack/react-query
+npm install @p4n/erc8004-ui react react-dom @tanstack/react-query
 ```
 
 ```tsx
-import { ERC8004Provider, AgentCard, ReputationScore } from "@erc8004/ui"
+import { ERC8004Provider, AgentCard, ReputationScore } from "@p4n/erc8004-ui"
 
 function App() {
   return (
@@ -122,14 +127,14 @@ trusting this list.
 ## Repo layout
 
 ```
-packages/ui/               the component library — published as @erc8004/ui
+packages/ui/               the component library — published as @p4n/erc8004-ui
   src/components/{identity,reputation,validation,activity}/
   src/components/_internal/  shared primitives (Card, Tag, Skeleton, …)
   src/provider/            ERC8004Provider, AgentProvider
   src/lib/                 subgraph client, registry parsing, shared utils
   src/styles/tokens.css    design tokens — the whole theming surface
   src/styles.css           build entry for the shipped dist/styles.css
-packages/mcp-server/       the stdio MCP server — published as @erc8004/ui-mcp
+packages/mcp-server/       the stdio MCP server — published as @p4n/erc8004-ui-mcp
 src/                       the docs site
   components/docs/registry.tsx    canonical component docs — SOURCE OF TRUTH
   components/landing/      landing page sections
@@ -148,7 +153,7 @@ scripts/
 tests/                     vitest: routing, API, MCP protocol, published files
 ```
 
-The docs site imports the library through the `@erc8004/ui` specifier, but a
+The docs site imports the library through the `@p4n/erc8004-ui` specifier, but a
 Vite alias points that at `packages/ui/src` rather than the built output — so
 `pnpm dev` hot-reloads component edits and `pnpm build` never depends on the
 library being built first.

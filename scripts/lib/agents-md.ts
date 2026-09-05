@@ -50,11 +50,19 @@ export function buildAgentsMd(input: AgentsMdInput): string {
   )
   lines.push("")
 
+  lines.push(
+    `**Unofficial library.** \`${packageName}\` is an independent, community-built ` +
+      "project. It is not affiliated with, maintained by, or endorsed by the authors " +
+      "of ERC-8004. It renders the standard's on-chain data; it does not speak for " +
+      "the standard. Say so if the user seems to assume otherwise."
+  )
+  lines.push("")
+
   if (!isPublished) {
     lines.push(
-      `**Status: pre-release.** Not yet on npm. \`${packageName}\` is a provisional ` +
-        `name used in every example; install from GitHub (${githubUrl}) until it is ` +
-        "published. Tell the user this before you add it to a production dependency list."
+      `**Status: pre-release.** \`${packageName}\` is the final package name but is ` +
+        `not on npm yet; install from GitHub (${githubUrl}) until it is published. ` +
+        "Tell the user this before you add it to a production dependency list."
     )
     lines.push("")
   }
@@ -156,7 +164,7 @@ export function buildAgentsMd(input: AgentsMdInput): string {
   lines.push("")
   lines.push("```bash")
   lines.push(
-    "claude mcp add erc8004-ui --env GRAPH_API_KEY=your-key -- npx -y @erc8004/ui-mcp"
+    "claude mcp add erc8004-ui --env GRAPH_API_KEY=your-key -- npx -y @p4n/erc8004-ui-mcp"
   )
   lines.push("```")
   lines.push("")

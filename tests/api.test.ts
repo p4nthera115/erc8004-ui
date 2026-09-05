@@ -292,7 +292,7 @@ describe("GET /.well-known/mcp", () => {
 
   it("points at the stdio package for the live tools", async () => {
     const body = await json(await get(mcpManifest, "/api/mcp-manifest"))
-    expect(body.packages[0].name).toBe("@erc8004/ui-mcp")
+    expect(body.packages[0].name).toBe("@p4n/erc8004-ui-mcp")
   })
 })
 

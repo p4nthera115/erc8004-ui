@@ -14,7 +14,7 @@ import {
   ReputationDistribution,
   TagCloud,
   LastActivity,
-} from "@erc8004/ui"
+} from "@p4n/erc8004-ui"
 import { cn } from "@/lib/cn"
 import { CodeBlock } from "./CodeBlock"
 
@@ -116,7 +116,7 @@ function getPresetCss(preset: Preset): string {
     return (
       `// Default — no overrides needed.\n` +
       `// Import the stylesheet and you're done:\n\n` +
-      `import "@erc8004/ui/styles.css"`
+      `import "@p4n/erc8004-ui/styles.css"`
     )
   }
 

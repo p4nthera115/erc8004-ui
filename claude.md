@@ -4,7 +4,7 @@
 
 This is a React component library for rendering AI agent identity data from the ERC-8004 standard. Components are self-contained, trustless, and visually distinctive. Each component takes an agent's on-chain identifier (`agentRegistry` + `agentId`) and fetches verified blockchain data internally.
 
-Distributed as an **npm package** (`@erc8004/ui`). Developers install, wrap their app in `ERC8004Provider` with a Graph API key, and import components. One install, clean imports, zero frontend expertise required.
+Distributed as an **npm package** (`@p4n/erc8004-ui`). Developers install, wrap their app in `ERC8004Provider` with a Graph API key, and import components. One install, clean imports, zero frontend expertise required.
 
 **Primary consumers are AI coding agents** (Claude Code, Cursor, etc.) — the ERC-8004 ecosystem is predominantly backend developers who use AI for frontend work. The npm package pattern was chosen specifically because every AI coding agent already knows how to `npm install` and import React components.
 
@@ -36,7 +36,7 @@ Every component fetches its own data. No global agent state. A developer drops a
 
 ```tsx
 // The complete developer experience:
-import { ERC8004Provider, ReputationScore } from "@erc8004/ui"
+import { ERC8004Provider, ReputationScore } from "@p4n/erc8004-ui"
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 
 const queryClient = new QueryClient()
@@ -333,7 +333,7 @@ Category-specific utilities live in their component directories (e.g., `componen
 
 Components are grouped by registry category. Each category directory contains its components and any category-specific utilities. Data fetching lives inside each component — there are no separate hook files. Truly shared utilities (Subgraph client, registry parser, address truncation) live in `/lib/` since every component needs them.
 
-The public API stays flat — developers import `{ ReputationScore }` from `'@erc8004/ui'`, never from subdirectories. `index.ts` re-exports everything.
+The public API stays flat — developers import `{ ReputationScore }` from `'@p4n/erc8004-ui'`, never from subdirectories. `index.ts` re-exports everything.
 
 ```
 packages/ui/                             # the published package
@@ -387,7 +387,7 @@ packages/ui/                             # the published package
 
 Imports inside the package are relative — there is no `@/` alias here. That
 alias belongs to the docs site in the repo root `src/`, which imports the
-library through the `@erc8004/ui` specifier; a Vite alias points that at
+library through the `@p4n/erc8004-ui` specifier; a Vite alias points that at
 `packages/ui/src` rather than `dist`, so the site never needs a prior library
 build and Tailwind still scans the component source.
 
@@ -491,7 +491,7 @@ agent-facing surface can never describe a different library than the docs site.
 
 ### MCP servers (two transports, one tool set)
 
-- **stdio** (`packages/mcp-server`) — `npx -y @erc8004/ui-mcp`. Four
+- **stdio** (`packages/mcp-server`) — `npx -y @p4n/erc8004-ui-mcp`. Four
   documentation tools plus two live tools (`check_chain_support`, `check_agent`)
   that need `GRAPH_API_KEY`.
 - **Hosted HTTP** (`api/mcp.ts`) — Streamable HTTP at `/api/mcp`, no key.

@@ -29,7 +29,7 @@ export function useERC8004Config(): ERC8004Config {
   if (!ctx) {
     throw new Error(
       "useERC8004Config must be used within <ERC8004Provider>. " +
-        "Wrap your app (or the part that uses @erc8004/ui components) " +
+        "Wrap your app (or the part that uses @p4n/erc8004-ui components) " +
         'in <ERC8004Provider apiKey="your-graph-api-key">.'
     )
   }
@@ -139,7 +139,7 @@ interface ERC8004ProviderProps {
 }
 
 /**
- * Top-level provider for @erc8004/ui components.
+ * Top-level provider for @p4n/erc8004-ui components.
  *
  * This is the only setup the developer needs. It handles:
  *   1. Storing the Graph API key so every hook can access it

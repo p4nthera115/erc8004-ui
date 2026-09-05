@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "@erc8004/ui documentation API",
+    "title": "@p4n/erc8004-ui documentation API",
     "summary": "Read-only JSON documentation API for the ERC-8004 UI component library.",
     "description": "Drop-in React components for displaying verified ERC-8004 AI agent identity, reputation, and validation data. Self-contained, trustless, and designed to be consumed by AI coding agents.\n\nThis API serves the library's own documentation — components, props, usage\nexamples, setup guides and supported chains — as JSON, so an agent can read\nthe reference without scraping HTML. It is generated from the same registry\nthat produces the documentation site, llms.txt and the MCP server, so all\nfour describe the same library.\n\nNo authentication. No API keys. CORS is open to every origin. Responses are\ncacheable for five minutes and only change when the site is redeployed.\n\nA fair-use quota of 300 requests per 60 seconds per client applies, enforced\nper function instance. Every response — success or failure — carries the\n`RateLimit` and `RateLimit-Policy` structured fields, plus the older\n`RateLimit-Limit` / `-Remaining` / `-Reset` triple, so a client can pace\nitself rather than discover the limit by being refused. A 429 adds\n`Retry-After`. If you need the whole reference in bulk and would rather not\nthink about any of this, fetch /llms-full.txt once instead.\n\nIt does **not** proxy on-chain data: the components query The Graph directly\nfrom the browser with the consuming application's own Graph API key. To check\nlive subgraph or agent state, use the MCP server's live tools instead.",
     "version": "1.0.0",
@@ -2455,7 +2455,10 @@
           "packageName": {
             "type": "string"
           },
-          "provisionalNameNotice": {
+          "nonAffiliationNotice": {
+            "type": "string"
+          },
+          "unpublishedNotice": {
             "type": [
               "string",
               "null"

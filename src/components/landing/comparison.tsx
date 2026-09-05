@@ -63,7 +63,7 @@ function useReputation(agentRegistry: string, agentId: number) {
 // ...then render loading, error, empty and not-found states.
 // Then do all of it again for feedback, validation and identity.`
 
-const LIBRARY_CODE = `import { ReputationScore } from "@erc8004/ui"
+const LIBRARY_CODE = `import { ReputationScore } from "@p4n/erc8004-ui"
 
 <ReputationScore
   agentRegistry="eip155:8453:0x8004...a432"
@@ -100,7 +100,7 @@ export function Comparison() {
 
         <div className="flex min-w-0 flex-col gap-3">
           <PanelLabel aside="every field, every chain">
-            With @erc8004/ui
+            With @p4n/erc8004-ui
           </PanelLabel>
           <CodeBlock code={LIBRARY_CODE} />
           <ul className={`mt-3 flex flex-col border-t ${RULE}`}>

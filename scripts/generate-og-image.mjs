@@ -90,7 +90,7 @@ const html = `<!doctype html>
       ${LOGO}
       <div>
         <div class="kicker">ERC-8004 · React components</div>
-        <h1>@erc8004/ui</h1>
+        <h1>@p4n/erc8004-ui</h1>
       </div>
     </div>
     <div class="rule"></div>

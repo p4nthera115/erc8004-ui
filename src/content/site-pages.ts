@@ -54,11 +54,11 @@ const X_URL = "https://x.com/p4nthera_"
 
 const about: SitePage = {
   slug: "about",
-  title: "About @erc8004/ui",
+  title: "About @p4n/erc8004-ui",
   description:
-    "What @erc8004/ui is, who maintains it, how it is funded, and the guarantees it makes about the data it renders.",
+    "What @p4n/erc8004-ui is, who maintains it, how it is funded, and the guarantees it makes about the data it renders.",
   intro:
-    "@erc8004/ui is an open-source React component library for displaying ERC-8004 AI agent identity, reputation and validation data. It is a presentation layer over on-chain data: you pass an agent's on-chain identifier, and the components fetch and render verified data themselves.",
+    "@p4n/erc8004-ui is an open-source React component library for displaying ERC-8004 AI agent identity, reputation and validation data. It is a presentation layer over on-chain data: you pass an agent's on-chain identifier, and the components fetch and render verified data themselves.",
   sections: [
     {
       heading: "What this project is",
@@ -88,7 +88,7 @@ const about: SitePage = {
     {
       heading: "Status and maintenance",
       paragraphs: [
-        "The library is pre-release and maintained in the open by its author, p4nthera115. It is not yet published to npm — the package name @erc8004/ui used throughout the documentation is provisional, and installs currently come from GitHub. There is no company behind it, no paid tier, and no telemetry inside the components themselves.",
+        "The library is pre-release and maintained in the open by its author, p4nthera115. It is not yet published to npm — the package name @p4n/erc8004-ui used throughout the documentation is provisional, and installs currently come from GitHub. There is no company behind it, no paid tier, and no telemetry inside the components themselves.",
         "Development happens entirely in public. Issues, pull requests and design discussion are on GitHub, and the documentation site is generated from the same registries that generate the machine-readable docs, so the two cannot drift apart.",
       ],
       links: [
@@ -115,7 +115,7 @@ const contact: SitePage = {
   slug: "contact",
   title: "Contact",
   description:
-    "How to report a bug, request a component, ask a question, or disclose a security issue in @erc8004/ui.",
+    "How to report a bug, request a component, ask a question, or disclose a security issue in @p4n/erc8004-ui.",
   intro:
     "This is a single-maintainer open-source project, so every channel is public and asynchronous. Anything that needs tracking — a bug, a feature request, a security report — belongs on GitHub, where the answer stays visible to the next person who hits the same thing. There is no support inbox, ticketing system or SLA, and nothing here should be read as a commitment to a response time.",
   sections: [

@@ -1,4 +1,4 @@
-# @erc8004/ui
+# @p4n/erc8004-ui
 
 Drop-in React components for displaying verified AI agent identity, reputation,
 and validation data from the [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004)
@@ -8,12 +8,17 @@ You pass an agent's on-chain identifier. The component fetches and renders the
 verified data itself. Components never accept display data as props, so what you
 see is always what the chain says.
 
+> **Unofficial library.** This is an independent, community-built project.
+> It is not affiliated with, maintained by, or endorsed by the authors of
+> ERC-8004. It renders the standard's on-chain data through public
+> subgraphs; it does not speak for the standard.
+
 Documentation: **https://erc8004-ui.vercel.app**
 
 ## Install
 
 ```bash
-npm install @erc8004/ui react react-dom @tanstack/react-query
+npm install @p4n/erc8004-ui react react-dom @tanstack/react-query
 ```
 
 `react` (18 or 19), `react-dom` and `@tanstack/react-query` (v5) are peer
@@ -24,8 +29,8 @@ components pointed at the same agent share one request.
 ## Quick start
 
 ```tsx
-import { ERC8004Provider, AgentCard } from "@erc8004/ui"
-import "@erc8004/ui/styles.css"
+import { ERC8004Provider, AgentCard } from "@p4n/erc8004-ui"
+import "@p4n/erc8004-ui/styles.css"
 
 function App() {
   return (
@@ -73,7 +78,7 @@ Full docs, live previews and props tables:
 
 ## Styling
 
-Import `@erc8004/ui/styles.css` and you're done — it carries the design tokens
+Import `@p4n/erc8004-ui/styles.css` and you're done — it carries the design tokens
 and only the utilities these components use. It deliberately does **not**
 include Tailwind's preflight, so it won't reset your page; the few base rules it
 does ship are scoped to the `.erc8004` wrapper the provider renders.
@@ -96,8 +101,8 @@ own build instead, so the utilities merge with the rest of your CSS:
 
 ```css
 @import "tailwindcss";
-@import "@erc8004/ui/tokens.css";
-@source "../node_modules/@erc8004/ui/dist";
+@import "@p4n/erc8004-ui/tokens.css";
+@source "../node_modules/@p4n/erc8004-ui/dist";
 ```
 
 See [docs/theming](https://erc8004-ui.vercel.app/docs/theming) for the full
@@ -126,7 +131,7 @@ The docs are published as [`/llms.txt`](https://erc8004-ui.vercel.app/llms.txt),
 [`/agents.md`](https://erc8004-ui.vercel.app/agents.md), a JSON API at
 [`/api`](https://erc8004-ui.vercel.app/api), and an MCP endpoint at
 [`/api/mcp`](https://erc8004-ui.vercel.app/api/mcp). A stdio MCP server with two
-extra live tools is on npm as `@erc8004/ui-mcp`.
+extra live tools is on npm as `@p4n/erc8004-ui-mcp`.
 
 ## Source
 

@@ -8,7 +8,7 @@ importers:
 
   .:
     dependencies:
-      '@erc8004/ui':
+      '@p4n/erc8004-ui':
         specifier: workspace:*
         version: link:packages/ui
       '@tailwindcss/vite':

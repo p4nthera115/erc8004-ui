@@ -17,7 +17,7 @@ import {
   ValidationDisplay,
   LastActivity,
   ActivityLog,
-} from "@erc8004/ui"
+} from "@p4n/erc8004-ui"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -148,8 +148,8 @@ const DOCS: ComponentDoc[] = [
     description:
       "Root context provider that holds infrastructure config — your Graph API key and optional subgraph URL overrides. Wrap your app once at the top level. Automatically creates an internal QueryClient if TanStack Query is not already set up in your app.",
     preview: null,
-    importLine: `import { ERC8004Provider } from "@erc8004/ui"`,
-    usage: `import { ERC8004Provider } from "@erc8004/ui"
+    importLine: `import { ERC8004Provider } from "@p4n/erc8004-ui"`,
+    usage: `import { ERC8004Provider } from "@p4n/erc8004-ui"
 
 // Minimal setup — no TanStack Query knowledge required:
 function App() {
@@ -211,8 +211,8 @@ function App() {
     description:
       "Optional convenience wrapper that sets a default agentRegistry and agentId for all child components. Eliminates prop repetition on profile pages. Components inside can still override with their own props.",
     preview: null,
-    importLine: `import { AgentProvider } from "@erc8004/ui"`,
-    usage: `import { AgentProvider, AgentName, ReputationScore, FeedbackList } from "@erc8004/ui"
+    importLine: `import { AgentProvider } from "@p4n/erc8004-ui"`,
+    usage: `import { AgentProvider, AgentName, ReputationScore, FeedbackList } from "@p4n/erc8004-ui"
 
 // Profile page — one agent, many components, no repetition:
 <AgentProvider agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888}>
@@ -259,7 +259,7 @@ function App() {
       "Fetches and renders the agent's registered name from the identity registry. Falls back to a truncated agent ID if no name is registered.",
     preview: withAgent(<AgentName />),
     previewCode: `<AgentName agentRegistry="eip155:8453:0x8004...a432" agentId={888} />`,
-    importLine: `import { AgentName } from "@erc8004/ui"`,
+    importLine: `import { AgentName } from "@p4n/erc8004-ui"`,
     usage: `<AgentName agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
@@ -322,7 +322,7 @@ function App() {
     description:
       "Renders the agent's registered image. Supports IPFS, HTTPS, and base64 sources. Falls back to the deterministic FingerprintBadge when no image is registered.",
     preview: withAgent(<AgentImage />),
-    importLine: `import { AgentImage } from "@erc8004/ui"`,
+    importLine: `import { AgentImage } from "@p4n/erc8004-ui"`,
     usage: `<AgentImage agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
@@ -384,7 +384,7 @@ function App() {
     description:
       "Renders the agent's registered description text from the identity registry.",
     preview: withAgent(<AgentDescription />),
-    importLine: `import { AgentDescription } from "@erc8004/ui"`,
+    importLine: `import { AgentDescription } from "@p4n/erc8004-ui"`,
     usage: `<AgentDescription agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
@@ -448,7 +448,7 @@ function App() {
     description:
       "Composed identity card combining avatar, name, description, owner address, and active protocol badges in a single component.",
     preview: withAgent(<AgentCard />),
-    importLine: `import { AgentCard } from "@erc8004/ui"`,
+    importLine: `import { AgentCard } from "@p4n/erc8004-ui"`,
     usage: `<AgentCard agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
@@ -563,7 +563,7 @@ function App() {
     description:
       "Lists all registered service endpoints (MCP, A2A, OASF, web, email) with protocol labels and optional live health check indicators.",
     preview: withAgent(<EndpointStatus />),
-    importLine: `import { EndpointStatus } from "@erc8004/ui"`,
+    importLine: `import { EndpointStatus } from "@p4n/erc8004-ui"`,
     usage: `<EndpointStatus agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
@@ -625,7 +625,7 @@ function App() {
     description:
       "Compact inline badge showing the agent's average feedback score and total review count.",
     preview: withAgent(<ReputationScore />),
-    importLine: `import { ReputationScore } from "@erc8004/ui"`,
+    importLine: `import { ReputationScore } from "@p4n/erc8004-ui"`,
     usage: `<ReputationScore agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
@@ -693,7 +693,7 @@ function App() {
     description:
       "Sparkline chart showing how the agent's feedback scores have trended over time. Pure SVG, no external charting library.",
     preview: withAgent(<ReputationTimeline />),
-    importLine: `import { ReputationTimeline } from "@erc8004/ui"`,
+    importLine: `import { ReputationTimeline } from "@p4n/erc8004-ui"`,
     usage: `<ReputationTimeline agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
@@ -788,7 +788,7 @@ function App() {
     description:
       "Score distribution histogram showing the spread of feedback values across configurable score ranges.",
     preview: withAgent(<ReputationDistribution />),
-    importLine: `import { ReputationDistribution } from "@erc8004/ui"`,
+    importLine: `import { ReputationDistribution } from "@p4n/erc8004-ui"`,
     usage: `<ReputationDistribution agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
@@ -866,7 +866,7 @@ function App() {
     description:
       "Paginated list of individual feedback entries with score, tag pills, reviewer address, timestamp, and optional written review text.",
     preview: withAgent(<FeedbackList />),
-    importLine: `import { FeedbackList } from "@erc8004/ui"`,
+    importLine: `import { FeedbackList } from "@p4n/erc8004-ui"`,
     usage: `<FeedbackList agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
@@ -984,7 +984,7 @@ function App() {
     description:
       "Weighted tag pills showing the agent's most frequent feedback tags. Pill size reflects mention frequency across all feedback entries.",
     preview: withAgent(<TagCloud />),
-    importLine: `import { TagCloud } from "@erc8004/ui"`,
+    importLine: `import { TagCloud } from "@p4n/erc8004-ui"`,
     usage: `<TagCloud agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
@@ -1057,7 +1057,7 @@ function App() {
       "Compact inline badge showing the agent's verification tier derived from completed validations and average validation score.",
     notes: [VALIDATION_REGISTRY_NOTE],
     preview: withAgent(<VerificationBadge />),
-    importLine: `import { VerificationBadge } from "@erc8004/ui"`,
+    importLine: `import { VerificationBadge } from "@p4n/erc8004-ui"`,
     usage: `<VerificationBadge agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
@@ -1116,7 +1116,7 @@ function App() {
       "Average validation score (0-100) with a fill bar and completed/pending counts.",
     notes: [VALIDATION_REGISTRY_NOTE],
     preview: withAgent(<ValidationScore />),
-    importLine: `import { ValidationScore } from "@erc8004/ui"`,
+    importLine: `import { ValidationScore } from "@p4n/erc8004-ui"`,
     usage: `<ValidationScore agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
@@ -1180,7 +1180,7 @@ function App() {
       "Paginated list of individual validation entries with score, status, tag, validator address, and timestamp.",
     notes: [VALIDATION_REGISTRY_NOTE],
     preview: withAgent(<ValidationList />),
-    importLine: `import { ValidationList } from "@erc8004/ui"`,
+    importLine: `import { ValidationList } from "@p4n/erc8004-ui"`,
     usage: `<ValidationList agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
@@ -1265,7 +1265,7 @@ function App() {
       "Composed view combining VerificationBadge, ValidationScore, and ValidationList into a single unified validation panel.",
     notes: [VALIDATION_REGISTRY_NOTE],
     preview: withAgent(<ValidationDisplay />),
-    importLine: `import { ValidationDisplay } from "@erc8004/ui"`,
+    importLine: `import { ValidationDisplay } from "@p4n/erc8004-ui"`,
     usage: `<ValidationDisplay agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
@@ -1325,7 +1325,7 @@ function App() {
     description:
       'Cross-registry relative timestamp showing when the agent was last active (e.g. "Active 3 hours ago"). Reflects the most recent event across all registries.',
     preview: withAgent(<LastActivity />),
-    importLine: `import { LastActivity } from "@erc8004/ui"`,
+    importLine: `import { LastActivity } from "@p4n/erc8004-ui"`,
     usage: `<LastActivity agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
@@ -1382,7 +1382,7 @@ function App() {
     description:
       "Chronological feed of all on-chain events across all registries — feedback and validations merged and sorted by time.",
     preview: withAgent(<ActivityLog />),
-    importLine: `import { ActivityLog } from "@erc8004/ui"`,
+    importLine: `import { ActivityLog } from "@p4n/erc8004-ui"`,
     usage: `<ActivityLog agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {

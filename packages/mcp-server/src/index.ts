@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * @erc8004/ui MCP server
+ * @p4n/erc8004-ui MCP server
  *
  * Two families of tools:
  *
@@ -115,7 +115,7 @@ function firstSentence(s: string): string {
 const API_KEY_HELP =
   "Live tools need a Graph API key.\n\n" +
   "Set GRAPH_API_KEY in the MCP server's environment:\n\n" +
-  '  { "mcpServers": { "erc8004-ui": { "command": "npx", "args": ["-y", "@erc8004/ui-mcp"],\n' +
+  '  { "mcpServers": { "erc8004-ui": { "command": "npx", "args": ["-y", "@p4n/erc8004-ui-mcp"],\n' +
   '      "env": { "GRAPH_API_KEY": "your-key" } } } }\n\n' +
   "Get a free key at https://thegraph.com/studio — it is a read-only query key.\n\n" +
   "The documentation tools (list_components, get_component, get_setup_guide, get_types) " +
@@ -143,7 +143,7 @@ server.registerTool(
   {
     title: "List components",
     description:
-      "Lists every component in the @erc8004/ui library, grouped by registry " +
+      "Lists every component in the @p4n/erc8004-ui library, grouped by registry " +
       "(Providers, Identity, Reputation, Validation, Activity). Start here to " +
       "discover what exists, then call get_component for full docs on one.",
     inputSchema: {
@@ -160,8 +160,9 @@ server.registerTool(
       return text(
         `# ${registry.packageName} — ${registry.components.length} components\n\n` +
           `${registry.tagline}\n\n${componentIndex()}` +
-          (registry.provisionalNameNotice
-            ? `\n> ${registry.provisionalNameNotice}\n`
+          `\n> ${registry.nonAffiliationNotice}\n` +
+          (registry.unpublishedNotice
+            ? `\n> ${registry.unpublishedNotice}\n`
             : ""),
       )
     }

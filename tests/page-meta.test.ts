@@ -34,7 +34,7 @@ describe("resolvePageMeta", () => {
   })
 
   it("does not repeat the product name when the page name already carries it", () => {
-    expect(resolvePageMeta("/about").title).toBe("About @erc8004/ui")
+    expect(resolvePageMeta("/about").title).toBe("About @p4n/erc8004-ui")
   })
 
   it("points a docs page at its own .md twin", () => {

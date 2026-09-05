@@ -19,7 +19,7 @@
     "build:ui": "pnpm -C packages/ui build"
   },
   "dependencies": {
-    "@erc8004/ui": "workspace:*",
+    "@p4n/erc8004-ui": "workspace:*",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/react-query": "^5.0.0",
     "@tanstack/react-router": "^1.168.8",

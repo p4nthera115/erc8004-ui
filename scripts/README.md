@@ -71,7 +71,7 @@ All three should return raw markdown, not HTML.
 
 Open a fresh Claude conversation. Paste:
 
-> Read https://erc8004-ui.vercel.app/llms-full.txt and then build me a marketplace card showing an agent's name, image, reputation score, and verification badge using @erc8004/ui.
+> Read https://erc8004-ui.vercel.app/llms-full.txt and then build me a marketplace card showing an agent's name, image, reputation score, and verification badge using @p4n/erc8004-ui.
 
 If Claude produces correct, runnable code with the right imports, prop names, and provider setup — without you telling it anything else — the docs are working. If it gets something wrong, the fix is to improve the relevant entry in `registry.tsx`. Everything downstream regenerates automatically on the next build.
 
@@ -80,5 +80,5 @@ If Claude produces correct, runnable code with the right imports, prop names, an
 Things deliberately NOT done in this first version, in priority order:
 
 1. **Inline guide prose into the per-guide markdown stubs.** Currently `_guides/*.md` files are stubs pointing back to the route URLs. The prose lives in `src/routes/pages/*.tsx` as JSX. A future iteration should parse those JSX files and extract the text content so the `_guides` markdown is self-contained and an AI doesn't need to fetch the live HTML site to read them.
-2. **MCP server** (`@erc8004/ui-mcp`). Same `registry.tsx` import, different output adapter. Exposes `list_components`, `get_component`, `get_setup_guide` as MCP tools so AI coding agents can query structured data instead of parsing markdown. Build this once `llms.txt` has been used in real workflows and the registry schema is proven stable.
+2. **MCP server** (`@p4n/erc8004-ui-mcp`). Same `registry.tsx` import, different output adapter. Exposes `list_components`, `get_component`, `get_setup_guide` as MCP tools so AI coding agents can query structured data instead of parsing markdown. Build this once `llms.txt` has been used in real workflows and the registry schema is proven stable.
 3. **Pre-rendering the demo site.** Add `vite-react-ssg` (or similar) so each route emits real HTML at build time. Fixes the empty-shell problem for Google, link previews, screen readers, and naive AI fetches that don't know about `llms.txt`.

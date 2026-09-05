@@ -9,7 +9,7 @@ import {
   FeedbackList,
   TagCloud,
   ActivityLog,
-} from "@erc8004/ui"
+} from "@p4n/erc8004-ui"
 import { RULE, Section } from "./section"
 
 /** Same agent the component docs preview against. */

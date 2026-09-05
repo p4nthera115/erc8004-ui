@@ -563,7 +563,8 @@ export function buildOpenApiDocument(input: OpenApiInput): Record<string, unknow
                 "`?format=markdown` and the site's `.md` URL return.",
             },
             packageName: { type: "string" },
-            provisionalNameNotice: { type: ["string", "null"] },
+            nonAffiliationNotice: { type: "string" },
+            unpublishedNotice: { type: ["string", "null"] },
           },
         },
         ComponentList: {

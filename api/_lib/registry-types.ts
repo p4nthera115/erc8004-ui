@@ -65,7 +65,8 @@ export type RegistrySnapshot = {
   generatedAt: string
   packageName: string
   isPublished: boolean
-  provisionalNameNotice: string | null
+  nonAffiliationNotice: string
+  unpublishedNotice: string | null
   tagline: string
   siteUrl: string
   githubUrl: string

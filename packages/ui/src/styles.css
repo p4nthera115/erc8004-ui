@@ -1,7 +1,7 @@
 /*
- * @erc8004/ui — prebuilt stylesheet
+ * @p4n/erc8004-ui — prebuilt stylesheet
  *
- *   import "@erc8004/ui/styles.css"
+ *   import "@p4n/erc8004-ui/styles.css"
  *
  * This is the whole styling setup for consumers who don't run Tailwind, and a
  * safe default for those who do: it ships only the utilities these components
@@ -14,8 +14,8 @@
  * renders — so nothing leaks into the surrounding app.
  *
  * Consumers who already run Tailwind v4 can skip this file entirely and add
- *   @source "../node_modules/@erc8004/ui/dist";
- *   @import "@erc8004/ui/tokens.css";
+ *   @source "../node_modules/@p4n/erc8004-ui/dist";
+ *   @import "@p4n/erc8004-ui/tokens.css";
  * to their own stylesheet instead.
  */
 

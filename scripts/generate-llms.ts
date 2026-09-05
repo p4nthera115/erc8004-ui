@@ -54,19 +54,21 @@ const GITHUB_URL = "https://github.com/p4nthera115/erc8004-ui"
 
 // Package naming.
 //
-// The library is not yet published to npm, and the final package name has not
-// been chosen. PACKAGE_NAME is used:
+// PACKAGE_NAME is used:
 //   1. As the import path in every code example in the generated docs
 //   2. As the title of llms.txt and llms-full.txt
 //   3. In the install instructions (when IS_PUBLISHED is true)
 //
-// When IS_PUBLISHED is false, the install snippet is replaced with a
-// "install from GitHub" instruction and a provisional-name banner is
-// emitted at the top of llms.txt and llms-full.txt.
+// The scope is deliberately personal rather than @erc8004. This is an
+// independent library; a package sitting on the protocol's own name would
+// read as an official release from the ERC-8004 authors, which it is not.
+// NON_AFFILIATION_NOTICE says so in plain words, and is emitted whether or
+// not the package has been published — AI agents ingest these files, and the
+// name alone is a weaker signal than a sentence.
 //
-// When you choose the real name and publish: update PACKAGE_NAME, set
-// IS_PUBLISHED = true, and re-run the build. Every output regenerates.
-const PACKAGE_NAME = "@erc8004/ui"
+// When you publish: set IS_PUBLISHED = true and re-run the build. Every
+// output regenerates.
+const PACKAGE_NAME = "@p4n/erc8004-ui"
 const IS_PUBLISHED = false
 
 // Version of the published API contract, not of the build. Bump it when an
@@ -77,11 +79,16 @@ const OPENAPI_VERSION = "1.0.0"
 const TAGLINE =
   "Drop-in React components for displaying verified ERC-8004 AI agent identity, reputation, and validation data. Self-contained, trustless, and designed to be consumed by AI coding agents."
 
-const PROVISIONAL_NAME_NOTICE =
-  `**NOTE — provisional package name.** This library is not yet published to npm. ` +
-  `\`${PACKAGE_NAME}\` is a placeholder used in code examples — the final package name has not been chosen and will likely differ. ` +
-  `Until publication, install directly from GitHub: ${GITHUB_URL}. ` +
-  `Once published, this notice will disappear and all code examples will reflect the real package name.`
+const NON_AFFILIATION_NOTICE =
+  `**NOTE — unofficial library.** \`${PACKAGE_NAME}\` is an independent, ` +
+  `community-built project. It is not affiliated with, maintained by, or ` +
+  `endorsed by the authors of ERC-8004. It reads the standard's on-chain data ` +
+  `through public subgraphs; it does not speak for the standard.`
+
+const UNPUBLISHED_NOTICE =
+  `**NOTE — not yet on npm.** \`${PACKAGE_NAME}\` is the final package name, ` +
+  `but it has not been published yet. Until it is, install directly from ` +
+  `GitHub: ${GITHUB_URL}.`
 
 // ---------------------------------------------------------------------------
 // Resolve paths relative to this file
@@ -251,8 +258,10 @@ function componentMarkdown(doc: ComponentDoc): string {
     "",
   ]
 
+  sections.push(`> ${NON_AFFILIATION_NOTICE}`)
+  sections.push("")
   if (!IS_PUBLISHED) {
-    sections.push(`> ${PROVISIONAL_NAME_NOTICE}`)
+    sections.push(`> ${UNPUBLISHED_NOTICE}`)
     sections.push("")
   }
 
@@ -335,8 +344,10 @@ function guideMarkdown(slug: string): string {
   sections.push(`# ${guide.name}`)
   sections.push("")
 
+  sections.push(`> ${NON_AFFILIATION_NOTICE}`)
+  sections.push("")
   if (!IS_PUBLISHED) {
-    sections.push(`> ${PROVISIONAL_NAME_NOTICE}`)
+    sections.push(`> ${UNPUBLISHED_NOTICE}`)
     sections.push("")
   }
 
@@ -390,8 +401,10 @@ function buildLlmsTxt(): string {
   lines.push("")
   lines.push(`> ${TAGLINE}`)
   lines.push("")
+  lines.push(NON_AFFILIATION_NOTICE)
+  lines.push("")
   if (!IS_PUBLISHED) {
-    lines.push(PROVISIONAL_NAME_NOTICE)
+    lines.push(UNPUBLISHED_NOTICE)
     lines.push("")
   }
 
@@ -503,8 +516,10 @@ function buildLlmsFull(): string {
   lines.push("")
   lines.push(`> ${TAGLINE}`)
   lines.push("")
+  lines.push(NON_AFFILIATION_NOTICE)
+  lines.push("")
   if (!IS_PUBLISHED) {
-    lines.push(PROVISIONAL_NAME_NOTICE)
+    lines.push(UNPUBLISHED_NOTICE)
     lines.push("")
   }
   lines.push(
@@ -680,7 +695,8 @@ function buildRegistrySnapshot() {
     generatedAt: new Date().toISOString(),
     packageName: PACKAGE_NAME,
     isPublished: IS_PUBLISHED,
-    provisionalNameNotice: IS_PUBLISHED ? null : PROVISIONAL_NAME_NOTICE,
+    nonAffiliationNotice: NON_AFFILIATION_NOTICE,
+    unpublishedNotice: IS_PUBLISHED ? null : UNPUBLISHED_NOTICE,
     tagline: TAGLINE,
     siteUrl: SITE_URL,
     githubUrl: GITHUB_URL,
@@ -713,7 +729,7 @@ const PRIMARY_GUIDES = new Set(["introduction", "components"])
 /**
  * Every <title> names the product, so a search for it by name has something to
  * match — but a page whose own name already contains it is left alone rather
- * than reading "About @erc8004/ui — @erc8004/ui".
+ * than reading "About @p4n/erc8004-ui — @p4n/erc8004-ui".
  */
 function titled(name: string): string {
   return name.includes(PACKAGE_NAME) ? name : `${name} — ${PACKAGE_NAME}`

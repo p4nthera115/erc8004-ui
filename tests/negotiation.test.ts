@@ -296,7 +296,7 @@ describe("route manifest", () => {
 
   it("names the product in every title, so a name query can match a page", () => {
     for (const route of ROUTE_MANIFEST) {
-      expect(route.title, route.path).toContain("@erc8004/ui")
+      expect(route.title, route.path).toContain("@p4n/erc8004-ui")
     }
   })
 })

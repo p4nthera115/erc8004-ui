@@ -55,7 +55,7 @@ describe("buildStructuredData", () => {
 
   it("identifies the product with the fields the audit asks for", () => {
     const software = nodeOf("/", "SoftwareApplication")!
-    expect(software.name).toBe("@erc8004/ui")
+    expect(software.name).toBe("@p4n/erc8004-ui")
     expect(software.url).toBe(`${SITE_URL}/`)
     expect(String(software.description).length).toBeGreaterThan(40)
     expect(software.applicationCategory).toBe("DeveloperApplication")

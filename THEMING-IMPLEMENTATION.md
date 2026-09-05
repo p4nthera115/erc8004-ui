@@ -2,7 +2,7 @@
 
 ## Context
 
-This document specifies how theming and styling customization works across the `@erc8004/ui` component library. Follow this exactly when building any component.
+This document specifies how theming and styling customization works across the `@p4n/erc8004-ui` component library. Follow this exactly when building any component.
 
 This library is an **npm package** that consumers install into their own apps. That constraint drives every decision here — our styles must never leak into or conflict with the consumer's styles. We achieve this through **namespaced CSS custom properties** (scoped to `.erc8004`) and a **`className` prop** on every component (merged with `tailwind-merge` so consumer overrides reliably win).
 
@@ -630,7 +630,7 @@ The consumer adds one import to their app:
 
 ```tsx
 // In the consumer's app entry point
-import "@erc8004/ui/styles.css"
+import "@p4n/erc8004-ui/styles.css"
 ```
 
 This is the most common pattern for component libraries. It gives the consumer control over CSS load order.
@@ -692,8 +692,8 @@ This is what goes in the library's README and docs site. Write it exactly like t
 
 ```tsx
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { ERC8004Provider, ReputationScore } from "@erc8004/ui"
-import "@erc8004/ui/styles.css"
+import { ERC8004Provider, ReputationScore } from "@p4n/erc8004-ui"
+import "@p4n/erc8004-ui/styles.css"
 
 const queryClient = new QueryClient()
 

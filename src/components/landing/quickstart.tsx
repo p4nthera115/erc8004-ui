@@ -7,7 +7,7 @@ const STEPS = [
     n: "01",
     title: "Install",
     body: "The library plus its one peer dependency. React 18 or 19.",
-    code: `npm install @erc8004/ui @tanstack/react-query`,
+    code: `npm install @p4n/erc8004-ui @tanstack/react-query`,
     language: "terminal",
   },
   {
@@ -15,7 +15,7 @@ const STEPS = [
     title: "Wrap your app once",
     body: "ERC8004Provider holds infrastructure config only — your Graph API key, and optional subgraph overrides. It stores no agent data.",
     code: `import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { ERC8004Provider } from "@erc8004/ui"
+import { ERC8004Provider } from "@p4n/erc8004-ui"
 
 const queryClient = new QueryClient()
 
@@ -38,7 +38,7 @@ export function App() {
   AgentCard,
   ReputationScore,
   FeedbackList,
-} from "@erc8004/ui"
+} from "@p4n/erc8004-ui"
 
 function Profile() {
   return (
@@ -83,7 +83,7 @@ export function Quickstart() {
       </div>
 
       <div className={`border p-5 text-xs leading-relaxed text-text-secondary ${RULE}`}>
-        <span className="text-text-primary">Note</span> — @erc8004/ui is a
+        <span className="text-text-primary">Note</span> — @p4n/erc8004-ui is a
         placeholder name; the package isn't on npm yet. Until it is, install
         straight from the repo with{" "}
         <span className="text-text-primary">

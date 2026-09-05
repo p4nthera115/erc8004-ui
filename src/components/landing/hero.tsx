@@ -17,10 +17,10 @@ export function HeroSection() {
         <p>Built for blockchain developers and AI coding agents.</p>
         <div className="flex flex-col md:flex-row mx-auto gap-4 md:gap-10 justify-self-start w-full mt-2 md:mt-6">
           <button
-            onClick={() => navigator.clipboard.writeText("npm i @erc8004/ui")}
+            onClick={() => navigator.clipboard.writeText("npm i @p4n/erc8004-ui")}
             className="border py-4 px-10 w-full justify-center items-center flex cursor-pointer hover:underline"
           >
-            npm i @erc8004/ui
+            npm i @p4n/erc8004-ui
           </button>
           <Link
             to="/docs/components"

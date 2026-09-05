@@ -45,10 +45,10 @@ export default {
         packages: [
           {
             registry: "npm",
-            name: "@erc8004/ui-mcp",
+            name: "@p4n/erc8004-ui-mcp",
             transport: { type: "stdio" },
             command: "npx",
-            args: ["-y", "@erc8004/ui-mcp"],
+            args: ["-y", "@p4n/erc8004-ui-mcp"],
             environmentVariables: [
               {
                 name: "GRAPH_API_KEY",

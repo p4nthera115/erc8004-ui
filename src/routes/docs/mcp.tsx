@@ -89,7 +89,7 @@ const LIVE_TOOLS = [
 
 /** Hosted endpoint vs local server — mirrors the table in the markdown twin. */
 const CONNECT_ROWS: Array<[string, string, string]> = [
-  ["Endpoint", "/api/mcp", "npx -y @erc8004/ui-mcp"],
+  ["Endpoint", "/api/mcp", "npx -y @p4n/erc8004-ui-mcp"],
   ["Transport", "Streamable HTTP", "stdio"],
   ["Install", "none", "npm"],
   ["Graph API key", "not used", "optional"],
@@ -209,7 +209,7 @@ function Mcp() {
           Add the server to your MCP client configuration. For Claude Code:
         </p>
         <CodeBlock
-          code={`claude mcp add erc8004-ui --env GRAPH_API_KEY=your-graph-api-key -- npx -y @erc8004/ui-mcp`}
+          code={`claude mcp add erc8004-ui --env GRAPH_API_KEY=your-graph-api-key -- npx -y @p4n/erc8004-ui-mcp`}
         />
         <p className={PROSE}>Or configure it directly:</p>
         <CodeBlock
@@ -217,7 +217,7 @@ function Mcp() {
   "mcpServers": {
     "erc8004-ui": {
       "command": "npx",
-      "args": ["-y", "@erc8004/ui-mcp"],
+      "args": ["-y", "@p4n/erc8004-ui-mcp"],
       "env": { "GRAPH_API_KEY": "your-graph-api-key" }
     }
   }

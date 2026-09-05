@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { createRouter, RouterProvider } from "@tanstack/react-router"
 import { routeTree } from "./routeTree.gen"
 import "./index.css"
-import { ERC8004Provider } from "@erc8004/ui"
+import { ERC8004Provider } from "@p4n/erc8004-ui"
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -28,7 +28,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@erc8004/ui": ["packages/ui/src/index.ts"]
+      "@p4n/erc8004-ui": ["packages/ui/src/index.ts"]
     }
   },
   "include": ["src"]

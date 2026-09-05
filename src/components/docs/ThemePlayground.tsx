@@ -7,12 +7,14 @@
  */
 
 import { useState } from "react"
-import { AgentProvider } from "@/provider/AgentProvider"
-import { AgentCard } from "@/components/identity/agent-card"
-import { ReputationScore } from "@/components/reputation/reputation-score"
-import { ReputationDistribution } from "@/components/reputation/reputation-distribution"
-import { TagCloud } from "@/components/reputation/tag-cloud"
-import { LastActivity } from "@/components/activity/last-activity"
+import {
+  AgentProvider,
+  AgentCard,
+  ReputationScore,
+  ReputationDistribution,
+  TagCloud,
+  LastActivity,
+} from "@erc8004/ui"
 import { cn } from "@/lib/cn"
 import { CodeBlock } from "./CodeBlock"
 

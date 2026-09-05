@@ -30,7 +30,7 @@ import {
   type PropDef,
 } from "../src/components/docs/registry"
 import { GUIDE_REGISTRY, GUIDE_ORDER } from "./guides-registry"
-import { SUBGRAPH_IDS } from "../src/lib/constants"
+import { SUBGRAPH_IDS } from "../packages/ui/src/lib/constants"
 import { SITE_PAGES, SITE_PAGE_ORDER } from "../src/content/site-pages"
 import { buildAgentsMd } from "./lib/agents-md"
 import { buildOpenApiDocument } from "./lib/openapi"
@@ -151,7 +151,7 @@ const GROUPS: Array<{ title: string; slugs: string[] }> = [
 ]
 
 // ---------------------------------------------------------------------------
-// Chain metadata — display names for the chain IDs in src/lib/constants.ts.
+// Chain metadata — display names for the chain IDs in packages/ui/src/lib/constants.ts.
 // The IDs themselves stay in constants.ts (the library's own source of truth);
 // only the human-readable labels live here, since they're documentation.
 // ---------------------------------------------------------------------------
@@ -689,9 +689,13 @@ function buildRegistrySnapshot() {
     groups: GROUPS,
     components,
     guides,
-    // src/types.ts verbatim — the public data-model surface. Inlined so the
-    // MCP server needs no filesystem access to the repo at runtime.
-    types: readFileSync(join(REPO_ROOT, "src", "types.ts"), "utf8"),
+    // packages/ui/src/types.ts verbatim — the public data-model surface.
+    // Inlined so the MCP server needs no filesystem access to the repo at
+    // runtime.
+    types: readFileSync(
+      join(REPO_ROOT, "packages", "ui", "src", "types.ts"),
+      "utf8"
+    ),
   }
 }
 

@@ -1,21 +1,23 @@
 import type React from "react"
-import { AgentProvider } from "@/provider/AgentProvider"
-import { AgentName } from "@/components/identity/agent-name"
-import { AgentImage } from "@/components/identity/agent-image"
-import { AgentDescription } from "@/components/identity/agent-description"
-import { AgentCard } from "@/components/identity/agent-card"
-import { EndpointStatus } from "@/components/identity/endpoint-status"
-import { ReputationScore } from "@/components/reputation/reputation-score"
-import { ReputationDistribution } from "@/components/reputation/reputation-distribution"
-import { ReputationTimeline } from "@/components/reputation/reputation-timeline"
-import { FeedbackList } from "@/components/reputation/feedback-list"
-import { TagCloud } from "@/components/reputation/tag-cloud"
-import { VerificationBadge } from "@/components/validation/verification-badge"
-import { ValidationScore } from "@/components/validation/validation-score"
-import { ValidationList } from "@/components/validation/validation-list"
-import { ValidationDisplay } from "@/components/validation/validation-display"
-import { LastActivity } from "@/components/activity/last-activity"
-import { ActivityLog } from "@/components/activity/activity-log"
+import {
+  AgentProvider,
+  AgentName,
+  AgentImage,
+  AgentDescription,
+  AgentCard,
+  EndpointStatus,
+  ReputationScore,
+  ReputationDistribution,
+  ReputationTimeline,
+  FeedbackList,
+  TagCloud,
+  VerificationBadge,
+  ValidationScore,
+  ValidationList,
+  ValidationDisplay,
+  LastActivity,
+  ActivityLog,
+} from "@erc8004/ui"
 
 // ---------------------------------------------------------------------------
 // Types

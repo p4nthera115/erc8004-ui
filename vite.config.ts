@@ -70,6 +70,11 @@ export default defineConfig(async () => {
     resolve: {
       alias: {
         "@": resolve(__dirname, "src"),
+        // The docs site consumes the library from source, not from
+        // packages/ui/dist — so `pnpm dev` hot-reloads component edits and
+        // `pnpm build` never depends on the library being built first.
+        // Tailwind picks up the component classes for the same reason.
+        "@erc8004/ui": resolve(__dirname, "packages/ui/src/index.ts"),
       },
     },
   }

@@ -1,13 +1,15 @@
 import { Link } from "@tanstack/react-router"
 import type { CSSProperties, ReactNode } from "react"
-import { AgentProvider } from "@/provider/AgentProvider"
-import { AgentCard } from "@/components/identity/agent-card"
-import { EndpointStatus } from "@/components/identity/endpoint-status"
-import { ReputationDistribution } from "@/components/reputation/reputation-distribution"
-import { ReputationTimeline } from "@/components/reputation/reputation-timeline"
-import { FeedbackList } from "@/components/reputation/feedback-list"
-import { TagCloud } from "@/components/reputation/tag-cloud"
-import { ActivityLog } from "@/components/activity/activity-log"
+import {
+  AgentProvider,
+  AgentCard,
+  EndpointStatus,
+  ReputationDistribution,
+  ReputationTimeline,
+  FeedbackList,
+  TagCloud,
+  ActivityLog,
+} from "@erc8004/ui"
 
 const BASE_REGISTRY = "eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432"
 

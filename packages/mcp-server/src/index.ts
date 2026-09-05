@@ -252,7 +252,7 @@ server.registerTool(
   },
   async () =>
     text(
-      `// ${registry.packageName} — public type definitions (src/types.ts)\n\n${registry.types}`,
+      `// ${registry.packageName} — public type definitions (packages/ui/src/types.ts)\n\n${registry.types}`,
     ),
 )
 

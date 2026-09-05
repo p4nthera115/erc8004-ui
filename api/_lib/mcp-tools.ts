@@ -217,7 +217,7 @@ export const TOOLS: ToolDefinition[] = [
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
     run: () =>
       text(
-        `// ${REGISTRY.packageName} — public type definitions (src/types.ts)\n\n${REGISTRY.types}`
+        `// ${REGISTRY.packageName} — public type definitions (packages/ui/src/types.ts)\n\n${REGISTRY.types}`
       ),
   },
 ]

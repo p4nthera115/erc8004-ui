@@ -1469,7 +1469,7 @@
         ],
         "operationId": "getTypes",
         "summary": "TypeScript type definitions",
-        "description": "`src/types.ts` verbatim — the public data model.",
+        "description": "`packages/ui/src/types.ts` verbatim — the public data model.",
         "parameters": [
           {
             "name": "format",
@@ -2665,7 +2665,7 @@
           "source": {
             "type": "string",
             "examples": [
-              "src/types.ts"
+              "packages/ui/src/types.ts"
             ]
           },
           "language": {

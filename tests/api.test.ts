@@ -220,7 +220,7 @@ describe("GET /api/chains and /api/types", () => {
 
   it("returns the public type definitions", async () => {
     const body = await json(await get(types, "/api/types"))
-    expect(body.source).toBe("src/types.ts")
+    expect(body.source).toBe("packages/ui/src/types.ts")
     expect(body.types).toContain("export interface")
 
     const markdown = await get(types, "/api/types?format=markdown")

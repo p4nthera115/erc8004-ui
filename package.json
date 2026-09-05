@@ -9,15 +9,17 @@
     "build": "tsc -b && vite build",
     "postbuild": "node -e \"const fs=require('node:fs');const path=require('node:path');const src=path.join('dist','404','index.html');const dst=path.join('dist','404.html');if(fs.existsSync(src)){fs.copyFileSync(src,dst);console.log('[postbuild] copied',src,'->',dst);}else{console.warn('[postbuild] missing',src);}\"",
     "build:mcp": "pnpm gen:registry && pnpm -C packages/mcp-server build",
-    "build:packages": "pnpm build:mcp",
+    "build:packages": "pnpm build:ui && pnpm build:mcp",
     "lint": "eslint .",
     "preview": "vite preview",
     "gen:registry": "tsx --tsconfig tsconfig.app.json scripts/generate-llms.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "pretest": "pnpm gen:registry"
+    "pretest": "pnpm gen:registry",
+    "build:ui": "pnpm -C packages/ui build"
   },
   "dependencies": {
+    "@erc8004/ui": "workspace:*",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/react-query": "^5.0.0",
     "@tanstack/react-router": "^1.168.8",
@@ -27,8 +29,7 @@
     "react-dom": "^19.2.4",
     "react-icons": "^5.6.0",
     "tailwind-merge": "^3.5.0",
-    "tailwindcss": "^4.2.2",
-    "valibot": "^1.3.1"
+    "tailwindcss": "^4.2.2"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

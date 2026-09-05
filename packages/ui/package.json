@@ -1,0 +1,86 @@
+{
+  "name": "@erc8004/ui",
+  "version": "0.1.0",
+  "description": "Drop-in React components for displaying verified ERC-8004 agent identity, reputation and validation data. Pass an on-chain identifier; the component fetches and renders the verified data itself.",
+  "keywords": [
+    "erc8004",
+    "erc-8004",
+    "agent",
+    "ai-agent",
+    "react",
+    "components",
+    "ethereum",
+    "web3",
+    "reputation",
+    "identity",
+    "thegraph",
+    "subgraph"
+  ],
+  "license": "MIT",
+  "author": "p4nthera115",
+  "homepage": "https://erc8004-ui.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/p4nthera115/erc8004-ui.git",
+    "directory": "packages/ui"
+  },
+  "bugs": {
+    "url": "https://github.com/p4nthera115/erc8004-ui/issues"
+  },
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./tokens.css": "./src/styles/tokens.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src/styles/tokens.css",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "pnpm build:js && pnpm build:css",
+    "build:js": "tsup",
+    "build:css": "tailwindcss -i ./src/styles.css -o ./dist/styles.css --minify",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm build"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5.0.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "tailwind-merge": "^3.5.0",
+    "valibot": "^1.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.2",
+    "@tanstack/react-query": "^5.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.2.2",
+    "tsup": "^8.0.0",
+    "typescript": "~5.9.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

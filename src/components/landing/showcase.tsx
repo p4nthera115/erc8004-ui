@@ -68,7 +68,9 @@ export function Showcase() {
         <div
           className={`flex flex-col gap-2 border-b pb-6 md:flex-row md:items-baseline md:justify-between ${RULE}`}
         >
-          <span className="text-xs text-text-secondary">
+          {/* The CAIP-10 registry string is one unbreakable token — without
+              break-all it sets the page's minimum width on a phone. */}
+          <span className="text-xs break-all text-text-secondary">
             Agent #{DEMO_AGENT_ID} · {DEMO_REGISTRY}
           </span>
           <span className="text-xs text-text-secondary">

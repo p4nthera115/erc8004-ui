@@ -12,7 +12,7 @@ function Theming() {
     <div className="flex flex-col gap-14">
       {/* Header */}
       <div className="flex flex-col gap-3">
-        <h1 className="font-mono text-3xl font-bold text-neutral-900 dark:text-white">
+        <h1 className="font-mono text-2xl font-bold text-neutral-900 sm:text-3xl dark:text-white">
           Theming
         </h1>
         <p className="text-base text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
@@ -520,8 +520,9 @@ function Theming() {
         {/* data-markdown-ignore: visual radius-scale table; markdown twin uses a real table. */}
         <div
           data-markdown-ignore
-          className="border border-black/60 dark:border-white/10 divide-y divide-black/60 dark:divide-white/10 text-sm font-mono"
+          className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0"
         >
+          <div className="max-sm:min-w-[34rem] border border-black/60 divide-y divide-black/60 text-sm font-mono dark:border-white/10 dark:divide-white/10">
           <div className="grid grid-cols-3 px-4 py-2 text-neutral-400 dark:text-white/40 text-xs uppercase tracking-wider">
             <span>Class</span>
             <span>Size</span>
@@ -544,6 +545,7 @@ function Theming() {
               </span>
             </div>
           ))}
+          </div>
         </div>
         <p className="text-sm text-neutral-700 dark:text-white leading-relaxed max-w-prose">
           Change <InlineCode>--erc8004-radius</InlineCode> once, and the entire
@@ -761,8 +763,9 @@ function TokenTable({ rows }: { rows: [string, string, string, string][] }) {
   return (
     <div
       data-markdown-ignore
-      className="border border-black/60 dark:border-white/10 divide-y divide-black/60 dark:divide-white/10 text-sm overflow-x-auto"
+      className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0"
     >
+      <div className="max-sm:min-w-[52rem] border border-black/60 divide-y divide-black/60 text-sm dark:border-white/10 dark:divide-white/10">
       <div className="grid grid-cols-4 px-4 py-2 text-neutral-400 dark:text-white/40 text-xs uppercase tracking-wider font-mono">
         <span>Token</span>
         <span>CSS Variable</span>
@@ -783,6 +786,7 @@ function TokenTable({ rows }: { rows: [string, string, string, string][] }) {
           </span>
         </div>
       ))}
+      </div>
     </div>
   )
 }

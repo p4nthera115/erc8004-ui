@@ -112,12 +112,20 @@ html:not(.dark) .docs-sidebar[data-scrolling="true"]::-webkit-scrollbar-thumb {
 .code-block .code-line::before {
   content: counter(code-line);
   flex: 0 0 auto;
-  width: 3.5rem;
-  padding-left: 1rem;
-  padding-right: 1.5rem;
+  /* Narrow gutter on phones — 3.5rem is a sixth of a 360px code block. */
+  width: 2.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.75rem;
   text-align: right;
   user-select: none;
   color: #a3a3a3;
+}
+@media (min-width: 640px) {
+  .code-block .code-line::before {
+    width: 3.5rem;
+    padding-left: 1rem;
+    padding-right: 1.5rem;
+  }
 }
 html.dark .code-block .code-line::before {
   color: #525252;
@@ -234,18 +242,38 @@ html.dark .cb-plain {
     transform: translateY(-50%);
   }
 }
+@keyframes erc-marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
 .marquee-track {
   animation-name: erc-marquee;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   will-change: transform;
 }
+/*
+  The horizontal band under the hero on phones
+  (ComponentCarousel in src/components/landing/component-wall.tsx).
+*/
+.marquee-track-x {
+  animation-name: erc-marquee-x;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
 /* Pause the column being read so its tiles (and their docs links) hold still. */
-.marquee-track:hover {
+.marquee-track:hover,
+.marquee-track-x:hover {
   animation-play-state: paused;
 }
 @media (prefers-reduced-motion: reduce) {
-  .marquee-track {
+  .marquee-track,
+  .marquee-track-x {
     animation: none;
   }
 }

@@ -11,7 +11,7 @@ function Installation() {
     <div className="flex flex-col gap-14">
       {/* Header */}
       <div className="flex flex-col gap-3">
-        <h1 className="font-mono text-3xl font-bold text-neutral-900 dark:text-white">
+        <h1 className="font-mono text-2xl font-bold text-neutral-900 sm:text-3xl dark:text-white">
           Installation
         </h1>
         <p className="text-base text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">

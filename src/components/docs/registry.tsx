@@ -289,10 +289,10 @@ function App() {
       description:
         "AgentName used in a profile header alongside the agent's image, description, and verification status.",
       preview: withAgent(
-        <div className="flex items-center gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg">
+        <div className="flex flex-col items-start gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg sm:flex-row sm:items-center">
           <AgentImage className="min-h-24 min-w-24" />
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-4">
+          <div className="flex min-w-0 flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
               <AgentName />
               <VerificationBadge />
             </div>
@@ -301,10 +301,10 @@ function App() {
         </div>
       ),
       code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={888}>
-  <div className="flex items-center gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg">
+  <div className="flex flex-col items-start gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg sm:flex-row sm:items-center">
     <AgentImage className="min-h-24 min-w-24" />
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-4">
+    <div className="flex min-w-0 flex-col gap-2">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
         <AgentName />
         <VerificationBadge />
       </div>
@@ -351,10 +351,10 @@ function App() {
       description:
         "AgentImage in a profile header alongside name and verification badge.",
       preview: withAgent(
-        <div className="flex items-center gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg">
+        <div className="flex flex-col items-start gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg sm:flex-row sm:items-center">
           <AgentImage className="min-h-24 min-w-24" />
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-4">
+          <div className="flex min-w-0 flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
               <AgentName />
               <VerificationBadge />
             </div>
@@ -363,10 +363,10 @@ function App() {
         </div>
       ),
       code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={888}>
-  <div className="flex items-center gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg">
+  <div className="flex flex-col items-start gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg sm:flex-row sm:items-center">
     <AgentImage className="min-h-24 min-w-24" />
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-4">
+    <div className="flex min-w-0 flex-col gap-2">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
         <AgentName />
         <VerificationBadge />
       </div>
@@ -414,10 +414,10 @@ function App() {
       description: "AgentDescription as part of a profile header composition.",
       preview: withAgent(
         <AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={888}>
-          <div className="flex items-center gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg">
+          <div className="flex flex-col items-start gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg sm:flex-row sm:items-center">
             <AgentImage className="min-h-24 min-w-24" />
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-4">
+            <div className="flex min-w-0 flex-col gap-2">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                 <AgentName />
                 <VerificationBadge />
               </div>
@@ -427,10 +427,10 @@ function App() {
         </AgentProvider>
       ),
       code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={888}>
-  <div className="flex items-center gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg">
+  <div className="flex flex-col items-start gap-4 p-4 bg-neutral-900 border border-white/20 rounded-lg sm:flex-row sm:items-center">
     <AgentImage className="min-h-24 min-w-24" />
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-4">
+    <div className="flex min-w-0 flex-col gap-2">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
         <AgentName />
         <VerificationBadge />
       </div>
@@ -908,7 +908,7 @@ function App() {
         "FeedbackList in a reputation panel alongside the score and tag cloud.",
       preview: withAgent(
         <div className="w-full space-y-4">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <ReputationScore />
             <TagCloud />
           </div>
@@ -916,7 +916,7 @@ function App() {
         </div>
       ),
       code: `<AgentProvider agentRegistry="eip155:8453:0x8004...a432" agentId={888}>
-  <div className="flex items-center gap-4">
+  <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
     <ReputationScore />
     <TagCloud />
   </div>

@@ -162,8 +162,12 @@ function tokenize(code: string): Token[] {
       continue
     }
 
-    // Line comment // ...
-    if ((m = s.match(/^(\/\/[^\n]*)/))) {
+    // Line comment // ... — but not the // in a URL scheme (https://...),
+    // where the preceding character is a colon.
+    if (
+      (m = s.match(/^(\/\/[^\n]*)/)) &&
+      code[code.length - s.length - 1] !== ":"
+    ) {
       tokens.push({ type: "comment", text: m[1] })
       s = s.slice(m[1].length)
       continue
@@ -280,7 +284,7 @@ function HighlightedCode({
 
 export function InlineCode({ children }: { children: React.ReactNode }) {
   return (
-    <code className="font-mono text-neutral-700 dark:text-white/80 bg-neutral-200 dark:bg-white/15 px-1.5 py-0.5 rounded text-[0.85em]">
+    <code className="font-mono text-neutral-700 dark:text-white/80 bg-neutral-200 dark:bg-white/15 px-1.5 py-0.5 rounded text-[0.85em] [overflow-wrap:anywhere]">
       {children}
     </code>
   )
@@ -325,7 +329,7 @@ export function CodeBlock({
     <div className="flex bg-neutral-200 dark:bg-neutral-900 border border-black/10 dark:border-white/10">
       <pre
         data-markdown-ignore
-        className={`code-block ${isTerminal ? "code-block-terminal " : ""}flex-1 min-w-0 overflow-x-auto py-4 font-mono text-sm leading-relaxed whitespace-pre`}
+        className={`code-block ${isTerminal ? "code-block-terminal " : ""}flex-1 min-w-0 overflow-x-auto py-4 font-mono text-xs sm:text-sm leading-relaxed whitespace-pre`}
       >
         <code>
           {isTerminal
@@ -345,7 +349,7 @@ export function CodeBlock({
               ))}
         </code>
       </pre>
-      <div className="shrink-0 pt-3 pr-3 ml-3">
+      <div className="shrink-0 pt-2 pr-2 ml-1 sm:pt-3 sm:pr-3 sm:ml-3">
         <button
           onClick={handleCopy}
           className="p-1.5 rounded-md text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 bg-neutral-300/50 hover:bg-neutral-300 dark:bg-white/10 dark:hover:bg-white/20 transition-colors cursor-pointer"

@@ -241,12 +241,20 @@ function FeedbackRow({ item, options }: { item: FeedbackItem; options: FeedbackR
   // width ("1.0" vs "100.0"), so an auto-width first column pushed every row's
   // tags to a different x. Fixing the column keeps tags, text and metadata on
   // the same vertical lines down the whole list.
+  //
+  // The metadata column is sized to its content, so in a narrow card it took
+  // the ~200px an address and a relative time need and left the tags with
+  // about 50px — every pill truncated to a single letter. Below `@md` the
+  // metadata drops onto its own line under the content instead, which is a
+  // container query, not a media query: what matters is how wide the card is,
+  // not how wide the window is. The same list is narrow in a sidebar on a
+  // desktop and wide in a phone-width single-column page.
   return (
     <div
       className={cn(
         "grid items-start gap-x-3 px-4 py-3",
         hasMeta
-          ? "grid-cols-[3.25rem_minmax(0,1fr)_auto]"
+          ? "grid-cols-[3.25rem_minmax(0,1fr)] @md:grid-cols-[3.25rem_minmax(0,1fr)_auto]"
           : "grid-cols-[3.25rem_minmax(0,1fr)]"
       )}
     >
@@ -288,7 +296,7 @@ function FeedbackRow({ item, options }: { item: FeedbackItem; options: FeedbackR
       </div>
 
       {hasMeta && (
-        <div className="flex shrink-0 items-center gap-2 leading-6">
+        <div className="col-start-2 mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 leading-6 @md:col-start-3 @md:row-start-1 @md:mt-0 @md:shrink-0 @md:flex-nowrap">
           {options.showReviewerAddress && <Address address={item.clientAddress} />}
           {options.showTimestamp && (
             <span className="text-xs text-erc8004-muted-fg tabular-nums">
@@ -347,7 +355,7 @@ export function FeedbackList({
 
   if (isLoading) {
     return (
-      <Card className={cn("w-full", className)}>
+      <Card className={cn("@container w-full", className)}>
         <div className="border-b border-erc8004-border px-4 py-3">
           <Skeleton className="h-4 w-16" />
         </div>
@@ -369,7 +377,7 @@ export function FeedbackList({
 
   if (error) {
     return (
-      <Card className={cn("w-full", className)}>
+      <Card className={cn("@container w-full", className)}>
         <ErrorState message="Couldn't load feedback" onRetry={() => refetch()} />
       </Card>
     )
@@ -377,7 +385,7 @@ export function FeedbackList({
 
   if (!data?.feedbacks.length && page === 0) {
     return (
-      <Card className={cn("w-full", className)}>
+      <Card className={cn("@container w-full", className)}>
         <EmptyState message={emptyMessage} />
       </Card>
     )
@@ -389,7 +397,7 @@ export function FeedbackList({
   const countCapped = totalCount === COUNT_QUERY_LIMIT
 
   return (
-    <Card className={cn("w-full", className)}>
+    <Card className={cn("@container w-full", className)}>
       <div className="border-b border-erc8004-border px-4 py-3">
         <h3 className="text-sm font-medium text-erc8004-card-fg">Feedback</h3>
       </div>

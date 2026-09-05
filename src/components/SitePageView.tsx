@@ -23,12 +23,12 @@ export function PageHeader({
   intro: ReactNode
 }) {
   return (
-    <header className={`border-b ${RULE} px-6 py-16 md:px-14 md:py-20`}>
+    <header className={`border-b ${RULE} px-5 py-12 sm:px-6 sm:py-16 md:px-14 md:py-20`}>
       <div className="flex max-w-3xl flex-col gap-4">
         <span className="text-xs uppercase tracking-[0.2em] text-text-secondary">
           {kicker}
         </span>
-        <h1 className="text-2xl leading-snug md:text-3xl">{title}</h1>
+        <h1 className="text-xl leading-snug sm:text-2xl md:text-3xl">{title}</h1>
         <p className="max-w-2xl text-sm leading-relaxed text-text-secondary md:text-base">
           {intro}
         </p>
@@ -46,7 +46,7 @@ export function PageSection({
 }) {
   return (
     <section className={`border-b ${RULE}`}>
-      <div className="flex flex-col gap-6 px-6 py-12 md:px-14 md:py-16">
+      <div className="flex flex-col gap-6 px-5 py-10 sm:px-6 sm:py-12 md:px-14 md:py-16">
         <h2 className="text-xs uppercase tracking-[0.2em] text-text-secondary">
           {heading}
         </h2>
@@ -66,7 +66,7 @@ export function PageFootnote({
 }) {
   return (
     <div
-      className={`flex flex-col gap-2 border-b px-6 py-6 text-xs text-text-secondary md:flex-row md:items-center md:justify-between md:px-14 ${RULE}`}
+      className={`flex flex-col gap-2 border-b px-5 py-6 text-xs break-words text-text-secondary sm:px-6 md:flex-row md:items-center md:justify-between md:px-14 ${RULE}`}
     >
       <span>{left}</span>
       <span>{right}</span>

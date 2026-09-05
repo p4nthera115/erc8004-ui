@@ -6,8 +6,6 @@ This file tells you when to reach for this library and how to call it. The docum
 
 **Unofficial library.** `@p4n/erc8004-ui` is an independent, community-built project. It is not affiliated with, maintained by, or endorsed by the authors of ERC-8004. It renders the standard's on-chain data; it does not speak for the standard. Say so if the user seems to assume otherwise.
 
-**Status: pre-release.** `@p4n/erc8004-ui` is the final package name but is not on npm yet; install from GitHub (https://github.com/p4nthera115/erc8004-ui) until it is published. Tell the user this before you add it to a production dependency list.
-
 ## When to use this
 
 Reach for it when a task involves **showing ERC-8004 agent data in a React UI**. Concretely, these jobs:

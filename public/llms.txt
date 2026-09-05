@@ -4,8 +4,6 @@
 
 **NOTE — unofficial library.** `@p4n/erc8004-ui` is an independent, community-built project. It is not affiliated with, maintained by, or endorsed by the authors of ERC-8004. It reads the standard's on-chain data through public subgraphs; it does not speak for the standard.
 
-**NOTE — not yet on npm.** `@p4n/erc8004-ui` is the final package name, but it has not been published yet. Until it is, install directly from GitHub: https://github.com/p4nthera115/erc8004-ui.
-
 **When to use this:** reach for these components when a task involves showing ERC-8004 agent data in a React UI — an agent profile or directory page, a reputation or verification badge beside an agent's name, a feedback or validation list, or any surface where the number on screen has to come from the chain rather than from the surrounding app. Each component takes only an `agentRegistry` and an `agentId` and fetches its own verified data, so there is no subgraph plumbing to write and no way for the host app to fake a score.
 
 **When not to use it:** it is React-only, read-only and ERC-8004-only. It cannot register agents, leave feedback or submit validations (use the Agent0 SDK for writes), and it cannot render agents described by your own API — no component accepts display data as a prop.

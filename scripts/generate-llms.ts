@@ -41,7 +41,13 @@ import {
 } from "./lib/route-manifest"
 import { sitePageMarkdown } from "./lib/site-pages-markdown"
 import { toYaml } from "./lib/yaml"
-import { writeFileSync, readFileSync, mkdirSync, rmSync, existsSync } from "node:fs"
+import {
+  writeFileSync,
+  readFileSync,
+  mkdirSync,
+  rmSync,
+  existsSync,
+} from "node:fs"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -69,7 +75,7 @@ const GITHUB_URL = "https://github.com/p4nthera115/erc8004-ui"
 // When you publish: set IS_PUBLISHED = true and re-run the build. Every
 // output regenerates.
 const PACKAGE_NAME = "@p4n/erc8004-ui"
-const IS_PUBLISHED = false
+const IS_PUBLISHED = true
 
 // Version of the published API contract, not of the build. Bump it when an
 // endpoint's response shape changes in a way a caller could notice; leaving the
@@ -107,7 +113,13 @@ const GENERATED_SRC_DIR = join(REPO_ROOT, "src", "generated")
 // importing registry.tsx directly — that would pull React and every component
 // into a server-side bundle. Emitting it here keeps the snapshot regenerating
 // on exactly the same cadence as llms.txt, so the two can never drift.
-const MCP_GENERATED_DIR = join(REPO_ROOT, "packages", "mcp-server", "src", "generated")
+const MCP_GENERATED_DIR = join(
+  REPO_ROOT,
+  "packages",
+  "mcp-server",
+  "src",
+  "generated"
+)
 // The same snapshot, as a TypeScript module, for the Vercel functions under
 // /api. A `.ts` module rather than a JSON import so the platform's bundler
 // traces it like any other source file.
@@ -211,9 +223,9 @@ function propsTable(props: PropDef[]): string {
   const rows = props.map((p) => {
     const req = p.required ? "yes" : "no"
     const def = p.default ? `\`${cell(p.default)}\`` : "—"
-    return `| \`${cell(p.name)}\` | \`${cell(p.type)}\` | ${req} | ${def} | ${cell(
-      p.description
-    )} |`
+    return `| \`${cell(p.name)}\` | \`${cell(
+      p.type
+    )}\` | ${req} | ${def} | ${cell(p.description)} |`
   })
   return [header, ...rows].join("\n") + "\n"
 }
@@ -439,9 +451,7 @@ function buildLlmsTxt(): string {
     // Link to the canonical /docs/{slug}.md path so llms.txt entries match the
     // sitemap (after stripping .md). The vercel.json rewrite proxies these to
     // the underlying /llms/_guides/{slug}.md file.
-    lines.push(
-      `- [${g.name}](${SITE_URL}/docs/${g.slug}.md): ${g.description}`
-    )
+    lines.push(`- [${g.name}](${SITE_URL}/docs/${g.slug}.md): ${g.description}`)
   }
   lines.push("")
   lines.push("## Components")
@@ -488,7 +498,9 @@ function buildLlmsTxt(): string {
   lines.push("")
   for (const slug of SITE_PAGE_ORDER) {
     const page = SITE_PAGES[slug]
-    lines.push(`- [${page.title}](${SITE_URL}/${page.slug}.md): ${page.description}`)
+    lines.push(
+      `- [${page.title}](${SITE_URL}/${page.slug}.md): ${page.description}`
+    )
   }
   lines.push("")
   lines.push("## Optional")
@@ -689,7 +701,9 @@ function buildRegistrySnapshot() {
         subgraphId,
       }
     })
-    .sort((a, b) => Number(a.testnet) - Number(b.testnet) || a.chainId - b.chainId)
+    .sort(
+      (a, b) => Number(a.testnet) - Number(b.testnet) || a.chainId - b.chainId
+    )
 
   return {
     generatedAt: new Date().toISOString(),
@@ -898,7 +912,11 @@ function main() {
     "// it, and they are not guaranteed to be built after the build command that\n" +
     "// generates it.\n\n" +
     'import type { RegistrySnapshot } from "../_lib/registry-types.js"\n\n' +
-    `export const REGISTRY: RegistrySnapshot = ${JSON.stringify(value, null, 2)}\n`
+    `export const REGISTRY: RegistrySnapshot = ${JSON.stringify(
+      value,
+      null,
+      2
+    )}\n`
 
   // Because it is committed, the build stamp has to be stable: a regeneration
   // that changes no documentation must leave no diff, or every `pnpm test`
@@ -906,7 +924,9 @@ function main() {
   const previousApiSnapshot = existsSync(apiSnapshotFile)
     ? readFileSync(apiSnapshotFile, "utf8")
     : null
-  const previousStamp = previousApiSnapshot?.match(/"generatedAt": "([^"]+)"/)?.[1]
+  const previousStamp = previousApiSnapshot?.match(
+    /"generatedAt": "([^"]+)"/
+  )?.[1]
   if (
     previousStamp &&
     renderApiSnapshot({ ...snapshot, generatedAt: previousStamp }) ===

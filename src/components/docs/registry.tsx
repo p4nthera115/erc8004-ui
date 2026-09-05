@@ -320,17 +320,17 @@ function App() {
     slug: "agent-image",
     name: "AgentImage",
     description:
-      "Renders the agent's registered image. Supports IPFS, HTTPS, and base64 sources. Falls back to the deterministic FingerprintBadge when no image is registered.",
+      "Renders the agent's registered image. Supports IPFS, HTTPS, and base64 sources. When no image is registered it falls back to an initials avatar in a colour derived from the agent's identity — or to the deterministic FingerprintBadge when the agent has no name either.",
     preview: withAgent(<AgentImage />),
     importLine: `import { AgentImage } from "@p4n/erc8004-ui"`,
     usage: `<AgentImage agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
     examples: [
       {
-        name: "With FingerprintBadge Fallback",
+        name: "Fallbacks",
         description:
-          "When no image is registered, AgentImage automatically renders the deterministic FingerprintBadge as a fallback.",
+          "With no registered image, AgentImage renders the agent's initials on a colour derived from its registry and id — the same colour on every page and every reload. An agent with no registered name falls back to the deterministic FingerprintBadge instead.",
         preview: withAgent(<AgentImage />),
-        code: `// If the agent has no registered image, a FingerprintBadge is shown:
+        code: `// No image: initials avatar. No image and no name: FingerprintBadge.
 <AgentImage agentRegistry="eip155:8453:0x8004...a432" agentId={888} />`,
       },
       {
@@ -524,7 +524,7 @@ function App() {
         required: false,
         default: "64",
         description:
-          "Rendered width and height in pixels. Also sets the FingerprintBadge fallback size.",
+          "Rendered width and height in pixels. Also sets the size of the initials or FingerprintBadge fallback.",
       },
       {
         name: "layout",

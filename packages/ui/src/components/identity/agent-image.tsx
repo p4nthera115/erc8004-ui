@@ -10,10 +10,12 @@ import { useQuery } from "@tanstack/react-query"
 import { Skeleton } from "../_internal"
 import * as v from "valibot"
 import { FingerprintBadge } from "./FingerprintBadge"
+import { AgentAvatar, agentInitials } from "./agent-avatar"
 
 type AgentImageResponse = {
   agent: {
-    registrationFile: { image: string | null } | null
+    // `name` is only here for the initials fallback, not rendered on its own.
+    registrationFile: { image: string | null; name: string | null } | null
   } | null
 }
 
@@ -23,6 +25,7 @@ const agentImageSchema = v.object({
       registrationFile: v.nullable(
         v.object({
           image: v.nullable(v.string()),
+          name: v.nullable(v.string()),
         })
       ),
     })
@@ -34,6 +37,7 @@ const AGENT_IMAGE_QUERY = `#graphql
     agent(id: $id) {
       registrationFile {
         image
+        name
       }
     }
   }
@@ -99,6 +103,9 @@ export function AgentImage({
   }
 
   const imageUrl = data?.agent?.registrationFile?.image
+  // No image: initials off the registered name, or the fingerprint when the
+  // agent has no name to take initials from.
+  const initials = agentInitials(data?.agent?.registrationFile?.name)
 
   return (
     <div
@@ -113,6 +120,13 @@ export function AgentImage({
           src={resolveImageUrl(imageUrl)}
           alt={`Agent #${agentId}`}
           className="h-full w-full object-cover"
+        />
+      ) : initials ? (
+        <AgentAvatar
+          agentRegistry={agentRegistry}
+          agentId={agentId}
+          initials={initials}
+          size={size}
         />
       ) : (
         <FingerprintBadge

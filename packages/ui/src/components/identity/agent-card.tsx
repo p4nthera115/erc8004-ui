@@ -17,6 +17,7 @@ import {
 } from "../_internal"
 import * as v from "valibot"
 import { FingerprintBadge } from "./FingerprintBadge"
+import { AgentAvatar, agentInitials } from "./agent-avatar"
 
 type AgentCardResponse = {
   agent: {
@@ -211,9 +212,13 @@ export function AgentCard({
   }
 
   const { owner, registrationFile: rf } = data.agent
-  const name = rf?.name ?? `Agent #${agentId}`
+  const registeredName = rf?.name ?? null
+  const name = registeredName ?? `Agent #${agentId}`
   const description = rf?.description ?? null
   const imageUrl = rf?.image ? resolveImageUrl(rf.image) : null
+  // No image: initials off the registered name, or the fingerprint when the
+  // agent has no name to take initials from.
+  const initials = agentInitials(registeredName)
 
   const activeProtocols = PROTOCOL_LABELS.filter(({ key }) => rf?.[key] != null)
 
@@ -221,7 +226,7 @@ export function AgentCard({
     const avatarSize = 80
     return (
       <Card shadow className={cn("p-6 max-w-sm w-full", className)}>
-        <div className="flex flex-col justify-center items-center text-center">
+        <div className="flex w-full min-w-0 flex-col justify-center items-center text-center">
           {/* Avatar */}
           <div
             className="aspect-square shrink-0 overflow-hidden rounded-erc8004-md border border-erc8004-border"
@@ -233,6 +238,13 @@ export function AgentCard({
                 alt={name}
                 className="h-full w-full object-cover"
               />
+            ) : initials ? (
+              <AgentAvatar
+                agentRegistry={agentRegistry}
+                agentId={agentId}
+                initials={initials}
+                size={avatarSize}
+              />
             ) : (
               <FingerprintBadge
                 agentRegistry={agentRegistry}
@@ -243,7 +255,7 @@ export function AgentCard({
           </div>
 
           {/* Name + agent id */}
-          <div className="mt-4 min-w-0">
+          <div className="mt-4 w-full min-w-0">
             <h2 className="truncate text-lg font-medium text-erc8004-card-fg">
               {name}
             </h2>
@@ -255,9 +267,9 @@ export function AgentCard({
           {/* Owner + protocols */}
           {(showOwner ||
             (showProtocolBadges && activeProtocols.length > 0)) && (
-            <div className="mt-3 flex flex-col items-center">
+            <div className="mt-3 flex w-full min-w-0 flex-col items-center">
               {showOwner && <Address address={owner} />}
-              <div className="mt-3 flex flex-wrap items-center gap-2">
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
                 {showProtocolBadges &&
                   activeProtocols.map(({ key, label }) => (
                     <Tag key={key}>{label}</Tag>
@@ -268,7 +280,7 @@ export function AgentCard({
 
           {/* Description */}
           {showDescription && description && (
-            <p className="mt-4 line-clamp-3 text-sm text-erc8004-muted-fg leading-relaxed">
+            <p className="mt-4 w-full min-w-0 line-clamp-3 break-words text-sm text-erc8004-muted-fg leading-relaxed">
               {description}
             </p>
           )}
@@ -287,6 +299,13 @@ export function AgentCard({
               src={imageUrl}
               alt={name}
               className="h-full w-full object-cover"
+            />
+          ) : initials ? (
+            <AgentAvatar
+              agentRegistry={agentRegistry}
+              agentId={agentId}
+              initials={initials}
+              size={48}
             />
           ) : (
             <FingerprintBadge
@@ -324,7 +343,7 @@ export function AgentCard({
 
       {/* Bottom row: description */}
       {showDescription && description && (
-        <p className="mt-4 line-clamp-2 text-sm text-erc8004-muted-fg leading-relaxed">
+        <p className="mt-4 line-clamp-2 break-words text-sm text-erc8004-muted-fg leading-relaxed">
           {description}
         </p>
       )}

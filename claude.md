@@ -239,7 +239,7 @@ Data source: `Agent` + `AgentRegistrationFile` subgraph entities.
 
 1. **FingerprintBadge** — deterministic SVG visual identity. No data fetch — generated from identifiers. ✓
 2. **AgentName** — agent's registered name. Fetches `registrationFile.name` only. Falls back to truncated agent ID.
-3. **AgentImage** — agent's registered image (IPFS/HTTPS/base64). Fetches `registrationFile.image` only. Falls back to FingerprintBadge.
+3. **AgentImage** — agent's registered image (IPFS/HTTPS/base64). Fetches `registrationFile.image` + `name`. With no image it falls back to an initials avatar (deterministic colour from registry + id), and to FingerprintBadge when there is no name either.
 4. **AgentDescription** — agent's description text. Fetches `registrationFile.description` only.
 
 **Composed:**
@@ -310,7 +310,7 @@ Category-specific utilities live in their component directories (e.g., `componen
 8. FeedbackList — individual reviews with tags, text, responses, pagination ✓
 9. _(composed reputation view: not shipped)_
 10. AgentName — atomic, fetches one field, validates identity data layer
-11. AgentImage — atomic, IPFS/HTTPS/base64 handling + FingerprintBadge fallback
+11. AgentImage — atomic, IPFS/HTTPS/base64 handling + initials/FingerprintBadge fallback
 12. AgentDescription — atomic, fetches one field
 13. TagCloud — tag frequency aggregation from feedback data
 14. LastActivity — atomic, fetches `Agent.lastActivity`
@@ -350,7 +350,8 @@ packages/ui/                             # the published package
 │   │   │   ├── FingerprintBadge.tsx     # deterministic SVG, no data fetch
 │   │   │   ├── visual-config.ts         # fingerprint seeding
 │   │   │   ├── agent-name.tsx           # fetches registrationFile.name only
-│   │   │   ├── agent-image.tsx          # fetches registrationFile.image, falls back to FingerprintBadge
+│   │   │   ├── agent-avatar.tsx         # internal initials avatar + deterministic colour
+│   │   │   ├── agent-image.tsx          # fetches registrationFile.image, falls back to initials then FingerprintBadge
 │   │   │   ├── agent-description.tsx    # fetches registrationFile.description only
 │   │   │   ├── agent-card.tsx           # composes atomic identity pieces
 │   │   │   ├── endpoint-status.tsx      # endpoint listing + health checks

@@ -90,7 +90,12 @@ export function AgentDescription({ className, ...props }: AgentDescriptionProps)
   if (!description) return null
 
   return (
-    <p className={cn("text-sm text-erc8004-muted-fg leading-relaxed", className)}>
+    <p
+      className={cn(
+        "break-words text-sm text-erc8004-muted-fg leading-relaxed",
+        className
+      )}
+    >
       {description}
     </p>
   )

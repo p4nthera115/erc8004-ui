@@ -10,6 +10,7 @@ import { cn } from "../../lib/cn"
 import { Card, Address, Tag, Skeleton, EmptyState, ErrorState } from "../_internal"
 import * as v from "valibot"
 import { FingerprintBadge } from "./FingerprintBadge"
+import { AgentAvatar, agentInitials } from "./agent-avatar"
 
 type IdentityDisplayResponse = {
   agent: {
@@ -181,6 +182,9 @@ export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
   const name = rf?.name ?? `Agent #${agentId}`
   const description = rf?.description ?? null
   const imageUrl = rf?.image ? resolveImageUrl(rf.image) : null
+  // No image: initials off the registered name, or the fingerprint when the
+  // agent has no name to take initials from.
+  const initials = agentInitials(rf?.name)
 
   const endpoints = rf
     ? ENDPOINT_DEFS.flatMap(({ key, versionKey, label, isEmail }) => {
@@ -202,6 +206,13 @@ export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
               alt={name}
               className="h-full w-full object-cover"
             />
+          ) : initials ? (
+            <AgentAvatar
+              agentRegistry={agentRegistry}
+              agentId={agentId}
+              initials={initials}
+              size={48}
+            />
           ) : (
             <FingerprintBadge
               agentRegistry={agentRegistry}
@@ -216,7 +227,7 @@ export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
             {name}
           </h2>
           {description && (
-            <p className="mt-1 line-clamp-2 text-sm text-erc8004-muted-fg leading-relaxed">
+            <p className="mt-1 line-clamp-2 break-words text-sm text-erc8004-muted-fg leading-relaxed">
               {description}
             </p>
           )}

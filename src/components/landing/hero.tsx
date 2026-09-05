@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router"
-import { ComponentWall } from "./component-wall"
+import { ComponentWall, LiveIndicator } from "./component-wall"
 import { useMinWidth } from "@/lib/use-min-width"
 
 export function HeroSection() {
@@ -41,16 +41,10 @@ export function HeroSection() {
           edge, so it reads as a caption for the components scrolling beside
           it. Positioned rather than flowed so it ignores the column padding.
         */}
-        <div className="absolute bottom-4 right-5 hidden items-center gap-2.5 text-[11px] text-text-secondary md:flex">
-          <span className="relative flex h-2.5 w-2.5 justify-center items-center">
-            <span className="absolute inline-flex h-full w-full rounded-full bg-green opacity-75 motion-safe:animate-ping" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-green" />
-          </span>
-          Live agent data from Base
-          <span aria-hidden className="text-xl mb-0.5">
-            →
-          </span>
-        </div>
+        <LiveIndicator
+          arrow="→"
+          className="absolute bottom-4 right-5 hidden md:flex"
+        />
       </div>
       <div className="col-span-1 diagonal-lines relative hidden md:block overflow-hidden">
         {isDesktop && <ComponentWall />}

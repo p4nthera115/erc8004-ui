@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import { useMinWidth } from "@/lib/use-min-width"
+import { cn } from "@/lib/cn"
 import type { CSSProperties, ReactNode } from "react"
 import {
   AgentProvider,
@@ -401,6 +402,39 @@ const CAROUSEL_TILES: TileDef[] = [
   },
 ]
 
+/**
+ * The line that tells you the tiles aren't a mockup. Shared by the hero (where
+ * it captions the wall beside it, hence the arrow) and the mobile carousel
+ * (where it sits on the band itself, so the arrow would point at nothing).
+ */
+export function LiveIndicator({
+  arrow,
+  className,
+}: {
+  arrow?: string
+  className?: string
+}) {
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-2.5 text-[11px] text-text-secondary",
+        className
+      )}
+    >
+      <span className="relative flex h-2.5 w-2.5 items-center justify-center">
+        <span className="absolute inline-flex h-full w-full rounded-full bg-green opacity-75 motion-safe:animate-ping" />
+        <span className="relative inline-flex h-2 w-2 rounded-full bg-green" />
+      </span>
+      Live agent data from Base
+      {arrow && (
+        <span aria-hidden className="mb-0.5 text-xl">
+          {arrow}
+        </span>
+      )}
+    </div>
+  )
+}
+
 export function ComponentCarousel() {
   const isDesktop = useMinWidth(768)
   if (isDesktop) return null
@@ -432,6 +466,8 @@ export function ComponentCarousel() {
       {/* Fade into the page colour at both edges, as the wall does. */}
       <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-surface to-transparent" />
       <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-surface to-transparent" />
+
+      <LiveIndicator className="pointer-events-none absolute bottom-3 left-3 z-10 border border-black/60 bg-surface px-2.5 py-1 dark:border-white/25" />
     </div>
   )
 }

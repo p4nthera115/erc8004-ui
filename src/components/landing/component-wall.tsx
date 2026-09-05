@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router"
+import { useMinWidth } from "@/lib/use-min-width"
 import type { CSSProperties, ReactNode } from "react"
 import {
   AgentProvider,
@@ -242,7 +243,7 @@ const COLUMN_C: TileDef[] = [
   },
 ]
 
-function Tile({ tile }: { tile: TileDef }) {
+function Tile({ tile, axis = "y" }: { tile: TileDef; axis?: "x" | "y" }) {
   const theme = tile.theme
 
   /*
@@ -264,7 +265,10 @@ function Tile({ tile }: { tile: TileDef }) {
   return (
     <div
       className={
-        "mb-4 border shadow-lg shadow-black/10 dark:shadow-black/50" +
+        // Spacing lives on the tile rather than as flex `gap` so the track's
+        // 50% translate lands exactly on the start of the second copy.
+        (axis === "x" ? "mr-4 w-[17rem] shrink-0" : "mb-4") +
+        " border shadow-lg shadow-black/10 dark:shadow-black/50" +
         (theme ? "" : " border-black/60 bg-surface dark:border-white/25")
       }
       style={style}
@@ -344,6 +348,90 @@ function MarqueeColumn({
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+/**
+ * The mobile counterpart to the wall. The three-column wall needs height the
+ * hero doesn't have on a phone, so below `md` the same tiles run past in a
+ * single horizontal band instead.
+ *
+ * Deliberately a shorter list than the wall's twelve: every tile is a live
+ * subgraph query, and this one loads on phones. The picks are the components
+ * whose natural height is close, so the band reads as one strip rather than a
+ * ragged skyline, and they carry a mix of themes to make the point that the
+ * tokens travel with the component.
+ */
+const CAROUSEL_TILES: TileDef[] = [
+  { name: "AgentCard", slug: "agent-card", agentId: 2290, render: () => <AgentCard /> },
+  {
+    name: "TagCloud",
+    slug: "tag-cloud",
+    agentId: 1380,
+    theme: THEMES.violet,
+    render: () => <TagCloud maxTags={6} />,
+  },
+  {
+    name: "ReputationTimeline",
+    slug: "reputation-timeline",
+    agentId: 888,
+    render: () => <ReputationTimeline />,
+  },
+  {
+    name: "EndpointStatus",
+    slug: "endpoint-status",
+    agentId: 1372,
+    theme: THEMES.terminal,
+    render: () => <EndpointStatus />,
+  },
+  {
+    name: "ReputationDistribution",
+    slug: "reputation-distribution",
+    agentId: 1380,
+    theme: THEMES.midnight,
+    render: () => <ReputationDistribution />,
+  },
+  {
+    name: "AgentCard",
+    slug: "agent-card",
+    agentId: 1156,
+    theme: THEMES.paper,
+    render: () => <AgentCard />,
+  },
+]
+
+export function ComponentCarousel() {
+  const isDesktop = useMinWidth(768)
+  if (isDesktop) return null
+
+  return (
+    <div className="diagonal-lines relative overflow-hidden border-b border-black/60 md:hidden dark:border-white/25">
+      {/*
+        `w-max` keeps the two copies on one line; the track then translates by
+        exactly half its width, which is one full copy, so the loop is seamless.
+        No horizontal padding here — it would count toward that width and put
+        the halfway point half a pad short, which shows up as a jump each loop.
+        Tiles keep their natural height against the diagonal ground, as they do
+        in the wall, and are centred on the band's midline so the strip reads
+        as one row rather than a set of things hanging off the top edge.
+      */}
+      <div
+        className="marquee-track-x flex w-max items-center py-4"
+        style={{ animationDuration: "55s" }}
+      >
+        {[0, 1].map((copy) => (
+          <div key={copy} aria-hidden={copy === 1 || undefined} className="flex items-center">
+            {CAROUSEL_TILES.map((tile, i) => (
+              <Tile key={`${tile.slug}-${tile.agentId}-${i}`} tile={tile} axis="x" />
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {/* Fade into the page colour at both edges, as the wall does. */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-surface to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-surface to-transparent" />
     </div>
   )
 }

@@ -242,18 +242,38 @@ html.dark .cb-plain {
     transform: translateY(-50%);
   }
 }
+@keyframes erc-marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
 .marquee-track {
   animation-name: erc-marquee;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   will-change: transform;
 }
+/*
+  The horizontal band under the hero on phones
+  (ComponentCarousel in src/components/landing/component-wall.tsx).
+*/
+.marquee-track-x {
+  animation-name: erc-marquee-x;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
 /* Pause the column being read so its tiles (and their docs links) hold still. */
-.marquee-track:hover {
+.marquee-track:hover,
+.marquee-track-x:hover {
   animation-play-state: paused;
 }
 @media (prefers-reduced-motion: reduce) {
-  .marquee-track {
+  .marquee-track,
+  .marquee-track-x {
     animation: none;
   }
 }

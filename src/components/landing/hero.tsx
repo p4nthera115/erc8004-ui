@@ -1,7 +1,12 @@
 import { Link } from "@tanstack/react-router"
 import { ComponentWall } from "./component-wall"
+import { useMinWidth } from "@/lib/use-min-width"
 
 export function HeroSection() {
+  // `hidden md:block` would still mount the wall's twelve live queries on a
+  // phone that never sees it.
+  const isDesktop = useMinWidth(768)
+
   return (
     <div className="md:h-[calc(100svh-81px)] border-b border-black/60 dark:border-white/25 grid grid-cols-1 md:grid-cols-2 font-mono overflow-x-hidden">
       <div className="col-span-1 relative flex flex-col py-10 px-5 gap-6 sm:px-6 sm:gap-8 md:py-14 md:px-14 md:gap-10 md:border-r border-black/60 dark:border-white/25">
@@ -48,7 +53,7 @@ export function HeroSection() {
         </div>
       </div>
       <div className="col-span-1 diagonal-lines relative hidden md:block overflow-hidden">
-        <ComponentWall />
+        {isDesktop && <ComponentWall />}
       </div>
     </div>
   )

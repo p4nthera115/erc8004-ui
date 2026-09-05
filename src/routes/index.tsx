@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { HeroSection } from "@/components/landing/hero"
+import { ComponentCarousel } from "@/components/landing/component-wall"
 import { ChainStrip } from "@/components/landing/chains"
 import { Comparison } from "@/components/landing/comparison"
 import { Showcase } from "@/components/landing/showcase"
@@ -14,6 +15,7 @@ function Home() {
   return (
     <>
       <HeroSection />
+      <ComponentCarousel />
       <ChainStrip />
       <Comparison />
       <Showcase />

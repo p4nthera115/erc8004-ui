@@ -21,12 +21,12 @@ export function Section({
 }) {
   return (
     <section className={`border-b ${RULE} font-mono`}>
-      <div className="flex flex-col gap-10 px-6 py-16 md:px-14 md:py-20">
+      <div className="flex flex-col gap-8 px-5 py-12 sm:gap-10 sm:px-6 sm:py-16 md:px-14 md:py-20">
         <header className="flex max-w-3xl flex-col gap-4">
           <span className="text-xs uppercase tracking-[0.2em] text-text-secondary">
             {label}
           </span>
-          <h2 className="text-2xl leading-snug md:text-3xl">{title}</h2>
+          <h2 className="text-xl leading-snug sm:text-2xl md:text-3xl">{title}</h2>
           {intro && (
             <p className="max-w-2xl text-sm leading-relaxed text-text-secondary md:text-base">
               {intro}

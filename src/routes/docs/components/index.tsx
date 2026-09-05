@@ -130,7 +130,7 @@ function ComponentsIndex() {
   return (
     <div className="flex flex-col gap-14">
       <div className="flex flex-col gap-3">
-        <h1 className="font-mono text-3xl font-bold text-neutral-900 dark:text-white">
+        <h1 className="font-mono text-2xl font-bold text-neutral-900 sm:text-3xl dark:text-white">
           Components
         </h1>
         <p className="text-base text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
@@ -155,9 +155,9 @@ function ComponentsIndex() {
                 key={item.slug}
                 to="/docs/components/$slug"
                 params={{ slug: item.slug }}
-                className="flex items-baseline gap-6 border-t border-black/60 dark:border-white/10 py-3 px-2 hover:bg-neutral-200 dark:hover:bg-white/10 group"
+                className="group flex flex-col gap-1 border-t border-black/60 px-2 py-3 hover:bg-neutral-200 sm:flex-row sm:items-baseline sm:gap-6 dark:border-white/10 dark:hover:bg-white/10"
               >
-                <span className="font-mono text-sm text-neutral-900 dark:text-white w-52 shrink-0 group-hover:underline">
+                <span className="font-mono text-sm text-neutral-900 group-hover:underline sm:w-52 sm:shrink-0 dark:text-white">
                   {item.name}
                 </span>
                 <span className="text-sm text-neutral-500 dark:text-white/50">

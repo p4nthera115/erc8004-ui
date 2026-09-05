@@ -89,9 +89,35 @@ function PreviewBox({ children }: { children: React.ReactNode }) {
     <div
       data-toc-exclude
       data-markdown-ignore
-      className="rounded border border-black/60 dark:border-white/10 bg-neutral-50 dark:bg-white/2 p-8 flex items-center justify-center min-h-32"
+      className="flex min-h-32 items-center justify-center overflow-x-auto rounded border border-black/60 bg-neutral-50 p-4 sm:p-8 dark:border-white/10 dark:bg-white/2"
     >
       {children}
+    </div>
+  )
+}
+
+/**
+ * Below `sm` the five-column table is replaced by one stacked block per prop:
+ * a 5-column scroll on a phone hides the description, which is the column that
+ * matters most. Same data, same order, rendered twice — the table markup stays
+ * intact for wide screens and for anything reading the DOM as a table.
+ */
+function PropCard({ prop }: { prop: ComponentDoc["props"][number] }) {
+  return (
+    <div className="flex flex-col gap-2 border-t border-black/60 py-4 dark:border-white/10">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <InlineCode>{prop.name}</InlineCode>
+        <span className="font-mono text-xs text-neutral-500 dark:text-white/50">
+          {prop.required ? "required" : "optional"}
+        </span>
+      </div>
+      <div className="flex flex-col gap-1 font-mono text-xs text-neutral-500 dark:text-white/50">
+        <span className="[overflow-wrap:anywhere]">type: {prop.type}</span>
+        {prop.default && <span>default: {prop.default}</span>}
+      </div>
+      <p className="text-sm leading-relaxed text-neutral-500 dark:text-white/60">
+        {prop.description}
+      </p>
     </div>
   )
 }
@@ -131,7 +157,7 @@ export function DocPageLayout({ doc }: { doc: ComponentDoc }) {
     <div className="flex flex-col gap-14">
       {/* Header */}
       <div className="flex flex-col gap-3">
-        <h1 className="font-mono text-3xl font-bold text-neutral-900 dark:text-white">
+        <h1 className="font-mono text-2xl font-bold break-words text-neutral-900 sm:text-3xl dark:text-white">
           {doc.name}
         </h1>
         <p className="text-base text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
@@ -192,7 +218,12 @@ export function DocPageLayout({ doc }: { doc: ComponentDoc }) {
       {/* API Reference */}
       <section>
         <SectionHeading>API Reference</SectionHeading>
-        <div className="overflow-x-auto">
+        <div className="flex flex-col sm:hidden">
+          {doc.props.map((prop) => (
+            <PropCard key={prop.name as string} prop={prop} />
+          ))}
+        </div>
+        <div className="hidden overflow-x-auto sm:block">
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-black/60 dark:border-white/20">

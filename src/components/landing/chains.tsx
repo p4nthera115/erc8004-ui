@@ -20,7 +20,7 @@ export function ChainStrip() {
         {MAINNETS.map((chain) => (
           <div
             key={chain.chainId}
-            className={`flex items-baseline justify-between gap-4 border-t px-6 py-5 md:flex-col md:items-start md:justify-start md:gap-1 md:border-t-0 md:border-r md:px-6 md:py-6 md:last:border-r-0 ${RULE}`}
+            className={`flex items-baseline justify-between gap-4 border-t px-5 py-5 sm:px-6 md:flex-col md:items-start md:justify-start md:gap-1 md:border-t-0 md:border-r md:px-6 md:py-6 md:last:border-r-0 ${RULE}`}
           >
             <span className="text-sm">{chain.name}</span>
             <span className="text-xs text-text-secondary">
@@ -29,7 +29,7 @@ export function ChainStrip() {
           </div>
         ))}
       </div>
-      <p className={`border-t ${RULE} px-6 py-4 text-xs text-text-secondary md:px-14`}>
+      <p className={`border-t ${RULE} px-5 py-4 text-xs text-text-secondary sm:px-6 md:px-14`}>
         Plus testnets — {TESTNETS.join(", ")}. The chain is read off the
         agent identifier; no network config, no RPC URL, no wallet.
       </p>

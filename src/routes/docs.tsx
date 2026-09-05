@@ -1,7 +1,7 @@
-import { createFileRoute, Outlet, Link } from "@tanstack/react-router"
+import { createFileRoute, Outlet } from "@tanstack/react-router"
 import { useRef, useState, useCallback } from "react"
 import { TableOfContents } from "@/components/docs/TableOfContents"
-import { NAV } from "@/components/docs/nav"
+import { DocsNavLinks } from "@/components/docs/nav-links"
 import { DocsPagination } from "@/components/docs/DocsPagination"
 
 function DocsSidebar() {
@@ -20,7 +20,7 @@ function DocsSidebar() {
       ref={ref}
       onScroll={handleScroll}
       data-scrolling={scrolling}
-      className="docs-sidebar min-h-full w-60 shrink-0 sticky top-[81px] h-[calc(100svh-81px)] overflow-y-auto py-8 pr-4 border-r border-black/60 dark:border-white/25 font-mono order-1"
+      className="docs-sidebar min-h-full w-60 shrink-0 sticky top-[81px] hidden h-[calc(100svh-81px)] overflow-y-auto border-r border-black/60 py-8 pr-4 font-mono lg:block dark:border-white/25 order-1"
       style={{
         scrollbarColor: scrolling
           ? "rgba(128,128,128,0.25) transparent"
@@ -28,42 +28,11 @@ function DocsSidebar() {
       }}
     >
       <nav className="flex flex-col gap-6">
-        {NAV.map((group, i) => (
-          <div key={i} className="flex flex-col gap-1">
-            {group.title && (
-              <span className="text-[10px] text-text-muted tracking-widest mb-1 select-none">
-                {group.title}
-              </span>
-            )}
-            {group.items.map((item) =>
-              "slug" in item ? (
-                <Link
-                  key={item.slug}
-                  to={item.to}
-                  params={{ slug: item.slug }}
-                  className="text-sm text-neutral-950 dark:text-white py-0.5 hover:bg-black/10 dark:hover:bg-white/20 px-2"
-                  activeProps={{
-                    className: "bg-black/10 dark:bg-white/15 font-medium",
-                  }}
-                >
-                  {item.label}
-                </Link>
-              ) : (
-                <Link
-                  key={item.label}
-                  to={item.to}
-                  activeOptions={{ exact: true }}
-                  className="text-sm text-neutral-950 dark:text-white py-0.5 hover:bg-black/5 dark:hover:bg-white/20 px-2"
-                  activeProps={{
-                    className: "bg-black/10 dark:bg-white/15 font-medium",
-                  }}
-                >
-                  {item.label}
-                </Link>
-              )
-            )}
-          </div>
-        ))}
+        <DocsNavLinks
+          groupClassName="flex flex-col gap-1"
+          titleClassName="text-[10px] text-text-muted tracking-widest mb-1 select-none"
+          linkClassName="text-sm text-neutral-950 dark:text-white py-0.5 hover:bg-black/10 dark:hover:bg-white/20 px-2"
+        />
       </nav>
     </aside>
   )
@@ -74,8 +43,8 @@ export const Route = createFileRoute("/docs")({
     // DOM order: <main> first so prerendered HTML puts page content near the
     // top of the agent-converted output. Visual order is restored with
     // Tailwind `order-*` utilities — sidebar (1), main (2), TOC (3).
-    <div className="max-w-screen-2xl mx-auto px-6 flex gap-8 min-h-[calc(100vh-3.5rem)]">
-      <main className="flex-1 min-w-0 py-10 max-w-4xl order-2">
+    <div className="mx-auto flex min-h-[calc(100svh-81px)] max-w-screen-2xl gap-8 px-4 sm:px-6">
+      <main className="order-2 min-w-0 max-w-4xl flex-1 py-8 md:py-10">
         {/*
           Agent-facing directive. Visually hidden via `sr-only`, but in DOM
           order before content so agents that strip presentation see it first.

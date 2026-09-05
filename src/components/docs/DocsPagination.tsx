@@ -14,26 +14,26 @@ export function DocsPagination() {
     currentIndex < FLAT_NAV.length - 1 ? FLAT_NAV[currentIndex + 1] : null
 
   return (
-    <div className="mt-16 pt-8 border-t border-black/60 dark:border-white/10 flex items-center justify-between gap-4 font-mono">
+    <div className="mt-16 flex items-center justify-between gap-4 border-t border-black/60 pt-8 font-mono dark:border-white/10">
       {prev ? (
         prev.slug ? (
           <Link
             to="/docs/components/$slug"
             params={{ slug: prev.slug }}
-            className="group px-4 min-w-0 max-w-[45%] text-neutral-500 dark:text-white/70 hover:text-neutral-900 dark:hover:text-white"
+            className="group flex min-w-0 max-w-[45%] items-center gap-2 px-1 text-neutral-500 hover:text-neutral-900 sm:px-4 dark:text-white/70 dark:hover:text-white"
           >
-            <span className="text-xl inline-block mr-2">←</span>
-            <span className="text-sm transition-colors truncate">
+            <span className="shrink-0 text-xl">←</span>
+            <span className="truncate text-sm transition-colors">
               {prev.label}
             </span>
           </Link>
         ) : (
           <Link
             to={prev.to as "/docs/introduction" | "/docs/installation" | "/docs/concepts" | "/docs/api-keys" | "/docs/components" | "/docs/theming"}
-            className="group px-4 min-w-0 max-w-[45%] text-neutral-500 dark:text-white/70 hover:text-neutral-900 dark:hover:text-white"
+            className="group flex min-w-0 max-w-[45%] items-center gap-2 px-1 text-neutral-500 hover:text-neutral-900 sm:px-4 dark:text-white/70 dark:hover:text-white"
           >
-            <span className="text-xl inline-block mr-2">←</span>
-            <span className="text-sm transition-colors truncate">
+            <span className="shrink-0 text-xl">←</span>
+            <span className="truncate text-sm transition-colors">
               {prev.label}
             </span>
           </Link>
@@ -47,22 +47,22 @@ export function DocsPagination() {
           <Link
             to="/docs/components/$slug"
             params={{ slug: next.slug }}
-            className="group px-4 min-w-0 max-w-[45%] text-neutral-500 dark:text-white/70 hover:text-neutral-900 dark:hover:text-white"
+            className="group flex min-w-0 max-w-[45%] items-center gap-2 px-1 text-neutral-500 hover:text-neutral-900 sm:px-4 dark:text-white/70 dark:hover:text-white"
           >
-            <span className="text-sm transition-colors truncate">
+            <span className="truncate text-sm transition-colors">
               {next.label}
             </span>
-            <span className="text-xl inline-block ml-2">→</span>
+            <span className="shrink-0 text-xl">→</span>
           </Link>
         ) : (
           <Link
             to={next.to as "/docs/introduction" | "/docs/installation" | "/docs/concepts" | "/docs/api-keys" | "/docs/components" | "/docs/theming"}
-            className="group px-4 min-w-0 max-w-[45%] text-neutral-500 dark:text-white/70 hover:text-neutral-900 dark:hover:text-white"
+            className="group flex min-w-0 max-w-[45%] items-center gap-2 px-1 text-neutral-500 hover:text-neutral-900 sm:px-4 dark:text-white/70 dark:hover:text-white"
           >
-            <span className="text-sm transition-colors truncate">
+            <span className="truncate text-sm transition-colors">
               {next.label}
             </span>
-            <span className="text-xl inline-block ml-2">→</span>
+            <span className="shrink-0 text-xl">→</span>
           </Link>
         )
       ) : (

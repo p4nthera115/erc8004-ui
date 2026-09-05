@@ -126,7 +126,7 @@ function Mcp() {
     <div className="flex flex-col gap-14">
       {/* Header */}
       <div className="flex flex-col gap-3">
-        <h1 className="font-mono text-3xl font-bold text-neutral-900 dark:text-white">
+        <h1 className="font-mono text-2xl font-bold text-neutral-900 sm:text-3xl dark:text-white">
           MCP Server
         </h1>
         <p className="text-base text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
@@ -154,8 +154,8 @@ function Mcp() {
       {/* Two ways to connect */}
       <section className="flex flex-col gap-4">
         <SectionHeading>Two ways to connect</SectionHeading>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm font-mono border-collapse">
+        <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+          <table className="w-full max-sm:min-w-[36rem] text-sm font-mono border-collapse">
             <thead>
               <tr className="text-left text-neutral-500 dark:text-white/50">
                 <th className="py-2 pr-6 font-normal" />

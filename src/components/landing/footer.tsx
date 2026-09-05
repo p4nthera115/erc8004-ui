@@ -46,7 +46,7 @@ function Column({
   children: React.ReactNode
 }) {
   return (
-    <div className={`flex flex-col gap-3 border-t px-6 py-8 md:border-t-0 md:border-r md:px-8 md:last:border-r-0 ${RULE}`}>
+    <div className={`flex flex-col gap-3 border-t px-5 py-8 sm:px-6 md:border-t-0 md:border-r md:px-8 md:last:border-r-0 ${RULE}`}>
       <span className="text-xs uppercase tracking-[0.2em] text-text-secondary">
         {title}
       </span>
@@ -100,14 +100,14 @@ export function Footer() {
         </Column>
       </div>
       <div
-        className={`flex flex-col gap-3 border-t px-6 py-6 text-xs text-text-secondary md:flex-row md:items-center md:justify-between md:px-8 ${RULE}`}
+        className={`flex flex-col gap-3 border-t px-5 py-6 text-xs text-text-secondary sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8 md:px-8 ${RULE}`}
       >
         <span className="max-w-xl">
           @p4n/erc8004-ui — component library for ERC-8004 agent data. An
           independent project, not affiliated with or endorsed by the authors of
           ERC-8004.
         </span>
-        <nav className="flex gap-4">
+        <nav className="flex shrink-0 gap-4">
           {PROJECT.map((item) => (
             <Link key={item.to} to={item.to} className="hover:underline">
               {item.label}

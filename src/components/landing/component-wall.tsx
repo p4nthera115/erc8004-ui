@@ -467,7 +467,7 @@ export function ComponentCarousel() {
       <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-surface to-transparent" />
       <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-surface to-transparent" />
 
-      <LiveIndicator className="pointer-events-none absolute bottom-3 left-3 z-10 border border-black/60 bg-surface px-2.5 py-1 dark:border-white/25" />
+      <LiveIndicator className="pointer-events-none absolute bottom-3 right-3 z-10 border border-black/60 bg-surface px-2.5 py-1 dark:border-white/25" />
     </div>
   )
 }

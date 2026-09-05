@@ -82,16 +82,6 @@ export function Quickstart() {
         ))}
       </div>
 
-      <div className={`border p-5 text-xs leading-relaxed text-text-secondary ${RULE}`}>
-        <span className="text-text-primary">Note</span> — @p4n/erc8004-ui is a
-        placeholder name; the package isn't on npm yet. Until it is, install
-        straight from the repo with{" "}
-        <span className="text-text-primary">
-          npm install github:p4nthera115/erc8004-ui
-        </span>
-        . Every example above works unchanged once it's published.
-      </div>
-
       <div className="flex flex-wrap items-center gap-6">
         <Link
           to="/docs/installation"

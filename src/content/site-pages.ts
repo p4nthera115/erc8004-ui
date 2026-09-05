@@ -88,7 +88,7 @@ const about: SitePage = {
     {
       heading: "Status and maintenance",
       paragraphs: [
-        "The library is pre-release and maintained in the open by its author, p4nthera115. It is not yet published to npm — the package name @p4n/erc8004-ui used throughout the documentation is provisional, and installs currently come from GitHub. There is no company behind it, no paid tier, and no telemetry inside the components themselves.",
+        "The library is published to npm as @p4n/erc8004-ui and maintained in the open by its author, p4nthera115. There is no company behind it, no paid tier, and no telemetry inside the components themselves.",
         "Development happens entirely in public. Issues, pull requests and design discussion are on GitHub, and the documentation site is generated from the same registries that generate the machine-readable docs, so the two cannot drift apart.",
       ],
       links: [

@@ -15,7 +15,7 @@
  *
  * Body strings may contain two placeholders that the generator substitutes:
  *   {{SITE_URL}}     — the deployed docs URL
- *   {{PACKAGE_NAME}} — the npm package name (provisional until published)
+ *   {{PACKAGE_NAME}} — the npm package name
  *
  * Internal `[label](/docs/...)` links are rewritten to absolute URLs by the
  * generator's `absolutizeDocsLinks()` helper. External links and anchors

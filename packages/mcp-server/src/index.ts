@@ -160,10 +160,7 @@ server.registerTool(
       return text(
         `# ${registry.packageName} — ${registry.components.length} components\n\n` +
           `${registry.tagline}\n\n${componentIndex()}` +
-          `\n> ${registry.nonAffiliationNotice}\n` +
-          (registry.unpublishedNotice
-            ? `\n> ${registry.unpublishedNotice}\n`
-            : ""),
+          `\n> ${registry.nonAffiliationNotice}\n`,
       )
     }
 

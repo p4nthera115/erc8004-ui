@@ -64,9 +64,7 @@ export type GroupSnapshot = { title: string; slugs: string[] }
 export type RegistrySnapshot = {
   generatedAt: string
   packageName: string
-  isPublished: boolean
   nonAffiliationNotice: string
-  unpublishedNotice: string | null
   tagline: string
   siteUrl: string
   githubUrl: string

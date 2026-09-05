@@ -8,11 +8,9 @@
 import type { RegistrySnapshot } from "../_lib/registry-types.js"
 
 export const REGISTRY: RegistrySnapshot = {
-  "generatedAt": "2026-09-05T06:22:34.579Z",
+  "generatedAt": "2026-09-05T08:28:45.214Z",
   "packageName": "@p4n/erc8004-ui",
-  "isPublished": true,
   "nonAffiliationNotice": "**NOTE — unofficial library.** `@p4n/erc8004-ui` is an independent, community-built project. It is not affiliated with, maintained by, or endorsed by the authors of ERC-8004. It reads the standard's on-chain data through public subgraphs; it does not speak for the standard.",
-  "unpublishedNotice": null,
   "tagline": "Drop-in React components for displaying verified ERC-8004 AI agent identity, reputation, and validation data. Self-contained, trustless, and designed to be consumed by AI coding agents.",
   "siteUrl": "https://erc8004-ui.vercel.app",
   "githubUrl": "https://github.com/p4nthera115/erc8004-ui",

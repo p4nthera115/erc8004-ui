@@ -14,7 +14,6 @@ export default {
           status: "ok",
           generatedAt: REGISTRY.generatedAt,
           packageName: REGISTRY.packageName,
-          isPublished: REGISTRY.isPublished,
           counts: {
             components: REGISTRY.components.length,
             guides: REGISTRY.guides.length,

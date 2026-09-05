@@ -49,7 +49,6 @@ export default {
         markdownUrl: `${component.docsUrl}.md`,
         packageName: REGISTRY.packageName,
         nonAffiliationNotice: REGISTRY.nonAffiliationNotice,
-        unpublishedNotice: REGISTRY.unpublishedNotice,
       })
     },
   }, {

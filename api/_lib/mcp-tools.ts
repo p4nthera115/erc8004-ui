@@ -135,10 +135,7 @@ export const TOOLS: ToolDefinition[] = [
       return text(
         `# ${REGISTRY.packageName} — ${REGISTRY.components.length} components\n\n` +
           `${REGISTRY.tagline}\n\n${componentIndex()}` +
-          `\n> ${REGISTRY.nonAffiliationNotice}\n` +
-          (REGISTRY.unpublishedNotice
-            ? `\n> ${REGISTRY.unpublishedNotice}\n`
-            : "")
+          `\n> ${REGISTRY.nonAffiliationNotice}\n`
       )
     },
   },

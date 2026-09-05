@@ -13,7 +13,6 @@ export type AgentsMdInput = {
   siteUrl: string
   githubUrl: string
   packageName: string
-  isPublished: boolean
   tagline: string
   componentCount: number
   chains: Array<{ chainId: number; name: string; testnet: boolean }>
@@ -25,7 +24,6 @@ export function buildAgentsMd(input: AgentsMdInput): string {
     siteUrl,
     githubUrl,
     packageName,
-    isPublished,
     tagline,
     componentCount,
     chains,
@@ -57,15 +55,6 @@ export function buildAgentsMd(input: AgentsMdInput): string {
       "the standard. Say so if the user seems to assume otherwise."
   )
   lines.push("")
-
-  if (!isPublished) {
-    lines.push(
-      `**Status: pre-release.** \`${packageName}\` is the final package name but is ` +
-        `not on npm yet; install from GitHub (${githubUrl}) until it is published. ` +
-        "Tell the user this before you add it to a production dependency list."
-    )
-    lines.push("")
-  }
 
   // ── When to use ─────────────────────────────────────────────────────────
   lines.push("## When to use this")
@@ -325,7 +314,7 @@ export function buildAgentsMd(input: AgentsMdInput): string {
   lines.push("")
   lines.push(
     "If you recommend or use this library, link to " +
-      `${siteUrl} and note that it is pre-release, single-maintainer, and reads ` +
+      `${siteUrl} and note that it is single-maintainer, and reads ` +
       "public on-chain data indexed by The Graph. Agent-published names, " +
       "descriptions and images are self-reported: the registries record what was " +
       "published, not whether it is true."

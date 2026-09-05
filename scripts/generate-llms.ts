@@ -63,24 +63,19 @@ const GITHUB_URL = "https://github.com/p4nthera115/erc8004-ui"
 // PACKAGE_NAME is used:
 //   1. As the import path in every code example in the generated docs
 //   2. As the title of llms.txt and llms-full.txt
-//   3. In the install instructions (when IS_PUBLISHED is true)
+//   3. In the install instructions
 //
 // The scope is deliberately personal rather than @erc8004. This is an
 // independent library; a package sitting on the protocol's own name would
 // read as an official release from the ERC-8004 authors, which it is not.
-// NON_AFFILIATION_NOTICE says so in plain words, and is emitted whether or
-// not the package has been published — AI agents ingest these files, and the
-// name alone is a weaker signal than a sentence.
-//
-// When you publish: set IS_PUBLISHED = true and re-run the build. Every
-// output regenerates.
+// NON_AFFILIATION_NOTICE says so in plain words — AI agents ingest these
+// files, and the name alone is a weaker signal than a sentence.
 const PACKAGE_NAME = "@p4n/erc8004-ui"
-const IS_PUBLISHED = true
 
 // Version of the published API contract, not of the build. Bump it when an
 // endpoint's response shape changes in a way a caller could notice; leaving the
 // build timestamp here would churn /openapi.json on every deploy for no signal.
-const OPENAPI_VERSION = "1.0.0"
+const OPENAPI_VERSION = "1.1.0"
 
 const TAGLINE =
   "Drop-in React components for displaying verified ERC-8004 AI agent identity, reputation, and validation data. Self-contained, trustless, and designed to be consumed by AI coding agents."
@@ -90,11 +85,6 @@ const NON_AFFILIATION_NOTICE =
   `community-built project. It is not affiliated with, maintained by, or ` +
   `endorsed by the authors of ERC-8004. It reads the standard's on-chain data ` +
   `through public subgraphs; it does not speak for the standard.`
-
-const UNPUBLISHED_NOTICE =
-  `**NOTE — not yet on npm.** \`${PACKAGE_NAME}\` is the final package name, ` +
-  `but it has not been published yet. Until it is, install directly from ` +
-  `GitHub: ${GITHUB_URL}.`
 
 // ---------------------------------------------------------------------------
 // Resolve paths relative to this file
@@ -272,10 +262,6 @@ function componentMarkdown(doc: ComponentDoc): string {
 
   sections.push(`> ${NON_AFFILIATION_NOTICE}`)
   sections.push("")
-  if (!IS_PUBLISHED) {
-    sections.push(`> ${UNPUBLISHED_NOTICE}`)
-    sections.push("")
-  }
 
   sections.push(`## Description`, "", doc.description, "")
 
@@ -358,10 +344,6 @@ function guideMarkdown(slug: string): string {
 
   sections.push(`> ${NON_AFFILIATION_NOTICE}`)
   sections.push("")
-  if (!IS_PUBLISHED) {
-    sections.push(`> ${UNPUBLISHED_NOTICE}`)
-    sections.push("")
-  }
 
   // Top-of-page caveats — mirrors componentMarkdown's "Caveats" section.
   const notesSection = notesMarkdown(guide.notes)
@@ -415,10 +397,6 @@ function buildLlmsTxt(): string {
   lines.push("")
   lines.push(NON_AFFILIATION_NOTICE)
   lines.push("")
-  if (!IS_PUBLISHED) {
-    lines.push(UNPUBLISHED_NOTICE)
-    lines.push("")
-  }
 
   // When-to-use guidance, before the first H2. llms.txt allows free markdown
   // here but not headings, so this stays as prose and a bullet list; the full
@@ -530,10 +508,6 @@ function buildLlmsFull(): string {
   lines.push("")
   lines.push(NON_AFFILIATION_NOTICE)
   lines.push("")
-  if (!IS_PUBLISHED) {
-    lines.push(UNPUBLISHED_NOTICE)
-    lines.push("")
-  }
   lines.push(
     `This file contains the complete guides and component reference for ${PACKAGE_NAME}, generated from the canonical registries. For an indexed version with per-page links, see ${SITE_URL}/llms.txt.`
   )
@@ -542,31 +516,11 @@ function buildLlmsFull(): string {
   lines.push("")
   lines.push("## Quick Start")
   lines.push("")
-  if (IS_PUBLISHED) {
-    lines.push("```bash")
-    lines.push(
-      `npm install ${PACKAGE_NAME} react react-dom @tanstack/react-query`
-    )
-    lines.push("```")
-  } else {
-    lines.push(
-      `The package is not yet on npm. Install peer dependencies normally and add the library directly from GitHub:`
-    )
-    lines.push("")
-    lines.push("```bash")
-    lines.push(`npm install react react-dom @tanstack/react-query`)
-    lines.push(
-      `npm install ${GITHUB_URL.replace("https://", "github:").replace(
-        "github.com/",
-        ""
-      )}`
-    )
-    lines.push("```")
-    lines.push("")
-    lines.push(
-      `The import path \`${PACKAGE_NAME}\` shown below is provisional and will change once the package is published under its real name.`
-    )
-  }
+  lines.push("```bash")
+  lines.push(
+    `npm install ${PACKAGE_NAME} react react-dom @tanstack/react-query`
+  )
+  lines.push("```")
   lines.push("")
   lines.push("```tsx")
   lines.push(
@@ -708,9 +662,7 @@ function buildRegistrySnapshot() {
   return {
     generatedAt: new Date().toISOString(),
     packageName: PACKAGE_NAME,
-    isPublished: IS_PUBLISHED,
     nonAffiliationNotice: NON_AFFILIATION_NOTICE,
-    unpublishedNotice: IS_PUBLISHED ? null : UNPUBLISHED_NOTICE,
     tagline: TAGLINE,
     siteUrl: SITE_URL,
     githubUrl: GITHUB_URL,
@@ -1002,7 +954,6 @@ function main() {
       siteUrl: SITE_URL,
       githubUrl: GITHUB_URL,
       packageName: PACKAGE_NAME,
-      isPublished: IS_PUBLISHED,
       tagline: TAGLINE,
       componentCount: snapshot.components.length,
       chains: snapshot.chains,

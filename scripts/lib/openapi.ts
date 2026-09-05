@@ -564,7 +564,6 @@ export function buildOpenApiDocument(input: OpenApiInput): Record<string, unknow
             },
             packageName: { type: "string" },
             nonAffiliationNotice: { type: "string" },
-            unpublishedNotice: { type: ["string", "null"] },
           },
         },
         ComponentList: {
@@ -708,7 +707,6 @@ export function buildOpenApiDocument(input: OpenApiInput): Record<string, unknow
             status: { type: "string", enum: ["ok"] },
             generatedAt: { type: "string", format: "date-time" },
             packageName: { type: "string" },
-            isPublished: { type: "boolean" },
             counts: { type: "object", additionalProperties: { type: "integer" } },
           },
         },

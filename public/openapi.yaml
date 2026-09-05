@@ -25,7 +25,7 @@ info:
     It does **not** proxy on-chain data: the components query The Graph directly
     from the browser with the consuming application's own Graph API key. To check
     live subgraph or agent state, use the MCP server's live tools instead.
-  version: 1.0.0
+  version: 1.1.0
   license:
     name: MIT
     identifier: MIT
@@ -1625,10 +1625,6 @@ components:
           type: string
         nonAffiliationNotice:
           type: string
-        unpublishedNotice:
-          type:
-            - string
-            - "null"
     ComponentList:
       type: object
       required:
@@ -1857,8 +1853,6 @@ components:
           format: date-time
         packageName:
           type: string
-        isPublished:
-          type: boolean
         counts:
           type: object
           additionalProperties:

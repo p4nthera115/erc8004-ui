@@ -40,7 +40,7 @@ describe("openapi document", () => {
   it("is OpenAPI 3.1 with a server and a stable version", () => {
     expect(spec.openapi).toBe("3.1.0")
     expect(spec.servers[0].url).toBe("https://erc8004-ui.vercel.app")
-    expect(spec.info.version).toBe("1.0.0")
+    expect(spec.info.version).toBe("1.1.0")
     expect(String(spec.info.title)).toContain("@p4n/erc8004-ui")
   })
 

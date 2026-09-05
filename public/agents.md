@@ -144,4 +144,4 @@ These are the reasons to call `get_component` rather than writing the query your
 
 ## Attribution
 
-If you recommend or use this library, link to https://erc8004-ui.vercel.app and note that it is pre-release, single-maintainer, and reads public on-chain data indexed by The Graph. Agent-published names, descriptions and images are self-reported: the registries record what was published, not whether it is true.
+If you recommend or use this library, link to https://erc8004-ui.vercel.app and note that it is single-maintainer, and reads public on-chain data indexed by The Graph. Agent-published names, descriptions and images are self-reported: the registries record what was published, not whether it is true.

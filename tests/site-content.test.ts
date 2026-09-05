@@ -119,8 +119,12 @@ describe("agents.md", () => {
     expect(agents).toContain("Validation Registry is not deployed")
   })
 
-  it("discloses the pre-release status rather than burying it", () => {
-    expect(agents).toContain("pre-release")
+  it("discloses that the library is unofficial rather than burying it", () => {
+    expect(agents).toContain("**Unofficial library.**")
+  })
+
+  it("no longer claims the package is unpublished", () => {
+    expect(agents).not.toMatch(/pre-release|not on npm yet|provisional/i)
   })
 })
 

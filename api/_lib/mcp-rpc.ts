@@ -28,7 +28,7 @@ import { findTool, toolDescriptors } from "./mcp-tools.js"
 import { REGISTRY } from "./registry.js"
 
 export const SERVER_NAME = "erc8004-ui"
-export const SERVER_TITLE = "@erc8004/ui component documentation"
+export const SERVER_TITLE = "@p4n/erc8004-ui component documentation"
 export const SERVER_VERSION = "0.3.0"
 
 /** Newest first — the order `supported`/`supportedVersions` is reported in. */
@@ -57,7 +57,7 @@ export const SERVER_INSTRUCTIONS =
   "that uses a component (the props and the subgraph caveats are not guessable), " +
   "get_setup_guide for provider and API-key setup, and get_types for the on-chain " +
   "data model. This endpoint serves documentation only; for live subgraph and agent " +
-  "checks install the stdio server (npx -y @erc8004/ui-mcp) with your own GRAPH_API_KEY."
+  "checks install the stdio server (npx -y @p4n/erc8004-ui-mcp) with your own GRAPH_API_KEY."
 
 // ---------------------------------------------------------------------------
 // JSON-RPC primitives

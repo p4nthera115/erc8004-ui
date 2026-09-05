@@ -4,7 +4,7 @@
 
 A React component library for rendering AI agent identity, reputation, and activity data from the ERC-8004 standard. Components are self-contained, trustless, and visually distinctive — each one takes an agent's on-chain identifier and fetches verified blockchain data internally. No shared agent state, no fake props.
 
-The library is distributed as an **npm package** (`@erc8004/ui`). Developers install it, wrap their app in a lightweight provider, and drop components in. The target audience is backend-heavy blockchain developers and AI coding agents — the developer experience is optimised for "install, import, done" with zero frontend expertise required.
+The library is distributed as an **npm package** (`@p4n/erc8004-ui`). Developers install it, wrap their app in a lightweight provider, and drop components in. The target audience is backend-heavy blockchain developers and AI coding agents — the developer experience is optimised for "install, import, done" with zero frontend expertise required.
 
 The flagship visual element — a deterministic SVG fingerprint generated via dithering algorithms — is the piece no one else can replicate.
 
@@ -30,7 +30,7 @@ This library aims to become the visual layer of the standard.
 
 The original plan was shadcn-style distribution: developers copy component source files into their own projects. This was revisited because the component dependency tree grew too deep. Each component depends on shared data hooks, a provider, a Subgraph client, chain resolvers, parsers, and shared types. A developer copying just one component would need to track and copy 5-7 dependency files manually — and keep them in sync with updates.
 
-More importantly, the target audience is backend blockchain developers who build frontends entirely with AI coding agents. For them, `npm install @erc8004/ui` followed by a single provider wrapper and component import is the fastest possible path. Every AI coding agent already knows this pattern. A custom CLI or manual file-copying workflow adds friction that this audience won't tolerate.
+More importantly, the target audience is backend blockchain developers who build frontends entirely with AI coding agents. For them, `npm install @p4n/erc8004-ui` followed by a single provider wrapper and component import is the fastest possible path. Every AI coding agent already knows this pattern. A custom CLI or manual file-copying workflow adds friction that this audience won't tolerate.
 
 The source code remains fully readable and well-documented on GitHub. The npm package is not a black box — it's a convenience layer over open, inspectable code. If developers need raw data access for custom UIs in the future, hooks can be extracted from components at that point.
 
@@ -112,7 +112,7 @@ This means most developers only need one line of setup:
 
 ```tsx
 // Minimal setup — no TanStack Query knowledge required:
-import { ERC8004Provider } from "@erc8004/ui"
+import { ERC8004Provider } from "@p4n/erc8004-ui"
 
 function App() {
   return (
@@ -127,7 +127,7 @@ If the app already uses TanStack Query, `ERC8004Provider` integrates seamlessly 
 
 ```tsx
 // With an existing TanStack Query setup — works seamlessly:
-import { ERC8004Provider } from "@erc8004/ui"
+import { ERC8004Provider } from "@p4n/erc8004-ui"
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 
 const queryClient = new QueryClient()

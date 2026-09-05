@@ -220,7 +220,7 @@ describe("GET /api/chains and /api/types", () => {
 
   it("returns the public type definitions", async () => {
     const body = await json(await get(types, "/api/types"))
-    expect(body.source).toBe("src/types.ts")
+    expect(body.source).toBe("packages/ui/src/types.ts")
     expect(body.types).toContain("export interface")
 
     const markdown = await get(types, "/api/types?format=markdown")
@@ -292,7 +292,7 @@ describe("GET /.well-known/mcp", () => {
 
   it("points at the stdio package for the live tools", async () => {
     const body = await json(await get(mcpManifest, "/api/mcp-manifest"))
-    expect(body.packages[0].name).toBe("@erc8004/ui-mcp")
+    expect(body.packages[0].name).toBe("@p4n/erc8004-ui-mcp")
   })
 })
 

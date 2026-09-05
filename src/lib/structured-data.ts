@@ -2,7 +2,7 @@
  * JSON-LD structured data.
  *
  * Two audiences read this and neither of them reads the page: search engines
- * resolving "@erc8004/ui" to a thing rather than a string, and agents deciding
+ * resolving "@p4n/erc8004-ui" to a thing rather than a string, and agents deciding
  * what this site is before spending tokens on it. Both want the same answer —
  * a piece of free, open-source developer software, who wrote it, where the
  * source is, and where the machine-readable documentation lives — and they
@@ -22,7 +22,7 @@ import { ROUTE_BY_PATH } from "@/generated/route-manifest"
 import { SITE_URL } from "@/content/recovery-links"
 import { normalizePath } from "@/server/negotiation"
 
-const PACKAGE_NAME = "@erc8004/ui"
+const PACKAGE_NAME = "@p4n/erc8004-ui"
 const GITHUB_URL = "https://github.com/p4nthera115/erc8004-ui"
 const X_URL = "https://x.com/p4nthera_"
 

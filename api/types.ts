@@ -1,5 +1,5 @@
 /**
- * GET /api/types — src/types.ts verbatim.
+ * GET /api/types — packages/ui/src/types.ts verbatim.
  *
  * The public data model an integrator codes against. Served as TypeScript
  * source with `?format=markdown`, and wrapped in JSON otherwise, so both a
@@ -25,7 +25,7 @@ export default {
       if (format.format === "markdown") {
         return markdown(
           `# ${REGISTRY.packageName} — public types\n\n` +
-            "Source of `src/types.ts`.\n\n" +
+            "Source of `packages/ui/src/types.ts`.\n\n" +
             "```ts\n" +
             REGISTRY.types +
             "\n```\n"
@@ -34,7 +34,7 @@ export default {
 
       return json({
         packageName: REGISTRY.packageName,
-        source: "src/types.ts",
+        source: "packages/ui/src/types.ts",
         language: "typescript",
         types: REGISTRY.types,
       })

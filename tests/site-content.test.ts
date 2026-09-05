@@ -24,7 +24,7 @@ describe("llms.txt", () => {
 
   it("keeps the llms.txt shape: an H1, then a blockquote summary", () => {
     const lines = llms.split("\n")
-    expect(lines[0]).toBe("# @erc8004/ui")
+    expect(lines[0]).toBe("# @p4n/erc8004-ui")
     expect(lines[2].startsWith("> ")).toBe(true)
   })
 
@@ -107,7 +107,7 @@ describe("agents.md", () => {
       `${SITE_URL}/openapi.json`,
       `${SITE_URL}/llms.txt`,
       "Accept: text/markdown",
-      "npx -y @erc8004/ui-mcp",
+      "npx -y @p4n/erc8004-ui-mcp",
     ]) {
       expect(agents, surface).toContain(surface)
     }

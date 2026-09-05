@@ -1,4 +1,4 @@
-# @erc8004/ui
+# @p4n/erc8004-ui
 
 Drop-in React components for displaying verified AI agent identity, reputation,
 and validation data from the [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004)
@@ -11,17 +11,24 @@ see is always what the chain says.
 Documentation: **https://erc8004-ui.vercel.app** — every page also available as
 Markdown, plus a JSON API at `/api` and an MCP endpoint at `/api/mcp`.
 
-> **Not yet published to npm.** `@erc8004/ui` is a provisional name used in all
-> examples — the final name hasn't been chosen. Until then, install from source.
+> **Unofficial library.** This is an independent, community-built project.
+> It is not affiliated with, maintained by, or endorsed by the authors of
+> ERC-8004. It renders the standard's on-chain data through public
+> subgraphs; it does not speak for the standard.
+
+This repo is a pnpm workspace holding three things: the component library
+([`packages/ui`](packages/ui), published as `@p4n/erc8004-ui`), the stdio MCP server
+([`packages/mcp-server`](packages/mcp-server), published as `@p4n/erc8004-ui-mcp`),
+and the docs site that consumes both.
 
 ## Quick start
 
 ```bash
-npm install react react-dom @tanstack/react-query
+npm install @p4n/erc8004-ui react react-dom @tanstack/react-query
 ```
 
 ```tsx
-import { ERC8004Provider, AgentCard, ReputationScore } from "@erc8004/ui"
+import { ERC8004Provider, AgentCard, ReputationScore } from "@p4n/erc8004-ui"
 
 function App() {
   return (
@@ -120,12 +127,18 @@ trusting this list.
 ## Repo layout
 
 ```
-src/
-  components/{identity,reputation,validation,activity}/   the library
-  provider/                ERC8004Provider, AgentProvider
-  lib/                     subgraph client, registry parsing, shared utils
+packages/ui/               the component library — published as @p4n/erc8004-ui
+  src/components/{identity,reputation,validation,activity}/
+  src/components/_internal/  shared primitives (Card, Tag, Skeleton, …)
+  src/provider/            ERC8004Provider, AgentProvider
+  src/lib/                 subgraph client, registry parsing, shared utils
+  src/styles/tokens.css    design tokens — the whole theming surface
+  src/styles.css           build entry for the shipped dist/styles.css
+packages/mcp-server/       the stdio MCP server — published as @p4n/erc8004-ui-mcp
+src/                       the docs site
   components/docs/registry.tsx    canonical component docs — SOURCE OF TRUTH
-  routes/                  the docs site (TanStack Router)
+  components/landing/      landing page sections
+  routes/                  TanStack Router pages
   content/site-pages.ts    /about, /contact, /privacy content (HTML + markdown)
   server/negotiation.ts    markdown content negotiation and 404 resolution
   generated/               route manifest (committed; the app imports it)
@@ -137,9 +150,13 @@ scripts/
   guides-registry.ts       canonical guide content
   lib/                     openapi, agents.md, sitemap and YAML builders
   generate-og-image.mjs    regenerates public/og.png (not part of the build)
-packages/mcp-server/       the stdio MCP server
 tests/                     vitest: routing, API, MCP protocol, published files
 ```
+
+The docs site imports the library through the `@p4n/erc8004-ui` specifier, but a
+Vite alias points that at `packages/ui/src` rather than the built output — so
+`pnpm dev` hot-reloads component edits and `pnpm build` never depends on the
+library being built first.
 
 `src/components/docs/registry.tsx` and `scripts/guides-registry.ts` are the
 single source of truth. The docs site, `llms.txt`, the per-component Markdown,
@@ -158,7 +175,9 @@ Note this guarantees every consumer says the *same* thing, not that the thing is
 pnpm install
 pnpm dev              # docs site at localhost:5173
 pnpm build            # regenerates docs, then builds the site
+pnpm build:ui         # builds the library — dist/index.{js,cjs,d.ts} + styles.css
 pnpm build:mcp        # regenerates the snapshot, then builds the MCP server
+pnpm build:packages   # both publishable packages
 pnpm test             # vitest — routing, API, MCP protocol, published files
 pnpm lint
 ```
@@ -168,4 +187,4 @@ The MCP server needs a build before the checked-in `.mcp.json` can start it, and
 
 ## License
 
-Not yet chosen. A license must be added before publishing.
+MIT — see [LICENSE](LICENSE).

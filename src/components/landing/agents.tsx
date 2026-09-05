@@ -3,7 +3,7 @@ import { FaCheck } from "react-icons/fa6"
 import { IoCopy } from "react-icons/io5"
 import { RULE, Section } from "./section"
 
-const PROMPT = `Read https://erc8004-ui.vercel.app/llms.txt, then build me an agent profile page with @erc8004/ui.`
+const PROMPT = `Read https://erc8004-ui.vercel.app/llms.txt, then build me an agent profile page with @p4n/erc8004-ui.`
 
 const RESOURCES = [
   {

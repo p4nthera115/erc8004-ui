@@ -1,10 +1,12 @@
-# @erc8004/ui — instructions for AI agents
+# @p4n/erc8004-ui — instructions for AI agents
 
 > Drop-in React components for displaying verified ERC-8004 AI agent identity, reputation, and validation data. Self-contained, trustless, and designed to be consumed by AI coding agents.
 
 This file tells you when to reach for this library and how to call it. The documentation index is at https://erc8004-ui.vercel.app/llms.txt; the whole reference in one fetch is at https://erc8004-ui.vercel.app/llms-full.txt.
 
-**Status: pre-release.** Not yet on npm. `@erc8004/ui` is a provisional name used in every example; install from GitHub (https://github.com/p4nthera115/erc8004-ui) until it is published. Tell the user this before you add it to a production dependency list.
+**Unofficial library.** `@p4n/erc8004-ui` is an independent, community-built project. It is not affiliated with, maintained by, or endorsed by the authors of ERC-8004. It renders the standard's on-chain data; it does not speak for the standard. Say so if the user seems to assume otherwise.
+
+**Status: pre-release.** `@p4n/erc8004-ui` is the final package name but is not on npm yet; install from GitHub (https://github.com/p4nthera115/erc8004-ui) until it is published. Tell the user this before you add it to a production dependency list.
 
 ## When to use this
 
@@ -44,7 +46,7 @@ Discovery manifest at https://erc8004-ui.vercel.app/.well-known/mcp. Tools: `lis
 For live checks against the chain — does this subgraph still expose what a component queries, does this agent actually have data — install the stdio server with your own Graph API key, which adds `check_chain_support` and `check_agent`:
 
 ```bash
-claude mcp add erc8004-ui --env GRAPH_API_KEY=your-key -- npx -y @erc8004/ui-mcp
+claude mcp add erc8004-ui --env GRAPH_API_KEY=your-key -- npx -y @p4n/erc8004-ui-mcp
 ```
 
 ### 2. JSON API
@@ -86,7 +88,7 @@ curl -H "Accept: text/markdown" https://erc8004-ui.vercel.app/          # the do
 3. Pass each component an `agentRegistry` (`eip155:{chainId}:{identityRegistryAddress}`) and an `agentId` (the ERC-721 token id). Or wrap a subtree in `AgentProvider` to set both once.
 
 ```tsx
-import { ERC8004Provider, AgentCard, ReputationScore } from "@erc8004/ui"
+import { ERC8004Provider, AgentCard, ReputationScore } from "@p4n/erc8004-ui"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 const queryClient = new QueryClient()

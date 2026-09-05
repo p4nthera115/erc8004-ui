@@ -35,7 +35,7 @@ export default {
           transport: "streamable-http",
           endpoint: `${base}/api/mcp`,
           manifest: `${base}/.well-known/mcp`,
-          stdio: "npx -y @erc8004/ui-mcp",
+          stdio: "npx -y @p4n/erc8004-ui-mcp",
         },
         endpoints: [
           {

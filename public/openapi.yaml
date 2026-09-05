@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  title: "@erc8004/ui documentation API"
+  title: "@p4n/erc8004-ui documentation API"
   summary: Read-only JSON documentation API for the ERC-8004 UI component library.
   description: |-
     Drop-in React components for displaying verified ERC-8004 AI agent identity, reputation, and validation data. Self-contained, trustless, and designed to be consumed by AI coding agents.
@@ -956,7 +956,7 @@ paths:
         - reference
       operationId: getTypes
       summary: TypeScript type definitions
-      description: "`src/types.ts` verbatim — the public data model."
+      description: "`packages/ui/src/types.ts` verbatim — the public data model."
       parameters:
         - name: format
           in: query
@@ -1623,7 +1623,9 @@ components:
           description: The whole component page as markdown — identical to what `?format=markdown` and the site's `.md` URL return.
         packageName:
           type: string
-        provisionalNameNotice:
+        nonAffiliationNotice:
+          type: string
+        unpublishedNotice:
           type:
             - string
             - "null"
@@ -1768,7 +1770,7 @@ components:
         source:
           type: string
           examples:
-            - src/types.ts
+            - packages/ui/src/types.ts
         language:
           type: string
           examples:

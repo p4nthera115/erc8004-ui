@@ -41,7 +41,7 @@ describe("openapi document", () => {
     expect(spec.openapi).toBe("3.1.0")
     expect(spec.servers[0].url).toBe("https://erc8004-ui.vercel.app")
     expect(spec.info.version).toBe("1.0.0")
-    expect(String(spec.info.title)).toContain("@erc8004/ui")
+    expect(String(spec.info.title)).toContain("@p4n/erc8004-ui")
   })
 
   it("documents every implemented endpoint", () => {

@@ -48,7 +48,8 @@ export default {
         ...component,
         markdownUrl: `${component.docsUrl}.md`,
         packageName: REGISTRY.packageName,
-        provisionalNameNotice: REGISTRY.provisionalNameNotice,
+        nonAffiliationNotice: REGISTRY.nonAffiliationNotice,
+        unpublishedNotice: REGISTRY.unpublishedNotice,
       })
     },
   }, {

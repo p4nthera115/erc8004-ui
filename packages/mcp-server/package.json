@@ -1,13 +1,16 @@
 {
-  "name": "@erc8004/ui-mcp",
+  "name": "@p4n/erc8004-ui-mcp",
   "version": "0.2.0",
-  "description": "MCP server for @erc8004/ui — component documentation plus live subgraph checks for ERC-8004 agent UIs.",
+  "description": "MCP server for @p4n/erc8004-ui \u2014 component documentation plus live subgraph checks for ERC-8004 agent UIs. Unofficial, not affiliated with the ERC-8004 authors.",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "erc8004-ui-mcp": "./dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --clean --platform node --target node20",

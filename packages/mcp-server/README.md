@@ -1,6 +1,6 @@
-# @erc8004/ui-mcp
+# @p4n/erc8004-ui-mcp
 
-MCP server for [`@erc8004/ui`](../../README.md) — component documentation plus
+MCP server for [`@p4n/erc8004-ui`](../../README.md) — component documentation plus
 live subgraph checks for ERC-8004 agent UIs.
 
 ## Hosted alternative
@@ -21,7 +21,7 @@ someone else's quota.
 ## Install
 
 ```bash
-claude mcp add erc8004-ui --env GRAPH_API_KEY=your-graph-api-key -- npx -y @erc8004/ui-mcp
+claude mcp add erc8004-ui --env GRAPH_API_KEY=your-graph-api-key -- npx -y @p4n/erc8004-ui-mcp
 ```
 
 Or configure the client directly:
@@ -31,7 +31,7 @@ Or configure the client directly:
   "mcpServers": {
     "erc8004-ui": {
       "command": "npx",
-      "args": ["-y", "@erc8004/ui-mcp"],
+      "args": ["-y", "@p4n/erc8004-ui-mcp"],
       "env": { "GRAPH_API_KEY": "your-graph-api-key" }
     }
   }

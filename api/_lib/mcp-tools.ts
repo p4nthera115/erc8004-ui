@@ -135,8 +135,9 @@ export const TOOLS: ToolDefinition[] = [
       return text(
         `# ${REGISTRY.packageName} — ${REGISTRY.components.length} components\n\n` +
           `${REGISTRY.tagline}\n\n${componentIndex()}` +
-          (REGISTRY.provisionalNameNotice
-            ? `\n> ${REGISTRY.provisionalNameNotice}\n`
+          `\n> ${REGISTRY.nonAffiliationNotice}\n` +
+          (REGISTRY.unpublishedNotice
+            ? `\n> ${REGISTRY.unpublishedNotice}\n`
             : "")
       )
     },
@@ -217,7 +218,7 @@ export const TOOLS: ToolDefinition[] = [
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
     run: () =>
       text(
-        `// ${REGISTRY.packageName} — public type definitions (src/types.ts)\n\n${REGISTRY.types}`
+        `// ${REGISTRY.packageName} — public type definitions (packages/ui/src/types.ts)\n\n${REGISTRY.types}`
       ),
   },
 ]

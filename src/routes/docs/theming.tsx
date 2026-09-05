@@ -16,7 +16,7 @@ function Theming() {
           Theming
         </h1>
         <p className="text-base text-neutral-500 dark:text-white/60 leading-relaxed max-w-prose">
-          <InlineCode>@erc8004/ui</InlineCode> uses CSS variables for theming.
+          <InlineCode>@p4n/erc8004-ui</InlineCode> uses CSS variables for theming.
           This gives you a set of named color and radius tokens that every
           component references. Override those tokens in your CSS to change the
           look of the entire library without touching component code.
@@ -28,7 +28,7 @@ function Theming() {
           or darkening a value produces a predictable visual shift, which makes
           themes easier to build and tweak.
         </p>
-        <CodeBlock code={`import "@erc8004/ui/styles.css"`} />
+        <CodeBlock code={`import "@p4n/erc8004-ui/styles.css"`} />
       </div>
 
       {/* OKLCH Primer */}

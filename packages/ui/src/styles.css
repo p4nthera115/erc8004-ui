@@ -1,0 +1,92 @@
+/*
+ * @p4n/erc8004-ui — prebuilt stylesheet
+ *
+ *   import "@p4n/erc8004-ui/styles.css"
+ *
+ * This is the whole styling setup for consumers who don't run Tailwind, and a
+ * safe default for those who do: it ships only the utilities these components
+ * actually use, plus the design tokens they read.
+ *
+ * Deliberately NOT included: Tailwind's preflight. A component library has no
+ * business resetting the host page's margins, heading sizes or form controls.
+ * The small base layer below covers what the components genuinely need, and
+ * every rule in it is scoped to `.erc8004` — the wrapper ERC8004Provider
+ * renders — so nothing leaks into the surrounding app.
+ *
+ * Consumers who already run Tailwind v4 can skip this file entirely and add
+ *   @source "../node_modules/@p4n/erc8004-ui/dist";
+ *   @import "@p4n/erc8004-ui/tokens.css";
+ * to their own stylesheet instead.
+ */
+
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@import "./styles/tokens.css";
+
+/* Scan only the component source — the utilities in the output are exactly
+   the ones these components reference, nothing more. */
+@source "./components";
+@source "./provider";
+
+@layer base {
+  /*
+   * Scoped equivalent of the handful of preflight rules the components rely
+   * on. `.erc8004` is the provider wrapper, so these apply inside the library
+   * and nowhere else.
+   */
+  .erc8004,
+  .erc8004 *,
+  .erc8004 *::before,
+  .erc8004 *::after {
+    box-sizing: border-box;
+  }
+
+  .erc8004 {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .erc8004 h1,
+  .erc8004 h2,
+  .erc8004 h3,
+  .erc8004 h4,
+  .erc8004 p,
+  .erc8004 figure,
+  .erc8004 blockquote,
+  .erc8004 dl,
+  .erc8004 dd {
+    margin: 0;
+  }
+
+  .erc8004 ol,
+  .erc8004 ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .erc8004 button {
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .erc8004 img,
+  .erc8004 svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  .erc8004 a {
+    color: inherit;
+    text-decoration: inherit;
+  }
+}

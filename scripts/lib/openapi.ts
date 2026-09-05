@@ -296,7 +296,7 @@ export function buildOpenApiDocument(input: OpenApiInput): Record<string, unknow
           tags: ["reference"],
           operationId: "getTypes",
           summary: "TypeScript type definitions",
-          description: "`src/types.ts` verbatim — the public data model.",
+          description: "`packages/ui/src/types.ts` verbatim — the public data model.",
           parameters: [formatParameter],
           responses: {
             "200": {
@@ -563,7 +563,8 @@ export function buildOpenApiDocument(input: OpenApiInput): Record<string, unknow
                 "`?format=markdown` and the site's `.md` URL return.",
             },
             packageName: { type: "string" },
-            provisionalNameNotice: { type: ["string", "null"] },
+            nonAffiliationNotice: { type: "string" },
+            unpublishedNotice: { type: ["string", "null"] },
           },
         },
         ComponentList: {
@@ -654,7 +655,7 @@ export function buildOpenApiDocument(input: OpenApiInput): Record<string, unknow
           required: ["types"],
           properties: {
             packageName: { type: "string" },
-            source: { type: "string", examples: ["src/types.ts"] },
+            source: { type: "string", examples: ["packages/ui/src/types.ts"] },
             language: { type: "string", examples: ["typescript"] },
             types: { type: "string" },
           },

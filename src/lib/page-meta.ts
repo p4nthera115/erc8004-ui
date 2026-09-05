@@ -31,7 +31,7 @@ export type PageMeta = {
 }
 
 const NOT_FOUND_META: PageMeta = {
-  title: "404 — Page not found — @erc8004/ui",
+  title: "404 — Page not found — @p4n/erc8004-ui",
   description:
     "That page does not exist. The documentation index is at /llms.txt and the sitemap at /sitemap.xml.",
   canonical: null,

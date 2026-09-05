@@ -40,7 +40,7 @@ function Installation() {
               Note
             </span>
             {" — "}
-            <InlineCode>@erc8004/ui</InlineCode> is a placeholder name — the
+            <InlineCode>@p4n/erc8004-ui</InlineCode> is a placeholder name — the
             package is not yet published to npm. Until publication, install
             directly from GitHub:
           </p>
@@ -52,11 +52,11 @@ function Installation() {
             will work unchanged once the package is published.
           </p>
         </div>
-        <CodeBlock code={`npm install @erc8004/ui`} />
+        <CodeBlock code={`npm install @p4n/erc8004-ui`} />
         <p className="text-sm text-neutral-400 dark:text-white/40 font-mono">
           or
         </p>
-        <CodeBlock code={`pnpm add @erc8004/ui\nyarn add @erc8004/ui`} />
+        <CodeBlock code={`pnpm add @p4n/erc8004-ui\nyarn add @p4n/erc8004-ui`} />
       </section>
 
       {/* Peer deps */}
@@ -117,7 +117,7 @@ function Installation() {
       <section className="flex flex-col gap-4">
         <SectionHeading>Minimal Working Example</SectionHeading>
         <CodeBlock
-          code={`import { ERC8004Provider, ReputationScore } from "@erc8004/ui"
+          code={`import { ERC8004Provider, ReputationScore } from "@p4n/erc8004-ui"
 
 function App() {
   return (
@@ -172,7 +172,7 @@ function App() {
         </p>
         <CodeBlock
           code={`import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { ERC8004Provider, ReputationScore } from "@erc8004/ui"
+import { ERC8004Provider, ReputationScore } from "@p4n/erc8004-ui"
 
 const queryClient = new QueryClient()
 
@@ -202,7 +202,7 @@ function App() {
           components can still override with their own props.
         </p>
         <CodeBlock
-          code={`import { AgentProvider, AgentCard, ReputationScore, FeedbackList } from "@erc8004/ui"
+          code={`import { AgentProvider, AgentCard, ReputationScore, FeedbackList } from "@p4n/erc8004-ui"
 
 <AgentProvider agentRegistry="eip155:8453:0x..." agentId={888}>
   <AgentCard />

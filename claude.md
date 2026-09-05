@@ -4,7 +4,7 @@
 
 This is a React component library for rendering AI agent identity data from the ERC-8004 standard. Components are self-contained, trustless, and visually distinctive. Each component takes an agent's on-chain identifier (`agentRegistry` + `agentId`) and fetches verified blockchain data internally.
 
-Distributed as an **npm package** (`@erc8004/ui`). Developers install, wrap their app in `ERC8004Provider` with a Graph API key, and import components. One install, clean imports, zero frontend expertise required.
+Distributed as an **npm package** (`@p4n/erc8004-ui`). Developers install, wrap their app in `ERC8004Provider` with a Graph API key, and import components. One install, clean imports, zero frontend expertise required.
 
 **Primary consumers are AI coding agents** (Claude Code, Cursor, etc.) — the ERC-8004 ecosystem is predominantly backend developers who use AI for frontend work. The npm package pattern was chosen specifically because every AI coding agent already knows how to `npm install` and import React components.
 
@@ -36,7 +36,7 @@ Every component fetches its own data. No global agent state. A developer drops a
 
 ```tsx
 // The complete developer experience:
-import { ERC8004Provider, ReputationScore } from "@erc8004/ui"
+import { ERC8004Provider, ReputationScore } from "@p4n/erc8004-ui"
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 
 const queryClient = new QueryClient()
@@ -107,7 +107,7 @@ All data comes from The Graph's Subgraph via direct GraphQL fetch calls. No SDK 
 - Chain `97` (BNB Chapel): `BTjind17gmRZ6YhT9peaCM13SvWuqztsmqyfjpntbg3Z`
 - Chain `10143` (Monad Testnet): `8iiMH9sj471jbp7AwUuuyBXvPJqCEsobuHBeUEKQSxhU`
 
-`src/lib/constants.ts` is the source of truth for this map. Ethereum Sepolia
+`packages/ui/src/lib/constants.ts` is the source of truth for this map. Ethereum Sepolia
 (11155111) was removed deliberately — its subgraph has been halted with a fatal
 indexing error since 2026-03-19 and still runs the old schema.
 
@@ -286,7 +286,7 @@ Data source: `Validation` entity + `agentValidationStats_collection`.
 
 ## Shared Utilities
 
-Global utilities in `src/lib/` (used across all categories):
+Global utilities in `packages/ui/src/lib/` (used across all categories):
 
 - **`parseAgentRegistry(registry)`** — extracts `{ namespace, chainId, contractAddress }` from `eip155:{chainId}:{address}`
 - **`getSubgraphUrl(chainId, apiKey)`** — resolves chainId to full Subgraph endpoint URL
@@ -333,50 +333,80 @@ Category-specific utilities live in their component directories (e.g., `componen
 
 Components are grouped by registry category. Each category directory contains its components and any category-specific utilities. Data fetching lives inside each component — there are no separate hook files. Truly shared utilities (Subgraph client, registry parser, address truncation) live in `/lib/` since every component needs them.
 
-The public API stays flat — developers import `{ ReputationScore }` from `'@erc8004/ui'`, never from subdirectories. `index.ts` re-exports everything.
+The public API stays flat — developers import `{ ReputationScore }` from `'@p4n/erc8004-ui'`, never from subdirectories. `index.ts` re-exports everything.
 
 ```
-@erc8004/ui
+packages/ui/                             # the published package
 ├── src/
 │   ├── provider/
 │   │   ├── ERC8004Provider.tsx
-│   │   └── AgentProvider.tsx      # optional convenience wrapper for agent identity
+│   │   └── AgentProvider.tsx            # optional convenience wrapper for agent identity
 │   ├── components/
+│   │   ├── _internal/                   # shared primitives, NOT exported
+│   │   │   ├── Card.tsx  Stat.tsx  Tag.tsx  Address.tsx
+│   │   │   ├── Skeleton.tsx  EmptyState.tsx  ErrorState.tsx
+│   │   │   └── index.ts
 │   │   ├── identity/
 │   │   │   ├── FingerprintBadge.tsx     # deterministic SVG, no data fetch
-│   │   │   ├── AgentName.tsx            # fetches registrationFile.name only
-│   │   │   ├── AgentImage.tsx           # fetches registrationFile.image, falls back to FingerprintBadge
-│   │   │   ├── AgentDescription.tsx     # fetches registrationFile.description only
-│   │   │   ├── AgentCard.tsx            # composes atomic identity pieces
-│   │   │   ├── EndpointStatus.tsx       # endpoint listing + health checks
-│   │   │   └── IdentityDisplay.tsx      # composes AgentCard + EndpointStatus
+│   │   │   ├── visual-config.ts         # fingerprint seeding
+│   │   │   ├── agent-name.tsx           # fetches registrationFile.name only
+│   │   │   ├── agent-image.tsx          # fetches registrationFile.image, falls back to FingerprintBadge
+│   │   │   ├── agent-description.tsx    # fetches registrationFile.description only
+│   │   │   ├── agent-card.tsx           # composes atomic identity pieces
+│   │   │   ├── endpoint-status.tsx      # endpoint listing + health checks
+│   │   │   └── identity-display.tsx     # composes AgentCard + EndpointStatus
 │   │   ├── reputation/
-│   │   │   ├── ReputationScore.tsx      # owns its own query (agentStats only)
+│   │   │   ├── reputation-score.tsx        # owns its own query (feedback stats only)
 │   │   │   ├── reputation-timeline.tsx     # owns its own query (feedback value + createdAt)
 │   │   │   ├── reputation-distribution.tsx # owns its own query (feedback value)
-│   │   │   ├── FeedbackList.tsx         # owns its own query (full feedback detail + pagination)
-│   │   │   ├── TagCloud.tsx             # owns its own query (tag1 + tag2 only)
-│   │   │   └── utils.ts                # tag frequency calc, score formatting
+│   │   │   ├── feedback-list.tsx           # owns its own query (full feedback detail + pagination)
+│   │   │   └── tag-cloud.tsx               # owns its own query (tag1 + tag2 only)
 │   │   ├── validation/
-│   │   │   ├── VerificationBadge.tsx    # compact verification indicator
-│   │   │   ├── ValidationScore.tsx      # aggregate validation stats
-│   │   │   ├── ValidationList.tsx       # individual validation entries + pagination
-│   │   │   └── ValidationDisplay.tsx    # composes Badge + Score + List
+│   │   │   ├── verification-badge.tsx   # compact verification indicator
+│   │   │   ├── validation-score.tsx     # aggregate validation stats
+│   │   │   ├── validation-list.tsx      # individual validation entries + pagination
+│   │   │   └── validation-display.tsx   # composes Badge + Score + List
 │   │   └── activity/
-│   │       ├── last-activity.tsx         # single timestamp from Agent.lastActivity
-│   │       └── ActivityLog.tsx          # cross-registry event feed
+│   │       ├── last-activity.tsx        # single timestamp from Agent.lastActivity
+│   │       └── activity-log.tsx         # cross-registry event feed
 │   ├── lib/                             # globally shared utilities
 │   │   ├── subgraph-client.ts
 │   │   ├── parse-registry.ts
 │   │   ├── constants.ts
+│   │   ├── cn.ts                        # twMerge wrapper — consumer className wins
 │   │   ├── useAgentIdentity.ts          # internal hook: resolves props vs AgentProvider context
 │   │   └── utils.ts
+│   ├── styles/tokens.css                # design tokens — the whole theming surface
+│   ├── styles.css                       # build entry for the shipped dist/styles.css
 │   ├── types.ts                         # shared types across all categories
 │   └── index.ts                         # flat public exports
 ├── package.json
 ├── tsconfig.json
 └── tsup.config.ts
 ```
+
+Imports inside the package are relative — there is no `@/` alias here. That
+alias belongs to the docs site in the repo root `src/`, which imports the
+library through the `@p4n/erc8004-ui` specifier; a Vite alias points that at
+`packages/ui/src` rather than `dist`, so the site never needs a prior library
+build and Tailwind still scans the component source.
+
+### Build and publish
+
+`pnpm build:ui` runs two steps:
+
+- **`tsup`** — one entry (`src/index.ts`), ESM + CJS + `.d.ts`. `treeshake` is
+  off on purpose: Rollup's post-esbuild pass strips the `"use client"`
+  directive, and every export here is a client component, so a `renderChunk`
+  plugin prepends the directive after esbuild instead. Both must stay as they
+  are or Next.js App Router imports break.
+- **`tailwindcss` CLI** — compiles `src/styles.css` to `dist/styles.css`. It
+  imports Tailwind's theme and utilities layers but deliberately **not**
+  preflight; the small base layer it ships is scoped to `.erc8004` so the
+  package never resets a consumer's page.
+
+`react`, `react-dom` and `@tanstack/react-query` are peer dependencies and
+externals. `valibot` and `tailwind-merge` are real dependencies.
 
 ### Package Exports
 
@@ -461,7 +491,7 @@ agent-facing surface can never describe a different library than the docs site.
 
 ### MCP servers (two transports, one tool set)
 
-- **stdio** (`packages/mcp-server`) — `npx -y @erc8004/ui-mcp`. Four
+- **stdio** (`packages/mcp-server`) — `npx -y @p4n/erc8004-ui-mcp`. Four
   documentation tools plus two live tools (`check_chain_support`, `check_agent`)
   that need `GRAPH_API_KEY`.
 - **Hosted HTTP** (`api/mcp.ts`) — Streamable HTTP at `/api/mcp`, no key.

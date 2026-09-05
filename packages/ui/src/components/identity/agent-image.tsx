@@ -9,8 +9,7 @@ import { cn } from "../../lib/cn"
 import { useQuery } from "@tanstack/react-query"
 import { Skeleton } from "../_internal"
 import * as v from "valibot"
-import { FingerprintBadge } from "./FingerprintBadge"
-import { AgentAvatar, agentInitials } from "./agent-avatar"
+import { AgentAvatar } from "./agent-avatar"
 
 type AgentImageResponse = {
   agent: {
@@ -73,13 +72,6 @@ function useAgentImage(agentRegistry: string, agentId: number) {
   })
 }
 
-function resolveImageUrl(uri: string) {
-  if (uri.startsWith("ipfs://")) {
-    return uri.replace("ipfs://", "https://ipfs.io/ipfs/")
-  }
-  return uri
-}
-
 interface AgentImageProps extends AgentIdentityProps {
   className?: string
   size?: number
@@ -102,10 +94,7 @@ export function AgentImage({
     )
   }
 
-  const imageUrl = data?.agent?.registrationFile?.image
-  // No image: initials off the registered name, or the fingerprint when the
-  // agent has no name to take initials from.
-  const initials = agentInitials(data?.agent?.registrationFile?.name)
+  const rf = data?.agent?.registrationFile
 
   return (
     <div
@@ -115,26 +104,13 @@ export function AgentImage({
       )}
       style={{ width: size, height: size }}
     >
-      {imageUrl ? (
-        <img
-          src={resolveImageUrl(imageUrl)}
-          alt={`Agent #${agentId}`}
-          className="h-full w-full object-cover"
-        />
-      ) : initials ? (
-        <AgentAvatar
-          agentRegistry={agentRegistry}
-          agentId={agentId}
-          initials={initials}
-          size={size}
-        />
-      ) : (
-        <FingerprintBadge
-          agentRegistry={agentRegistry}
-          agentId={agentId}
-          size={size}
-        />
-      )}
+      <AgentAvatar
+        agentRegistry={agentRegistry}
+        agentId={agentId}
+        name={rf?.name}
+        image={rf?.image}
+        size={size}
+      />
     </div>
   )
 }

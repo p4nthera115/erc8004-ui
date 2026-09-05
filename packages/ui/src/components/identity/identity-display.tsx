@@ -9,8 +9,7 @@ import {
 import { cn } from "../../lib/cn"
 import { Card, Address, Tag, Skeleton, EmptyState, ErrorState } from "../_internal"
 import * as v from "valibot"
-import { FingerprintBadge } from "./FingerprintBadge"
-import { AgentAvatar, agentInitials } from "./agent-avatar"
+import { AgentAvatar } from "./agent-avatar"
 
 type IdentityDisplayResponse = {
   agent: {
@@ -105,13 +104,6 @@ function useIdentityDisplay(agentRegistry: string, agentId: number) {
   })
 }
 
-function resolveImageUrl(uri: string): string {
-  if (uri.startsWith("ipfs://")) {
-    return uri.replace("ipfs://", "https://ipfs.io/ipfs/")
-  }
-  return uri
-}
-
 function truncateUrl(url: string, maxLen = 38): string {
   try {
     const u = new URL(url)
@@ -181,10 +173,6 @@ export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
   const { owner, registrationFile: rf } = data.agent
   const name = rf?.name ?? `Agent #${agentId}`
   const description = rf?.description ?? null
-  const imageUrl = rf?.image ? resolveImageUrl(rf.image) : null
-  // No image: initials off the registered name, or the fingerprint when the
-  // agent has no name to take initials from.
-  const initials = agentInitials(rf?.name)
 
   const endpoints = rf
     ? ENDPOINT_DEFS.flatMap(({ key, versionKey, label, isEmail }) => {
@@ -200,26 +188,13 @@ export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
       {/* Identity header */}
       <div className="flex gap-4 p-6">
         <div className="h-12 w-12 shrink-0 overflow-hidden rounded-erc8004-md border border-erc8004-border">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={name}
-              className="h-full w-full object-cover"
-            />
-          ) : initials ? (
-            <AgentAvatar
-              agentRegistry={agentRegistry}
-              agentId={agentId}
-              initials={initials}
-              size={48}
-            />
-          ) : (
-            <FingerprintBadge
-              agentRegistry={agentRegistry}
-              agentId={agentId}
-              size={48}
-            />
-          )}
+          <AgentAvatar
+            agentRegistry={agentRegistry}
+            agentId={agentId}
+            name={rf?.name}
+            image={rf?.image}
+            size={48}
+          />
         </div>
 
         <div className="min-w-0 flex-1">

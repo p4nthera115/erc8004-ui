@@ -16,8 +16,7 @@ import {
   ErrorState,
 } from "../_internal"
 import * as v from "valibot"
-import { FingerprintBadge } from "./FingerprintBadge"
-import { AgentAvatar, agentInitials } from "./agent-avatar"
+import { AgentAvatar } from "./agent-avatar"
 
 type AgentCardResponse = {
   agent: {
@@ -101,13 +100,6 @@ function useAgentCard(agentRegistry: string, agentId: number) {
       }
     },
   })
-}
-
-function resolveImageUrl(uri: string): string {
-  if (uri.startsWith("ipfs://")) {
-    return uri.replace("ipfs://", "https://ipfs.io/ipfs/")
-  }
-  return uri
 }
 
 const PROTOCOL_LABELS: Array<{
@@ -215,10 +207,6 @@ export function AgentCard({
   const registeredName = rf?.name ?? null
   const name = registeredName ?? `Agent #${agentId}`
   const description = rf?.description ?? null
-  const imageUrl = rf?.image ? resolveImageUrl(rf.image) : null
-  // No image: initials off the registered name, or the fingerprint when the
-  // agent has no name to take initials from.
-  const initials = agentInitials(registeredName)
 
   const activeProtocols = PROTOCOL_LABELS.filter(({ key }) => rf?.[key] != null)
 
@@ -232,26 +220,13 @@ export function AgentCard({
             className="aspect-square shrink-0 overflow-hidden rounded-erc8004-md border border-erc8004-border"
             style={{ width: avatarSize, height: avatarSize }}
           >
-            {imageUrl ? (
-              <img
-                src={imageUrl}
-                alt={name}
-                className="h-full w-full object-cover"
-              />
-            ) : initials ? (
-              <AgentAvatar
-                agentRegistry={agentRegistry}
-                agentId={agentId}
-                initials={initials}
-                size={avatarSize}
-              />
-            ) : (
-              <FingerprintBadge
-                agentRegistry={agentRegistry}
-                agentId={agentId}
-                size={avatarSize}
-              />
-            )}
+            <AgentAvatar
+              agentRegistry={agentRegistry}
+              agentId={agentId}
+              name={registeredName}
+              image={rf?.image}
+              size={avatarSize}
+            />
           </div>
 
           {/* Name + agent id */}
@@ -294,26 +269,13 @@ export function AgentCard({
       {/* Top row: avatar + name + address + protocol tags */}
       <div className="flex gap-4">
         <div className="h-12 w-12 aspect-square shrink-0 overflow-hidden rounded-erc8004-md border border-erc8004-border">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={name}
-              className="h-full w-full object-cover"
-            />
-          ) : initials ? (
-            <AgentAvatar
-              agentRegistry={agentRegistry}
-              agentId={agentId}
-              initials={initials}
-              size={48}
-            />
-          ) : (
-            <FingerprintBadge
-              agentRegistry={agentRegistry}
-              agentId={agentId}
-              size={48}
-            />
-          )}
+          <AgentAvatar
+            agentRegistry={agentRegistry}
+            agentId={agentId}
+            name={registeredName}
+            image={rf?.image}
+            size={48}
+          />
         </div>
 
         <div className="min-w-0 flex-1">

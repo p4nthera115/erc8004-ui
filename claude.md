@@ -239,7 +239,7 @@ Data source: `Agent` + `AgentRegistrationFile` subgraph entities.
 
 1. **FingerprintBadge** — deterministic SVG visual identity. No data fetch — generated from identifiers. ✓
 2. **AgentName** — agent's registered name. Fetches `registrationFile.name` only. Falls back to truncated agent ID.
-3. **AgentImage** — agent's registered image (IPFS/HTTPS/base64). Fetches `registrationFile.image` + `name`. With no image it falls back to an initials avatar (deterministic colour from registry + id), and to FingerprintBadge when there is no name either.
+3. **AgentImage** — agent's registered image (IPFS/HTTPS/base64). Fetches `registrationFile.image` + `name`. With no image — or an image that fails to load — it falls back to an initials avatar (deterministic colour from registry + id), and to FingerprintBadge when there is no name either.
 4. **AgentDescription** — agent's description text. Fetches `registrationFile.description` only.
 
 **Composed:**

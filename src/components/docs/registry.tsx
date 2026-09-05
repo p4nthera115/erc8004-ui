@@ -320,7 +320,7 @@ function App() {
     slug: "agent-image",
     name: "AgentImage",
     description:
-      "Renders the agent's registered image. Supports IPFS, HTTPS, and base64 sources. When no image is registered it falls back to an initials avatar in a colour derived from the agent's identity — or to the deterministic FingerprintBadge when the agent has no name either.",
+      "Renders the agent's registered image. Supports IPFS, HTTPS, and base64 sources. When no image is registered — or when the registered one fails to load — it falls back to an initials avatar in a colour derived from the agent's identity, and to the deterministic FingerprintBadge when the agent has no name either.",
     preview: withAgent(<AgentImage />),
     importLine: `import { AgentImage } from "@p4n/erc8004-ui"`,
     usage: `<AgentImage agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} />`,
@@ -328,9 +328,9 @@ function App() {
       {
         name: "Fallbacks",
         description:
-          "With no registered image, AgentImage renders the agent's initials on a colour derived from its registry and id — the same colour on every page and every reload. An agent with no registered name falls back to the deterministic FingerprintBadge instead.",
+          "With no registered image, AgentImage renders the agent's initials on a colour derived from its registry and id — the same colour on every page and every reload. A registered image that fails to load (dead host, unreachable IPFS gateway, 404) falls through to the same chain rather than leaving a broken image in place. An agent with no registered name lands on the deterministic FingerprintBadge instead.",
         preview: withAgent(<AgentImage />),
-        code: `// No image: initials avatar. No image and no name: FingerprintBadge.
+        code: `// No usable image: initials avatar. No image and no name: FingerprintBadge.
 <AgentImage agentRegistry="eip155:8453:0x8004...a432" agentId={888} />`,
       },
       {

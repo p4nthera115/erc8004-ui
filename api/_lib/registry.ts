@@ -3,8 +3,8 @@
  * the HTTP MCP endpoint so both resolve names the same way.
  */
 
-import { REGISTRY } from "../_generated/registry"
-import type { ComponentSnapshot, GuideSnapshot } from "./registry-types"
+import { REGISTRY } from "../_generated/registry.js"
+import type { ComponentSnapshot, GuideSnapshot } from "./registry-types.js"
 
 export { REGISTRY }
 

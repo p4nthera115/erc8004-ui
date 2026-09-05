@@ -6,8 +6,8 @@
  * depends on which registry contracts are deployed there, which only the live
  * MCP tools can answer.
  */
-import { handler, json } from "./_lib/http"
-import { REGISTRY } from "./_lib/registry"
+import { handler, json } from "./_lib/http.js"
+import { REGISTRY } from "./_lib/registry.js"
 
 export default {
   fetch: handler({

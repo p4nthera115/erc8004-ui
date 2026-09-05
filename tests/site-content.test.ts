@@ -59,6 +59,14 @@ describe("llms.txt", () => {
   })
 })
 
+describe("the index's .md twin", () => {
+  it("is byte-identical to llms.txt", () => {
+    // Two names for one document. A caller that negotiates `/` into markdown
+    // and a caller that fetches /llms.txt must not be handed different text.
+    expect(read("public", "llms", "index.md")).toBe(read("public", "llms.txt"))
+  })
+})
+
 describe("agents.md", () => {
   const agents = read("public", "agents.md")
 
@@ -84,6 +92,13 @@ describe("agents.md", () => {
   it("is specific about the jobs it is wrong for", () => {
     expect(agents).toContain("not building a React UI")
     expect(agents).toContain("write to the registries")
+  })
+
+  it("states the API quota and the headers that report it", () => {
+    const agents = read("public", "agents.md")
+    expect(agents).toContain("RateLimit-Remaining")
+    expect(agents).toContain("429")
+    expect(agents).toContain("Retry-After")
   })
 
   it("tells an agent how to call every surface", () => {

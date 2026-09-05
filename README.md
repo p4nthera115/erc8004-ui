@@ -8,6 +8,9 @@ You pass an agent's on-chain identifier. The component fetches and renders the
 verified data itself. Components never accept display data as props, so what you
 see is always what the chain says.
 
+Documentation: **https://erc8004-ui.vercel.app** — every page also available as
+Markdown, plus a JSON API at `/api` and an MCP endpoint at `/api/mcp`.
+
 > **Not yet published to npm.** `@erc8004/ui` is a provisional name used in all
 > examples — the final name hasn't been chosen. Until then, install from source.
 

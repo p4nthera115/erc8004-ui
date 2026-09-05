@@ -23,16 +23,37 @@ export type OpenApiInput = {
 }
 
 const ref = (name: string) => ({ $ref: `#/components/schemas/${name}` })
+const headerRef = (name: string) => ({ $ref: `#/components/headers/${name}` })
 
-function jsonResponse(description: string, schema: unknown) {
+/**
+ * Every response carries the quota headers, so a caller can pace itself from
+ * the first successful request instead of discovering the limit by hitting it.
+ */
+const RATE_LIMIT_HEADERS: Record<string, unknown> = {
+  RateLimit: headerRef("RateLimit"),
+  "RateLimit-Policy": headerRef("RateLimitPolicy"),
+  "RateLimit-Limit": headerRef("RateLimitLimit"),
+  "RateLimit-Remaining": headerRef("RateLimitRemaining"),
+  "RateLimit-Reset": headerRef("RateLimitReset"),
+}
+
+function jsonResponse(
+  description: string,
+  schema: unknown,
+  headers: Record<string, unknown> = {}
+) {
   return {
     description,
+    headers: { ...RATE_LIMIT_HEADERS, ...headers },
     content: { "application/json": { schema } },
   }
 }
 
-function errorResponse(description: string) {
-  return jsonResponse(description, ref("Error"))
+function errorResponse(
+  description: string,
+  headers: Record<string, unknown> = {}
+) {
+  return jsonResponse(description, ref("Error"), headers)
 }
 
 /** Every operation can fail these ways; spelled out so agents can plan for them. */
@@ -40,6 +61,16 @@ function commonErrors(extra: Record<string, unknown> = {}) {
   return {
     "404": errorResponse("No such resource. `error.allowed` lists valid values."),
     "405": errorResponse("Method not supported by this endpoint."),
+    "406": errorResponse(
+      "The Accept header rules out every media type this endpoint can " +
+        "produce. `error.allowed` lists what it can. Omitting Accept, or " +
+        "sending `*/*`, is never rejected."
+    ),
+    "429": errorResponse(
+      "Over the fair-use quota. `Retry-After` and `RateLimit-Reset` both give " +
+        "the seconds to wait.",
+      { "Retry-After": headerRef("RetryAfter") }
+    ),
     "500": errorResponse("Unhandled server error."),
     ...extra,
   }
@@ -83,6 +114,14 @@ export function buildOpenApiDocument(input: OpenApiInput): Record<string, unknow
         "",
         "No authentication. No API keys. CORS is open to every origin. Responses are",
         "cacheable for five minutes and only change when the site is redeployed.",
+        "",
+        "A fair-use quota of 300 requests per 60 seconds per client applies, enforced",
+        "per function instance. Every response — success or failure — carries the",
+        "`RateLimit` and `RateLimit-Policy` structured fields, plus the older",
+        "`RateLimit-Limit` / `-Remaining` / `-Reset` triple, so a client can pace",
+        "itself rather than discover the limit by being refused. A 429 adds",
+        "`Retry-After`. If you need the whole reference in bulk and would rather not",
+        "think about any of this, fetch /llms-full.txt once instead.",
         "",
         "It does **not** proxy on-chain data: the components query The Graph directly",
         "from the browser with the consuming application's own Graph API key. To check",
@@ -188,6 +227,7 @@ export function buildOpenApiDocument(input: OpenApiInput): Record<string, unknow
           responses: {
             "200": {
               description: "The component, as JSON or as markdown.",
+              headers: { ...RATE_LIMIT_HEADERS },
               content: {
                 "application/json": { schema: ref("Component") },
                 "text/markdown": { schema: { type: "string" } },
@@ -226,6 +266,7 @@ export function buildOpenApiDocument(input: OpenApiInput): Record<string, unknow
           responses: {
             "200": {
               description: "The guide, as JSON or as markdown.",
+              headers: { ...RATE_LIMIT_HEADERS },
               content: {
                 "application/json": { schema: ref("Guide") },
                 "text/markdown": { schema: { type: "string" } },
@@ -260,6 +301,7 @@ export function buildOpenApiDocument(input: OpenApiInput): Record<string, unknow
           responses: {
             "200": {
               description: "The type definitions.",
+              headers: { ...RATE_LIMIT_HEADERS },
               content: {
                 "application/json": { schema: ref("Types") },
                 "text/markdown": { schema: { type: "string" } },
@@ -324,7 +366,10 @@ export function buildOpenApiDocument(input: OpenApiInput): Record<string, unknow
           },
           responses: {
             "200": jsonResponse("JSON-RPC response.", ref("JsonRpcResponse")),
-            "202": { description: "Notification accepted. No body." },
+            "202": {
+              description: "Notification accepted. No body.",
+              headers: { ...RATE_LIMIT_HEADERS },
+            },
             "400": jsonResponse(
               "Malformed message, header mismatch (-32020) or unsupported protocol " +
                 "version (-32022).",
@@ -339,6 +384,12 @@ export function buildOpenApiDocument(input: OpenApiInput): Record<string, unknow
               "GET and DELETE are not supported: this endpoint is stateless and " +
                 "offers no standalone stream.",
               ref("JsonRpcResponse")
+            ),
+            "429": jsonResponse(
+              "Over the fair-use quota, as a JSON-RPC error (-32000) rather than " +
+                "the REST envelope — this endpoint's clients read JSON-RPC.",
+              ref("JsonRpcResponse"),
+              { "Retry-After": headerRef("RetryAfter") }
             ),
           },
         },
@@ -359,6 +410,41 @@ export function buildOpenApiDocument(input: OpenApiInput): Record<string, unknow
       },
     },
     components: {
+      headers: {
+        RateLimit: {
+          description:
+            "This caller's position in the quota window, as the structured " +
+            "field from draft-ietf-httpapi-ratelimit-headers: the policy name, " +
+            "`r` remaining requests, `t` seconds until the window resets.",
+          schema: { type: "string", examples: ['"default";r=299;t=60'] },
+        },
+        RateLimitPolicy: {
+          description:
+            "The quota policy itself: `q` requests per `w` seconds. Enforced " +
+            "per function instance, so the effective ceiling is at least this.",
+          schema: { type: "string", examples: ['"default";q=300;w=60'] },
+        },
+        RateLimitLimit: {
+          description:
+            "Requests allowed in the current window. The earlier spelling of " +
+            "the `q` parameter of RateLimit-Policy, emitted for clients that " +
+            "only understand the original draft.",
+          schema: { type: "integer", examples: [300] },
+        },
+        RateLimitRemaining: {
+          description: "Requests left in the current window.",
+          schema: { type: "integer", examples: [299] },
+        },
+        RateLimitReset: {
+          description: "Seconds until the current window resets.",
+          schema: { type: "integer", examples: [60] },
+        },
+        RetryAfter: {
+          description:
+            "Seconds to wait before retrying. Only on a 429.",
+          schema: { type: "integer", examples: [42] },
+        },
+      },
       schemas: {
         Error: {
           type: "object",
@@ -377,7 +463,9 @@ export function buildOpenApiDocument(input: OpenApiInput): Record<string, unknow
                     "not_found",
                     "invalid_parameter",
                     "method_not_allowed",
+                    "not_acceptable",
                     "unsupported_media_type",
+                    "rate_limited",
                     "internal_error",
                   ],
                 },
@@ -584,6 +672,20 @@ export function buildOpenApiDocument(input: OpenApiInput): Record<string, unknow
             llmsTxt: { type: "string", format: "uri" },
             llmsFullTxt: { type: "string", format: "uri" },
             mcp: { type: "object", additionalProperties: true },
+            rateLimit: {
+              type: "object",
+              description:
+                "The fair-use quota, and the header names that report it.",
+              properties: {
+                policy: { type: "string" },
+                limit: { type: "integer" },
+                windowSeconds: { type: "integer" },
+                scope: { type: "string" },
+                headers: { type: "array", items: { type: "string" } },
+                onExceeded: { type: "object", additionalProperties: true },
+                note: { type: "string" },
+              },
+            },
             endpoints: {
               type: "array",
               items: {

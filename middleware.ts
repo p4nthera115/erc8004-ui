@@ -58,5 +58,19 @@ export default function middleware(request: Request): Response {
           "X-Robots-Tag": "noindex",
         },
       })
+
+    case "not-acceptable":
+      // Never cached: the same URL answers 200 for the next client with a
+      // different Accept, and a shared cache keyed on this one would be wrong
+      // for everybody else.
+      return new Response(decision.body, {
+        status: 406,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "no-store",
+          Vary: VARY_VALUE,
+          "X-Robots-Tag": "noindex",
+        },
+      })
   }
 }

@@ -18,7 +18,7 @@ const spec = JSON.parse(
   info: Record<string, unknown>
   servers: Array<{ url: string }>
   paths: Record<string, Record<string, { operationId?: string; responses: Record<string, unknown> }>>
-  components: { schemas: Record<string, unknown> }
+  components: { schemas: Record<string, unknown>; headers: Record<string, unknown> }
 }
 
 /** Documented path → the file under /api that Vercel routes it to. */
@@ -101,8 +101,63 @@ describe("openapi document", () => {
 
     expect(refs.size).toBeGreaterThan(0)
     for (const ref of refs) {
-      const name = ref.replace("#/components/schemas/", "")
-      expect(spec.components.schemas[name], ref).toBeTruthy()
+      // Local pointers only, and every one of them has to land on something —
+      // headers as well as schemas, now that responses reference both.
+      const match = /^#\/components\/([a-z]+)\/(.+)$/.exec(ref)
+      expect(match, ref).toBeTruthy()
+      const section = (spec.components as Record<string, Record<string, unknown>>)[
+        match![1]
+      ]
+      expect(section, ref).toBeTruthy()
+      expect(section[match![2]], ref).toBeTruthy()
+    }
+  })
+
+  it("documents the rate-limit headers on every response", () => {
+    // An agent can only self-throttle if the contract says the headers are
+    // there. Advertising them on the 429 alone would be too late to be useful.
+    for (const [path, operations] of Object.entries(spec.paths)) {
+      for (const operation of Object.values(operations)) {
+        for (const [status, response] of Object.entries(operation.responses)) {
+          const headers = (response as { headers?: Record<string, unknown> }).headers
+          expect(Object.keys(headers ?? {}), `${path} ${status}`).toEqual(
+            expect.arrayContaining([
+              "RateLimit",
+              "RateLimit-Policy",
+              "RateLimit-Limit",
+              "RateLimit-Remaining",
+              "RateLimit-Reset",
+            ])
+          )
+        }
+      }
+    }
+  })
+
+  it("documents Retry-After on every 429", () => {
+    for (const [path, operations] of Object.entries(spec.paths)) {
+      for (const operation of Object.values(operations)) {
+        const tooMany = operation.responses["429"]
+        expect(tooMany, `${path} has no 429`).toBeTruthy()
+        const headers = (tooMany as { headers?: Record<string, unknown> }).headers
+        expect(Object.keys(headers ?? {}), `${path} 429`).toContain("Retry-After")
+      }
+    }
+  })
+
+  it("documents 406 on every endpoint that negotiates content", () => {
+    for (const [path, operations] of Object.entries(spec.paths)) {
+      for (const operation of Object.values(operations)) {
+        // /api/mcp is excluded on purpose: the MCP transport has its own
+        // Accept requirements (clients send application/json plus
+        // text/event-stream), so refusing on Accept there would break
+        // conforming clients rather than help agents.
+        if (path === "/api/mcp") {
+          expect(operation.responses["406"], `${path} should not 406`).toBeFalsy()
+          continue
+        }
+        expect(operation.responses["406"], `${path} has no 406`).toBeTruthy()
+      }
     }
   })
 

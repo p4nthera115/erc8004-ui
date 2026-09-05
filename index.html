@@ -77,6 +77,124 @@
     />
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
 
+    <!--
+      Identity, as data. The homepage graph is inlined so it is present with
+      JavaScript disabled and before hydration; src/lib/structured-data.ts
+      swaps in the current route's graph on navigation, and the prerenderer
+      bakes that into every static page. tests/structured-data.test.ts asserts
+      this copy and buildStructuredData("/") are the same graph, so editing one
+      without the other fails the build.
+    -->
+    <script type="application/ld+json" id="structured-data">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://erc8004-ui.vercel.app/#website",
+            "url": "https://erc8004-ui.vercel.app/",
+            "name": "@erc8004/ui",
+            "alternateName": [
+              "erc8004-ui",
+              "ERC-8004 UI"
+            ],
+            "description": "Drop-in React components for displaying verified ERC-8004 AI agent identity, reputation, and validation data. Self-contained, trustless, and designed to be consumed by AI coding agents.",
+            "inLanguage": "en",
+            "publisher": {
+              "@id": "https://erc8004-ui.vercel.app/#author"
+            }
+          },
+          {
+            "@type": "Person",
+            "@id": "https://erc8004-ui.vercel.app/#author",
+            "name": "p4nthera115",
+            "alternateName": "@p4nthera_",
+            "url": "https://github.com/p4nthera115",
+            "sameAs": [
+              "https://github.com/p4nthera115",
+              "https://x.com/p4nthera_"
+            ]
+          },
+          {
+            "@type": [
+              "SoftwareApplication",
+              "SoftwareSourceCode"
+            ],
+            "@id": "https://erc8004-ui.vercel.app/#software",
+            "name": "@erc8004/ui",
+            "alternateName": [
+              "erc8004-ui",
+              "ERC-8004 UI"
+            ],
+            "description": "Drop-in React components for displaying verified ERC-8004 AI agent identity, reputation, and validation data. Self-contained, trustless, and designed to be consumed by AI coding agents.",
+            "url": "https://erc8004-ui.vercel.app/",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "Any",
+            "codeRepository": "https://github.com/p4nthera115/erc8004-ui",
+            "programmingLanguage": [
+              "TypeScript",
+              "JavaScript"
+            ],
+            "runtimePlatform": "React 19",
+            "license": "https://spdx.org/licenses/MIT.html",
+            "isAccessibleForFree": true,
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock"
+            },
+            "author": {
+              "@id": "https://erc8004-ui.vercel.app/#author"
+            },
+            "maintainer": {
+              "@id": "https://erc8004-ui.vercel.app/#author"
+            },
+            "publisher": {
+              "@id": "https://erc8004-ui.vercel.app/#author"
+            },
+            "softwareHelp": {
+              "@type": "WebPage",
+              "url": "https://erc8004-ui.vercel.app/docs/introduction"
+            },
+            "sameAs": [
+              "https://github.com/p4nthera115/erc8004-ui"
+            ],
+            "keywords": [
+              "ERC-8004",
+              "AI agents",
+              "agent identity",
+              "agent reputation",
+              "React components",
+              "The Graph",
+              "blockchain",
+              "trustless agents"
+            ]
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://erc8004-ui.vercel.app/#webpage",
+            "url": "https://erc8004-ui.vercel.app/",
+            "name": "@erc8004/ui — React components for ERC-8004 agent data",
+            "description": "Drop-in React components for displaying verified ERC-8004 AI agent identity, reputation, and validation data. Self-contained, trustless, and designed to be consumed by AI coding agents.",
+            "inLanguage": "en",
+            "isPartOf": {
+              "@id": "https://erc8004-ui.vercel.app/#website"
+            },
+            "about": {
+              "@id": "https://erc8004-ui.vercel.app/#software"
+            },
+            "primaryImageOfPage": "https://erc8004-ui.vercel.app/og.png",
+            "encoding": {
+              "@type": "MediaObject",
+              "encodingFormat": "text/markdown",
+              "contentUrl": "https://erc8004-ui.vercel.app/llms.txt"
+            }
+          }
+        ]
+      }
+    </script>
+
     <script
       defer
       src="https://cloud.umami.is/script.js"

@@ -1,8 +1,8 @@
 /**
  * GET /api/guides — the setup and concept guides, in reading order.
  */
-import { handler, json } from "../_lib/http"
-import { REGISTRY } from "../_lib/registry"
+import { handler, json } from "../_lib/http.js"
+import { REGISTRY } from "../_lib/registry.js"
 
 export default {
   fetch: handler({

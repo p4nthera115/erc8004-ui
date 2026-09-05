@@ -2,8 +2,17 @@
  * GET /api/guides/{slug} — one guide, as JSON metadata plus its markdown body,
  * or as raw markdown with ?format=markdown.
  */
-import { badFormat, error, handler, json, markdown, readFormat } from "../_lib/http"
-import { findGuide, guideSlugs } from "../_lib/registry"
+import {
+  badFormat,
+  error,
+  handler,
+  json,
+  JSON_TYPE,
+  markdown,
+  MARKDOWN_TYPE,
+  readFormat,
+} from "../_lib/http.js"
+import { findGuide, guideSlugs } from "../_lib/registry.js"
 
 function slugFromUrl(url: string): string {
   const { pathname } = new URL(url)
@@ -32,5 +41,9 @@ export default {
 
       return json(guide)
     },
+  }, {
+    // This endpoint answers the same URL as JSON or as markdown, so a caller
+    // accepting only one of the two is still satisfiable and must not get 406.
+    offers: [JSON_TYPE, MARKDOWN_TYPE],
   }),
 }

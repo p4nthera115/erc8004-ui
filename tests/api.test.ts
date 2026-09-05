@@ -5,7 +5,7 @@
  * point of most of these assertions is the *error* side: an agent that mistypes
  * an endpoint or a slug has to get JSON it can branch on, never HTML.
  */
-import { describe, expect, it } from "vitest"
+import { beforeEach, describe, expect, it } from "vitest"
 
 import apiIndex from "../api/index"
 import health from "../api/health"
@@ -18,6 +18,12 @@ import types from "../api/types"
 import notFound from "../api/not-found"
 import mcpManifest from "../api/mcp-manifest"
 import { REGISTRY } from "../api/_lib/registry"
+import { acceptsType, isNotAcceptable } from "../api/_lib/accept"
+import {
+  RATE_LIMIT,
+  RATE_WINDOW_SECONDS,
+  resetRateLimits,
+} from "../api/_lib/rate-limit"
 
 const BASE = "https://erc8004-ui.vercel.app"
 
@@ -287,5 +293,212 @@ describe("GET /.well-known/mcp", () => {
   it("points at the stdio package for the live tools", async () => {
     const body = await json(await get(mcpManifest, "/api/mcp-manifest"))
     expect(body.packages[0].name).toBe("@erc8004/ui-mcp")
+  })
+})
+
+describe("content negotiation", () => {
+  it("answers 406 when the caller accepts nothing this endpoint produces", async () => {
+    const response = await get(components, "/api/components", {
+      headers: { Accept: "application/pdf" },
+    })
+    expect(response.status).toBe(406)
+
+    const body = await json(response)
+    expect(body.error.code).toBe("not_acceptable")
+    expect(body.error.allowed).toEqual(["application/json"])
+    expect(body.error.hint).toContain("application/json")
+  })
+
+  it("never 406s a caller that asked for anything, or for nothing", async () => {
+    // The common bug is 406-ing too eagerly. A missing header and a wildcard
+    // both mean "no constraint".
+    for (const headers of [
+      undefined,
+      { Accept: "*/*" },
+      { Accept: "application/json" },
+      {
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      },
+    ]) {
+      const response = await get(components, "/api/components", { headers })
+      expect(response.status, JSON.stringify(headers)).toBe(200)
+    }
+  })
+
+  it("does not 406 a markdown-only caller on an endpoint that speaks markdown", async () => {
+    const response = await get(component, "/api/components/agent-card", {
+      headers: { Accept: "text/markdown" },
+    })
+    expect(response.status).toBe(200)
+    expect(response.headers.get("content-type")).toContain("text/markdown")
+  })
+
+  it("406s a markdown-only caller on an endpoint that only speaks JSON", async () => {
+    const response = await get(chains, "/api/chains", {
+      headers: { Accept: "text/markdown" },
+    })
+    expect(response.status).toBe(406)
+    expect((await json(response)).error.code).toBe("not_acceptable")
+  })
+})
+
+describe("rate limiting", () => {
+  beforeEach(() => resetRateLimits())
+
+  const headers = (response: Response) => ({
+    policy: response.headers.get("ratelimit-policy"),
+    current: response.headers.get("ratelimit"),
+    limit: response.headers.get("ratelimit-limit"),
+    remaining: response.headers.get("ratelimit-remaining"),
+    reset: response.headers.get("ratelimit-reset"),
+  })
+
+  it("reports the quota on an ordinary successful response", async () => {
+    // Advertised on every response, not only on a refusal, so a client can
+    // slow down before it is refused rather than after.
+    const values = headers(await get(health, "/api/health"))
+    expect(values.policy).toBe(`"default";q=${RATE_LIMIT};w=${RATE_WINDOW_SECONDS}`)
+    expect(values.current).toBe(`"default";r=${RATE_LIMIT - 1};t=${RATE_WINDOW_SECONDS}`)
+    expect(values.limit).toBe(String(RATE_LIMIT))
+    expect(values.remaining).toBe(String(RATE_LIMIT - 1))
+    expect(Number(values.reset)).toBeGreaterThan(0)
+  })
+
+  it("counts down as a client spends its quota", async () => {
+    const first = headers(await get(health, "/api/health"))
+    const second = headers(await get(health, "/api/health"))
+    expect(Number(second.remaining)).toBe(Number(first.remaining) - 1)
+  })
+
+  it("counts each client separately", async () => {
+    await get(health, "/api/health", { headers: { "x-forwarded-for": "203.0.113.1" } })
+    const other = await get(health, "/api/health", {
+      headers: { "x-forwarded-for": "198.51.100.7" },
+    })
+    expect(other.headers.get("ratelimit-remaining")).toBe(String(RATE_LIMIT - 1))
+  })
+
+  it("reads only the first hop of x-forwarded-for", async () => {
+    // The rest of that header is client-supplied and would let a caller mint a
+    // fresh bucket per request.
+    for (let i = 0; i < 3; i++) {
+      await get(health, "/api/health", {
+        headers: { "x-forwarded-for": `203.0.113.9, 10.0.0.${i}` },
+      })
+    }
+    const response = await get(health, "/api/health", {
+      headers: { "x-forwarded-for": "203.0.113.9, 172.16.0.1" },
+    })
+    expect(response.headers.get("ratelimit-remaining")).toBe(String(RATE_LIMIT - 4))
+  })
+
+  it("refuses with a JSON 429 and Retry-After once the window is spent", async () => {
+    const ip = { "x-forwarded-for": "203.0.113.42" }
+    let response!: Response
+    for (let i = 0; i <= RATE_LIMIT; i++) {
+      response = await get(health, "/api/health", { headers: ip })
+    }
+
+    expect(response.status).toBe(429)
+    expect(response.headers.get("content-type")).toContain("application/json")
+    expect(Number(response.headers.get("retry-after"))).toBeGreaterThan(0)
+    expect(response.headers.get("ratelimit-remaining")).toBe("0")
+
+    const body = await json(response)
+    expect(body.error.code).toBe("rate_limited")
+    expect(body.error.status).toBe(429)
+    // The hint has to name a way out, not just restate the refusal.
+    expect(body.error.hint).toContain("llms-full.txt")
+  })
+
+  it("does not spend quota on a CORS preflight", async () => {
+    const ip = { "x-forwarded-for": "203.0.113.77" }
+    await get(components, "/api/components", { method: "OPTIONS", headers: ip })
+    const response = await get(components, "/api/components", { headers: ip })
+    expect(response.headers.get("ratelimit-remaining")).toBe(String(RATE_LIMIT - 1))
+  })
+})
+
+describe("module resolution", () => {
+  it("gives every relative import under /api a file extension", async () => {
+    // package.json declares "type": "module" and Vercel compiles the functions
+    // under /api one file at a time rather than bundling them, so Node's ESM
+    // resolver sees these specifiers verbatim. An extensionless one throws
+    // ERR_MODULE_NOT_FOUND at import — which is a 500 on every route, with no
+    // build-time warning. This is the assertion that stops it recurring.
+    const { readdirSync, readFileSync: read } = await import("node:fs")
+    const { join: joinPath } = await import("node:path")
+
+    const walk = (dir: string): string[] =>
+      readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+        const full = joinPath(dir, entry.name)
+        if (entry.isDirectory()) return walk(full)
+        return entry.name.endsWith(".ts") ? [full] : []
+      })
+
+    const files = walk(joinPath(__dirname, "..", "api"))
+    expect(files.length).toBeGreaterThan(10)
+
+    for (const file of files) {
+      const source = read(file, "utf8")
+      for (const match of source.matchAll(/from\s+"(\.[^"]*)"/g)) {
+        expect(match[1], `${file}: ${match[1]}`).toMatch(/\.(js|json)$/)
+      }
+    }
+  })
+})
+
+describe("accept parsing", () => {
+  it("decides identically to the edge middleware's copy", async () => {
+    // api/_lib/accept.ts is a deliberate duplicate of the pair in
+    // src/server/negotiation.ts — the /api functions must not drag the front
+    // end's module graph in. This is what stops the two drifting.
+    const { acceptsType: edgeAcceptsType, isNotAcceptable: edgeIsNotAcceptable } =
+      await import("../src/server/negotiation")
+
+    const accepts = [
+      null,
+      "",
+      "*/*",
+      "text/*",
+      "text/markdown",
+      "application/json",
+      "application/pdf",
+      "text/markdown;q=0, */*",
+      "text/html;q=0.9, text/markdown;q=0.1",
+      "*/*;q=0",
+      "garbage",
+    ]
+    const types = ["text/html", "text/markdown", "application/json"]
+
+    for (const accept of accepts) {
+      for (const type of types) {
+        expect(acceptsType(accept, type), `${accept} / ${type}`).toBe(
+          edgeAcceptsType(accept, type)
+        )
+      }
+      expect(isNotAcceptable(accept, types), String(accept)).toBe(
+        edgeIsNotAcceptable(accept, types)
+      )
+    }
+  })
+})
+
+describe("the /api catch-all", () => {
+  it("reports the quota too — a probe usually lands on a mistyped path", async () => {
+    const response = await get(notFound, "/api/nope")
+    expect(response.status).toBe(404)
+    expect(response.headers.get("ratelimit-policy")).toContain('"default"')
+    expect(response.headers.get("ratelimit-remaining")).toBeTruthy()
+  })
+
+  it("still answers 404 whatever the caller says it accepts", async () => {
+    // 404 beats 406: the path is wrong, which is the more useful correction.
+    const response = await get(notFound, "/api/nope", {
+      headers: { Accept: "application/pdf" },
+    })
+    expect(response.status).toBe(404)
+    expect((await json(response)).error.code).toBe("not_found")
   })
 })

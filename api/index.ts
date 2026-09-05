@@ -5,8 +5,13 @@
  * request, every endpoint it can call, the OpenAPI document describing them,
  * and the non-API entry points (llms.txt, agents.md, the MCP endpoint).
  */
-import { handler, json } from "./_lib/http"
-import { REGISTRY } from "./_lib/registry"
+import { handler, json } from "./_lib/http.js"
+import {
+  RATE_LIMIT,
+  RATE_POLICY_NAME,
+  RATE_WINDOW_SECONDS,
+} from "./_lib/rate-limit.js"
+import { REGISTRY } from "./_lib/registry.js"
 
 const base = REGISTRY.siteUrl
 
@@ -18,8 +23,8 @@ export default {
         description:
           "Read-only JSON API over the documentation for " +
           `${REGISTRY.packageName}: components, props, usage examples, guides ` +
-          "and supported chains. No authentication, no rate limit beyond fair " +
-          "use, CORS open to any origin.",
+          "and supported chains. No authentication, CORS open to any origin, " +
+          "and a fair-use quota reported on every response.",
         version: REGISTRY.generatedAt,
         documentation: `${base}/docs/introduction`,
         specification: `${base}/openapi.json`,
@@ -80,6 +85,28 @@ export default {
               "Model Context Protocol endpoint, Streamable HTTP transport.",
           },
         ],
+        rateLimit: {
+          policy: RATE_POLICY_NAME,
+          limit: RATE_LIMIT,
+          windowSeconds: RATE_WINDOW_SECONDS,
+          scope: "client IP, per function instance",
+          headers: [
+            "RateLimit",
+            "RateLimit-Policy",
+            "RateLimit-Limit",
+            "RateLimit-Remaining",
+            "RateLimit-Reset",
+          ],
+          onExceeded: {
+            status: 429,
+            errorCode: "rate_limited",
+            retryAfterHeader: "Retry-After",
+          },
+          note:
+            "Read RateLimit-Remaining and slow down before you are refused. " +
+            "To read the whole reference in one request and skip the quota " +
+            `entirely, fetch ${base}/llms-full.txt.`,
+        },
         counts: {
           components: REGISTRY.components.length,
           guides: REGISTRY.guides.length,

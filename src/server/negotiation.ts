@@ -33,6 +33,12 @@ export type Decision =
   | { kind: "rewrite"; to: string }
   /** Unknown path, markdown-preferring client: 404 with a recoverable body. */
   | { kind: "not-found-markdown"; body: string }
+  /** The page exists but none of its representations satisfies Accept. */
+  | { kind: "not-acceptable"; body: string }
+
+/** Media types a documentation page can be served as. */
+export const HTML_TYPE = "text/html"
+export const MARKDOWN_TYPE = "text/markdown"
 
 // ---------------------------------------------------------------------------
 // Accept parsing
@@ -101,6 +107,55 @@ export function acceptsHtml(accept: string | null | undefined): boolean {
   )
 }
 
+/**
+ * Whether the caller will accept `mediaType` at all.
+ *
+ * RFC 9110 §12.5.1: the most specific media range that matches decides, so
+ * `text/markdown;q=0, *\/*` rejects markdown even though the wildcard would
+ * have allowed it. A missing or empty header is "no constraint", not "nothing
+ * works", and always accepts.
+ */
+export function acceptsType(
+  accept: string | null | undefined,
+  mediaType: string
+): boolean {
+  const ranges = parseAccept(accept)
+  if (ranges.length === 0) return true
+
+  const [group] = mediaType.split("/")
+  let bestSpecificity = -1
+  let q = 0
+  for (const range of ranges) {
+    const specificity =
+      range.type === mediaType
+        ? 2
+        : range.type === `${group}/*`
+          ? 1
+          : range.type === "*/*"
+            ? 0
+            : -1
+    if (specificity > bestSpecificity) {
+      bestSpecificity = specificity
+      q = range.q
+    }
+  }
+  return bestSpecificity >= 0 && q > 0
+}
+
+/**
+ * True when none of the representations this URL can produce is acceptable to
+ * the caller — the only case where 406 is the right answer. Deliberately
+ * conservative: a missing header, a bare wildcard, or one matching offer is
+ * enough to serve something.
+ */
+export function isNotAcceptable(
+  accept: string | null | undefined,
+  offered: readonly string[]
+): boolean {
+  if (!accept || accept.trim() === "") return false
+  return !offered.some((mediaType) => acceptsType(accept, mediaType))
+}
+
 // ---------------------------------------------------------------------------
 // The markdown 404 body
 // ---------------------------------------------------------------------------
@@ -123,6 +178,41 @@ export function notFoundMarkdown(pathname: string): string {
     "- Every documentation page has a markdown twin: append `.md` to its URL, or",
     "  send `Accept: text/markdown` to the HTML URL.",
     "- The JSON API is at `/api` and always answers with JSON, including errors.",
+    "",
+  ].join("\n")
+}
+
+// ---------------------------------------------------------------------------
+// The 406 body
+// ---------------------------------------------------------------------------
+
+/**
+ * RFC 9110 §15.5.7 recommends that a 406 lists the representations that *are*
+ * available, so the client can pick one and retry. Plain text rather than
+ * markdown: the caller has just told us it does not accept markdown.
+ */
+export function notAcceptableText(
+  pathname: string,
+  offered: readonly string[],
+  accept: string | null | undefined,
+  /** Public path of this page's markdown twin — the one a caller can fetch. */
+  markdownPath: string | null
+): string {
+  return [
+    "406 Not Acceptable",
+    "",
+    `${SITE_URL}${pathname} is available as:`,
+    ...offered.map((mediaType) =>
+      mediaType === MARKDOWN_TYPE && markdownPath
+        ? `- ${mediaType} (also served at ${SITE_URL}${markdownPath})`
+        : `- ${mediaType}`
+    ),
+    "",
+    `You sent: Accept: ${accept ?? "(none)"}`,
+    "",
+    "Retry with one of the media types above, or omit the Accept header to get",
+    "the default representation. Sending `Accept: text/markdown` returns this",
+    "page as Markdown.",
     "",
   ].join("\n")
 }
@@ -158,6 +248,26 @@ export function negotiate(
   const route = ROUTE_BY_PATH[path]
 
   if (route) {
+    const offered = route.markdown ? [HTML_TYPE, MARKDOWN_TYPE] : [HTML_TYPE]
+
+    // The page exists, but the caller accepts neither of the things it can be.
+    // Answering with HTML anyway would hand an agent bytes it has said it
+    // cannot parse; 406 tells it exactly what to ask for instead.
+    if (isNotAcceptable(accept, offered)) {
+      // The twin's *public* path, not the file the rewrite points at: a caller
+      // that has just been refused needs a URL it can type, and the internal
+      // /llms/... layout is an implementation detail.
+      const markdownPath = route.markdown
+        ? path === "/"
+          ? "/llms.txt"
+          : `${path}.md`
+        : null
+      return {
+        kind: "not-acceptable",
+        body: notAcceptableText(path, offered, accept, markdownPath),
+      }
+    }
+
     if (route.markdown && prefersMarkdown(accept)) {
       return { kind: "rewrite", to: route.markdown }
     }

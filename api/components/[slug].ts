@@ -5,8 +5,17 @@
  * handler is a plain function of a Request: the same call works in a test, in
  * local dev and on the platform.
  */
-import { badFormat, error, handler, json, markdown, readFormat } from "../_lib/http"
-import { REGISTRY, componentSlugs, findComponent } from "../_lib/registry"
+import {
+  badFormat,
+  error,
+  handler,
+  json,
+  JSON_TYPE,
+  markdown,
+  MARKDOWN_TYPE,
+  readFormat,
+} from "../_lib/http.js"
+import { REGISTRY, componentSlugs, findComponent } from "../_lib/registry.js"
 
 function slugFromUrl(url: string): string {
   const { pathname } = new URL(url)
@@ -42,5 +51,9 @@ export default {
         provisionalNameNotice: REGISTRY.provisionalNameNotice,
       })
     },
+  }, {
+    // This endpoint answers the same URL as JSON or as markdown, so a caller
+    // accepting only one of the two is still satisfiable and must not get 406.
+    offers: [JSON_TYPE, MARKDOWN_TYPE],
   }),
 }

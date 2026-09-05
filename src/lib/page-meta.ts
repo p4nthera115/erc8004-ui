@@ -18,6 +18,7 @@
 import { ROUTE_BY_PATH } from "@/generated/route-manifest"
 import { SITE_URL } from "@/content/recovery-links"
 import { normalizePath } from "@/server/negotiation"
+import { applyStructuredData } from "@/lib/structured-data"
 
 export type PageMeta = {
   title: string
@@ -162,4 +163,8 @@ export function applyPageMeta(pathname: string): void {
   } else {
     removeMeta("link[data-page-markdown]")
   }
+
+  // The same identity claims as the <meta> tags above, in the form a search
+  // engine or an agent can parse without inferring anything from prose.
+  applyStructuredData(pathname)
 }

@@ -62,6 +62,8 @@ curl https://erc8004-ui.vercel.app/api/chains
 
 Errors are JSON with a stable `error.code`, a `message`, a `hint` telling you what to do next, and — for a bad identifier — an `allowed` list.
 
+Every response carries `RateLimit` and `RateLimit-Policy` (and the older `RateLimit-Limit` / `-Remaining` / `-Reset` triple) describing a fair-use quota of 300 requests per 60 seconds. Read `RateLimit-Remaining` and pace yourself; over the quota you get a JSON `429` with `Retry-After`. Reading the whole reference in bulk (below) is cheaper than paging the API and spends no quota at all.
+
 ### 3. Markdown
 
 Every documentation page has a markdown twin. Append `.md` to any docs URL, or send `Accept: text/markdown` to the HTML URL and get the markdown back:
@@ -69,7 +71,7 @@ Every documentation page has a markdown twin. Append `.md` to any docs URL, or s
 ```bash
 curl https://erc8004-ui.vercel.app/docs/components/agent-card.md
 curl -H "Accept: text/markdown" https://erc8004-ui.vercel.app/docs/components/agent-card
-curl -H "Accept: text/markdown" https://erc8004-ui.vercel.app/          # returns llms.txt
+curl -H "Accept: text/markdown" https://erc8004-ui.vercel.app/          # the documentation index
 ```
 
 ### 4. Bulk

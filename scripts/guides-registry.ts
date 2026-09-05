@@ -765,6 +765,7 @@ const mcpBody = [
   "```",
   "",
   "Add `?format=markdown` to `/api/components/{slug}`, `/api/guides/{slug}` or `/api/types` to get the markdown rendering instead of JSON. Errors are JSON with a stable `error.code`, a `hint` saying what to do next, and an `allowed` list when the failure was an unknown identifier.",
+  "Every response carries the `RateLimit` and `RateLimit-Policy` headers (plus the older `RateLimit-Limit` / `-Remaining` / `-Reset` triple) describing a fair-use quota of 300 requests per 60 seconds; going over it returns a JSON `429` with `Retry-After`. If you want the whole reference and would rather not think about pacing, fetch [/llms-full.txt](https://erc8004-ui.vercel.app/llms-full.txt) once instead.",
   "",
   "The specification is at [/openapi.json]({{SITE_URL}}/openapi.json) (YAML at [/openapi.yaml]({{SITE_URL}}/openapi.yaml)), and [/agents.md]({{SITE_URL}}/agents.md) covers when to reach for this library at all.",
 ].join("\n")

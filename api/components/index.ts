@@ -5,14 +5,14 @@
  *   ?group=Identity   exact group match (the registry categories)
  *   ?q=reputation     free-text search across name, slug, props and body
  */
-import { error, handler, json } from "../_lib/http"
+import { error, handler, json } from "../_lib/http.js"
 import {
   REGISTRY,
   componentSummary,
   findGroup,
   groupTitles,
   searchComponents,
-} from "../_lib/registry"
+} from "../_lib/registry.js"
 
 export default {
   fetch: handler({

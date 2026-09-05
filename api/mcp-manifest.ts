@@ -6,16 +6,16 @@
  * so a client that reads the manifest and a client that calls `server/discover`
  * cannot be told different things.
  */
-import { handler, json } from "./_lib/http"
+import { handler, json } from "./_lib/http.js"
 import {
   SERVER_INSTRUCTIONS,
   SERVER_NAME,
   SERVER_TITLE,
   SERVER_VERSION,
   SUPPORTED_VERSIONS,
-} from "./_lib/mcp-rpc"
-import { toolDescriptors } from "./_lib/mcp-tools"
-import { REGISTRY } from "./_lib/registry"
+} from "./_lib/mcp-rpc.js"
+import { toolDescriptors } from "./_lib/mcp-tools.js"
+import { REGISTRY } from "./_lib/registry.js"
 
 const base = REGISTRY.siteUrl
 

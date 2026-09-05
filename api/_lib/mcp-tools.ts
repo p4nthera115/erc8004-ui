@@ -19,7 +19,7 @@ import {
   guideSlugs,
   findGuide,
   searchComponents,
-} from "./registry"
+} from "./registry.js"
 
 export type ToolContent = { type: "text"; text: string }
 export type ToolResult = { content: ToolContent[]; isError?: boolean }

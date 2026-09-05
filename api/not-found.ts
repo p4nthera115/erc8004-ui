@@ -6,8 +6,9 @@
  * agent calling a mistyped endpoint gets HTML it cannot parse — the failure
  * the "JSON error responses" check is looking for.
  */
-import { error } from "./_lib/http"
-import { REGISTRY } from "./_lib/registry"
+import { error } from "./_lib/http.js"
+import { consume, rateLimitHeaders } from "./_lib/rate-limit.js"
+import { REGISTRY } from "./_lib/registry.js"
 
 export default {
   fetch: (request: Request): Response => {
@@ -18,7 +19,11 @@ export default {
     const { pathname } = new URL(request.url)
     const isRewriteTarget = pathname === "/api/not-found"
 
-    return error({
+    // A mistyped endpoint is the most likely place for a probe to land, so it
+    // reports the quota like every other route. It answers 404 for any method
+    // and any Accept: the path is wrong, which is the more useful thing to say
+    // than that the format is.
+    const response = error({
       code: "not_found",
       message: isRewriteTarget
         ? "That path is not an endpoint of this API."
@@ -38,5 +43,11 @@ export default {
         "/api/mcp",
       ],
     })
+
+    const headers = new Headers(response.headers)
+    for (const [key, value] of Object.entries(rateLimitHeaders(consume(request)))) {
+      headers.set(key, value)
+    }
+    return new Response(response.body, { status: response.status, headers })
   },
 }

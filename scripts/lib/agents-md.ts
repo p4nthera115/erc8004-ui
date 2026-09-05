@@ -178,6 +178,15 @@ export function buildAgentsMd(input: AgentsMdInput): string {
       "what to do next, and — for a bad identifier — an `allowed` list."
   )
   lines.push("")
+  lines.push(
+    "Every response carries `RateLimit` and `RateLimit-Policy` (and the older " +
+      "`RateLimit-Limit` / `-Remaining` / `-Reset` triple) describing a fair-use " +
+      "quota of 300 requests per 60 seconds. Read `RateLimit-Remaining` and pace " +
+      "yourself; over the quota you get a JSON `429` with `Retry-After`. Reading " +
+      "the whole reference in bulk (below) is cheaper than paging the API and " +
+      "spends no quota at all."
+  )
+  lines.push("")
   lines.push("### 3. Markdown")
   lines.push("")
   lines.push(
@@ -188,7 +197,9 @@ export function buildAgentsMd(input: AgentsMdInput): string {
   lines.push("```bash")
   lines.push(`curl ${siteUrl}/docs/components/agent-card.md`)
   lines.push(`curl -H "Accept: text/markdown" ${siteUrl}/docs/components/agent-card`)
-  lines.push(`curl -H "Accept: text/markdown" ${siteUrl}/          # returns llms.txt`)
+  lines.push(
+    `curl -H "Accept: text/markdown" ${siteUrl}/          # the documentation index`
+  )
   lines.push("```")
   lines.push("")
   lines.push("### 4. Bulk")

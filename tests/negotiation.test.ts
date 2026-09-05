@@ -5,8 +5,11 @@
 import { describe, expect, it } from "vitest"
 import {
   acceptsHtml,
+  acceptsType,
+  isNotAcceptable,
   negotiate,
   normalizePath,
+  notAcceptableText,
   notFoundMarkdown,
   prefersMarkdown,
 } from "../src/server/negotiation"
@@ -79,10 +82,28 @@ describe("negotiate", () => {
   })
 
   it("serves the homepage's markdown twin — the documentation index", () => {
+    // /llms/index.md, not /llms.txt: a middleware rewrite is served without
+    // the vercel.json Content-Type override (those match the requested path,
+    // not the destination), and a .txt file would come back as text/plain —
+    // which is precisely the acceptmarkdown.com failure this avoids.
     expect(negotiate("/", "text/markdown")).toEqual({
       kind: "rewrite",
-      to: "/llms.txt",
+      to: "/llms/index.md",
     })
+    expect(negotiate("/docs", "text/markdown")).toEqual({
+      kind: "rewrite",
+      to: "/llms/index.md",
+    })
+  })
+
+  it("only ever negotiates to a .md file", () => {
+    // Vercel types a static file from its extension, and only .md gets
+    // text/markdown. A twin with any other extension silently serves the
+    // right bytes under the wrong media type.
+    for (const route of ROUTE_MANIFEST) {
+      if (!route.markdown) continue
+      expect(route.markdown, route.path).toMatch(/\.md$/)
+    }
   })
 
   it("rewrites the standalone pages", () => {
@@ -136,6 +157,99 @@ describe("negotiate", () => {
       const decision = negotiate("/some-path-that-does-not-exist", accept)
       expect(decision.kind).toBe("not-found-markdown")
     }
+  })
+
+  it("answers 406 when the caller accepts neither HTML nor markdown", () => {
+    for (const accept of [
+      "application/pdf",
+      "application/json",
+      "text/plain",
+      "text/html;q=0, text/markdown;q=0",
+    ]) {
+      const decision = negotiate("/docs/installation", accept)
+      expect(decision.kind, accept).toBe("not-acceptable")
+    }
+  })
+
+  it("never 406s a client that has expressed no constraint", () => {
+    // The most common bug in the other direction: 406 for a missing header or
+    // a wildcard, both of which mean "anything", not "nothing".
+    for (const accept of [null, "", "*/*", "text/*", BROWSER_ACCEPT]) {
+      expect(negotiate("/docs/installation", accept).kind, String(accept)).not.toBe(
+        "not-acceptable"
+      )
+    }
+  })
+
+  it("prefers 404 over 406 for a path that does not exist", () => {
+    // The resource is missing, which is the more useful thing to be told; a
+    // 406 would imply the URL is real and only the format was wrong.
+    expect(negotiate("/nope", "application/pdf").kind).toBe("not-found-markdown")
+  })
+})
+
+describe("acceptsType", () => {
+  it("treats a missing or empty header as no constraint", () => {
+    expect(acceptsType(null, "text/html")).toBe(true)
+    expect(acceptsType("", "text/markdown")).toBe(true)
+  })
+
+  it("matches exact types, subtype wildcards and full wildcards", () => {
+    expect(acceptsType("text/markdown", "text/markdown")).toBe(true)
+    expect(acceptsType("text/*", "text/markdown")).toBe(true)
+    expect(acceptsType("*/*", "application/json")).toBe(true)
+    expect(acceptsType("image/png", "text/html")).toBe(false)
+  })
+
+  it("lets the most specific range win, including a q=0 rejection", () => {
+    // RFC 9110 §12.5.1: `text/markdown;q=0, */*` rejects markdown even though
+    // the wildcard would otherwise have allowed it.
+    expect(acceptsType("text/markdown;q=0, */*", "text/markdown")).toBe(false)
+    expect(acceptsType("text/markdown;q=0, */*", "text/html")).toBe(true)
+    expect(acceptsType("text/*;q=0, text/markdown", "text/markdown")).toBe(true)
+  })
+})
+
+describe("isNotAcceptable", () => {
+  const offers = ["text/html", "text/markdown"]
+
+  it("is false whenever any offer matches", () => {
+    expect(isNotAcceptable("text/markdown", offers)).toBe(false)
+    expect(isNotAcceptable("text/html, application/pdf", offers)).toBe(false)
+  })
+
+  it("is false for no constraint at all", () => {
+    expect(isNotAcceptable(null, offers)).toBe(false)
+    expect(isNotAcceptable("   ", offers)).toBe(false)
+    expect(isNotAcceptable("*/*", offers)).toBe(false)
+  })
+
+  it("is true only when every offer is ruled out", () => {
+    expect(isNotAcceptable("application/pdf", offers)).toBe(true)
+    expect(isNotAcceptable("*/*;q=0", offers)).toBe(true)
+  })
+})
+
+describe("notAcceptableText", () => {
+  const body = notAcceptableText(
+    "/docs/installation",
+    ["text/html", "text/markdown"],
+    "application/pdf",
+    "/docs/installation.md"
+  )
+
+  it("lists the representations that do exist, as RFC 9110 recommends", () => {
+    expect(body).toMatch(/^406 Not Acceptable/)
+    expect(body).toContain("- text/html")
+    expect(body).toContain("- text/markdown")
+  })
+
+  it("quotes back what the caller sent, so the mismatch is unambiguous", () => {
+    expect(body).toContain("Accept: application/pdf")
+  })
+
+  it("names a URL the caller can fetch instead", () => {
+    expect(body).toContain("https://erc8004-ui.vercel.app/docs/installation.md")
   })
 })
 

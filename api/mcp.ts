@@ -14,7 +14,13 @@
  * skin around it.
  */
 
-import { dispatch, MODERN_VERSION, SUPPORTED_VERSIONS } from "./_lib/mcp-rpc"
+import { dispatch, MODERN_VERSION, SUPPORTED_VERSIONS } from "./_lib/mcp-rpc.js"
+import {
+  consume,
+  RATE_LIMIT,
+  RATE_WINDOW_SECONDS,
+  rateLimitHeaders,
+} from "./_lib/rate-limit.js"
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
@@ -63,7 +69,10 @@ function originIsAcceptable(origin: string | null): boolean {
   }
 }
 
-const notAllowed = (method: string): Response =>
+const notAllowed = (
+  method: string,
+  extra: Record<string, string> = {}
+): Response =>
   respond(
     {
       jsonrpc: "2.0",
@@ -77,13 +86,36 @@ const notAllowed = (method: string): Response =>
       },
     },
     405,
-    { Allow: "POST, OPTIONS" }
+    { Allow: "POST, OPTIONS", ...extra }
   )
 
 export default {
   async fetch(request: Request): Promise<Response> {
     if (request.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: CORS_HEADERS })
+    }
+
+    // Same fair-use quota as the REST endpoints, reported the same way. The
+    // refusal is a JSON-RPC error rather than the REST envelope, because that
+    // is the shape a client of this endpoint knows how to read.
+    const limit = consume(request)
+    const limitHeaders = rateLimitHeaders(limit)
+
+    if (limit.exceeded) {
+      return respond(
+        {
+          jsonrpc: "2.0",
+          id: null,
+          error: {
+            code: -32000,
+            message:
+              `Over the fair-use limit of ${RATE_LIMIT} requests per ` +
+              `${RATE_WINDOW_SECONDS} seconds. Retry in ${limit.reset} seconds.`,
+          },
+        },
+        429,
+        { ...limitHeaders, "Retry-After": String(limit.reset) }
+      )
     }
 
     if (!originIsAcceptable(request.headers.get("origin"))) {
@@ -93,11 +125,12 @@ export default {
           id: null,
           error: { code: -32600, message: "Invalid Origin header." },
         },
-        403
+        403,
+        limitHeaders
       )
     }
 
-    if (request.method !== "POST") return notAllowed(request.method)
+    if (request.method !== "POST") return notAllowed(request.method, limitHeaders)
 
     let payload: unknown
     try {
@@ -114,7 +147,8 @@ export default {
               `Supported protocol versions: ${SUPPORTED_VERSIONS.join(", ")}.`,
           },
         },
-        400
+        400,
+        limitHeaders
       )
     }
 
@@ -131,14 +165,16 @@ export default {
         .map((message) => dispatch(message, context))
         .filter((outcome) => outcome.body !== null)
         .map((outcome) => outcome.body)
-      if (responses.length === 0) return respond(null, 202)
+      if (responses.length === 0) return respond(null, 202, limitHeaders)
       return respond(responses, 200, {
+        ...limitHeaders,
         "MCP-Protocol-Version": context.protocolVersion ?? "2025-03-26",
       })
     }
 
     const outcome = dispatch(payload, context)
     return respond(outcome.body, outcome.status, {
+      ...limitHeaders,
       "MCP-Protocol-Version": context.protocolVersion ?? MODERN_VERSION,
     })
   },

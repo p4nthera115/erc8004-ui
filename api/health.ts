@@ -3,8 +3,8 @@
  * serving? `generatedAt` is the snapshot timestamp, so a caller can tell
  * whether a redeploy has picked up a docs change.
  */
-import { handler, json } from "./_lib/http"
-import { REGISTRY } from "./_lib/registry"
+import { handler, json } from "./_lib/http.js"
+import { REGISTRY } from "./_lib/registry.js"
 
 export default {
   fetch: handler({

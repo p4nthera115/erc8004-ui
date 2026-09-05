@@ -16,8 +16,8 @@ export type ManifestRoute = {
 }
 
 export const ROUTE_MANIFEST: ManifestRoute[] = [
-  {"path":"/","title":"@erc8004/ui — React components for ERC-8004 agent data","description":"Drop-in React components for displaying verified ERC-8004 AI agent identity, reputation, and validation data. Self-contained, trustless, and designed to be consumed by AI coding agents.","markdown":"/llms.txt","kind":"home","priority":1},
-  {"path":"/docs","title":"Documentation — @erc8004/ui","description":"Documentation index.","markdown":"/llms.txt","kind":"index","priority":0},
+  {"path":"/","title":"@erc8004/ui — React components for ERC-8004 agent data","description":"Drop-in React components for displaying verified ERC-8004 AI agent identity, reputation, and validation data. Self-contained, trustless, and designed to be consumed by AI coding agents.","markdown":"/llms/index.md","kind":"home","priority":1},
+  {"path":"/docs","title":"Documentation — @erc8004/ui","description":"Documentation index.","markdown":"/llms/index.md","kind":"index","priority":0},
   {"path":"/docs/introduction","title":"Introduction — @erc8004/ui","description":"Why this library exists and what problems it solves.","markdown":"/llms/_guides/introduction.md","kind":"guide","priority":0.8},
   {"path":"/docs/installation","title":"Installation — @erc8004/ui","description":"Install the package, set up the provider, write your first component.","markdown":"/llms/_guides/installation.md","kind":"guide","priority":0.64},
   {"path":"/docs/concepts","title":"Concepts — @erc8004/ui","description":"Core concepts: registries, agentRegistry/agentId, trustless data, supported chains.","markdown":"/llms/_guides/concepts.md","kind":"guide","priority":0.64},

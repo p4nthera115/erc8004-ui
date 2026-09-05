@@ -33,5 +33,6 @@ packages/mcp-server/src/generated/
 # Environment variables
 .env
 .env.*
-# Documentation snapshot compiled for the Vercel functions under /api
-api/_generated/
+# api/_generated/registry.ts is deliberately NOT ignored: the Vercel functions
+# under /api import it, and Vercel does not guarantee they are built after the
+# build command that generates it.

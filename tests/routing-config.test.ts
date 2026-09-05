@@ -26,6 +26,12 @@ const headerFor = (source: string, key: string) =>
     ?.headers.find((header) => header.key.toLowerCase() === key.toLowerCase())?.value
 
 describe("rewrites", () => {
+  it("serves the index as markdown at /docs.md, from a .md file", () => {
+    // /llms.txt would be served as text/plain through a rewrite; only a .md
+    // destination gets text/markdown from the static file server.
+    expect(rewriteFor("/docs.md")?.destination).toBe("/llms/index.md")
+  })
+
   it("serves the markdown twin of every standalone page", () => {
     for (const slug of ["about", "contact", "privacy"]) {
       expect(rewriteFor(`/${slug}.md`)?.destination).toBe(`/llms/_pages/${slug}.md`)
@@ -74,14 +80,35 @@ describe("headers", () => {
     // Without Vary a CDN can serve the cached HTML variant to an agent asking
     // for markdown, or the reverse — the acceptmarkdown.com failure mode.
     expect(headerFor("/(llms.txt|llms-full.txt|agents.md)", "Vary")).toContain("Accept")
-    expect(headerFor("/llms/(.*).md", "Vary")).toContain("Accept")
+    expect(headerFor("/(.*).md", "Vary")).toContain("Accept")
   })
 
   it("serves markdown files as text/markdown", () => {
     expect(headerFor("/(llms.txt|llms-full.txt|agents.md)", "Content-Type")).toContain(
       "text/markdown"
     )
-    expect(headerFor("/llms/(.*).md", "Content-Type")).toContain("text/markdown")
+    expect(headerFor("/(.*).md", "Content-Type")).toContain("text/markdown")
+  })
+
+  it("covers every public .md spelling, not just the files behind them", () => {
+    // A `headers` rule matches the URL the caller asked for, never a rewrite
+    // destination — so /AGENTS.md, /about.md, /docs.md and /docs/**.md have to
+    // be covered by their own public paths or they lose caching, CORS and
+    // Vary the moment they are served through a rewrite.
+    const rule = config.headers.find((entry) => entry.source === "/(.*).md")
+    expect(rule).toBeTruthy()
+    const pattern = /^\/(.*)\.md$/
+    for (const path of [
+      "/AGENTS.md",
+      "/about.md",
+      "/docs.md",
+      "/docs/installation.md",
+      "/docs/components/agent-card.md",
+      "/llms/index.md",
+      "/llms/_guides/installation.md",
+    ]) {
+      expect(pattern.test(path), path).toBe(true)
+    }
   })
 
   it("serves the OpenAPI documents with their own content types, CORS-open", () => {
@@ -156,6 +183,15 @@ describe("middleware", () => {
   it("marks the HTML variant varying too, and otherwise leaves it alone", () => {
     const response = run("/docs/installation", "text/html")
     expect(response.headers.get("x-middleware-next")).toBe("1")
+    expect(response.headers.get("vary")).toBe("Accept, Accept-Encoding")
+  })
+
+  it("answers 406 with the list of representations, and never caches it", () => {
+    const response = run("/docs/installation", "application/pdf")
+    expect(response.status).toBe(406)
+    expect(response.headers.get("content-type")).toContain("text/plain")
+    // A shared cache keyed on this Accept would be wrong for everyone else.
+    expect(response.headers.get("cache-control")).toBe("no-store")
     expect(response.headers.get("vary")).toBe("Accept, Accept-Encoding")
   })
 

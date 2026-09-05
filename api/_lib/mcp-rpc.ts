@@ -24,8 +24,8 @@
  * between requests.
  */
 
-import { findTool, toolDescriptors } from "./mcp-tools"
-import { REGISTRY } from "./registry"
+import { findTool, toolDescriptors } from "./mcp-tools.js"
+import { REGISTRY } from "./registry.js"
 
 export const SERVER_NAME = "erc8004-ui"
 export const SERVER_TITLE = "@erc8004/ui component documentation"

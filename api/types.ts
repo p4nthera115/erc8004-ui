@@ -5,8 +5,16 @@
  * source with `?format=markdown`, and wrapped in JSON otherwise, so both a
  * curl-and-read agent and a JSON client get something usable.
  */
-import { badFormat, handler, json, markdown, readFormat } from "./_lib/http"
-import { REGISTRY } from "./_lib/registry"
+import {
+  badFormat,
+  handler,
+  json,
+  JSON_TYPE,
+  markdown,
+  MARKDOWN_TYPE,
+  readFormat,
+} from "./_lib/http.js"
+import { REGISTRY } from "./_lib/registry.js"
 
 export default {
   fetch: handler({
@@ -31,5 +39,9 @@ export default {
         types: REGISTRY.types,
       })
     },
+  }, {
+    // This endpoint answers the same URL as JSON or as markdown, so a caller
+    // accepting only one of the two is still satisfiable and must not get 406.
+    offers: [JSON_TYPE, MARKDOWN_TYPE],
   }),
 }

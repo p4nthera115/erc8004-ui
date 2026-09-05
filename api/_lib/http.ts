@@ -11,11 +11,21 @@
  * from tests with no server involved.
  */
 
+import { isNotAcceptable } from "./accept.js"
+import {
+  consume,
+  RATE_LIMIT,
+  RATE_WINDOW_SECONDS,
+  rateLimitHeaders,
+} from "./rate-limit.js"
+
 export type ErrorCode =
   | "not_found"
   | "invalid_parameter"
   | "method_not_allowed"
+  | "not_acceptable"
   | "unsupported_media_type"
+  | "rate_limited"
   | "internal_error"
 
 export const DOCS_URL = "https://erc8004-ui.vercel.app/docs"
@@ -25,9 +35,15 @@ const STATUS_FOR: Record<ErrorCode, number> = {
   not_found: 404,
   invalid_parameter: 400,
   method_not_allowed: 405,
+  not_acceptable: 406,
   unsupported_media_type: 415,
+  rate_limited: 429,
   internal_error: 500,
 }
+
+/** Media types every endpoint can produce. */
+export const JSON_TYPE = "application/json"
+export const MARKDOWN_TYPE = "text/markdown"
 
 /** Cache profile for the docs data — it only changes on redeploy. */
 const CACHE_CONTROL = "public, max-age=300, s-maxage=3600"
@@ -107,19 +123,50 @@ export function error(init: ApiErrorInit): Response {
   )
 }
 
+/** Copies `response` with extra headers merged in. */
+function withHeaders(
+  response: Response,
+  extra: Record<string, string>
+): Response {
+  const headers = new Headers(response.headers)
+  for (const [key, value] of Object.entries(extra)) headers.set(key, value)
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
+}
+
+export type HandlerOptions = {
+  /**
+   * Media types this endpoint can produce, most preferred first. Used to
+   * answer 406 when the caller accepts none of them. Defaults to JSON only.
+   */
+  offers?: readonly string[]
+}
+
 /**
  * Wraps a handler so that unsupported methods produce a JSON 405 (rather than
- * the platform's HTML default), CORS preflight works, and an unexpected throw
- * becomes a JSON 500 instead of a stack trace.
+ * the platform's HTML default), an Accept header nothing can satisfy produces
+ * a JSON 406, a caller over the fair-use quota gets a JSON 429 with
+ * Retry-After, CORS preflight works, and an unexpected throw becomes a JSON
+ * 500 instead of a stack trace.
+ *
+ * Every response carries the RateLimit headers, so an agent can pace itself
+ * without first having to be refused.
  */
 export function handler(
-  methods: Record<string, (request: Request) => Response | Promise<Response>>
+  methods: Record<string, (request: Request) => Response | Promise<Response>>,
+  options: HandlerOptions = {}
 ) {
   const allow = [...Object.keys(methods), "OPTIONS"]
   if (methods.GET && !methods.HEAD) allow.push("HEAD")
+  const offers = options.offers ?? [JSON_TYPE]
 
   return async function fetchHandler(request: Request): Promise<Response> {
     try {
+      // A CORS preflight is not a request for the resource, so it neither
+      // spends quota nor carries the quota headers.
       if (request.method === "OPTIONS") {
         return new Response(null, {
           status: 204,
@@ -127,27 +174,63 @@ export function handler(
         })
       }
 
+      const limit = consume(request)
+      const limitHeaders = rateLimitHeaders(limit)
+
+      if (limit.exceeded) {
+        return withHeaders(
+          error({
+            code: "rate_limited",
+            message: `Over the fair-use limit of ${RATE_LIMIT} requests per ${RATE_WINDOW_SECONDS} seconds.`,
+            hint:
+              `Wait ${limit.reset} seconds, then retry — the RateLimit-Reset header ` +
+              `on every response counts the window down. This documentation is also ` +
+              `published as static files that carry no limit at all: ` +
+              `https://erc8004-ui.vercel.app/llms-full.txt.`,
+            headers: { "Retry-After": String(limit.reset) },
+          }),
+          limitHeaders
+        )
+      }
+
+      // RFC 9110 §15.5.7. Only when the caller has ruled out everything this
+      // endpoint can produce — a missing header or a wildcard is no constraint.
+      if (isNotAcceptable(request.headers.get("accept"), offers)) {
+        return withHeaders(
+          error({
+            code: "not_acceptable",
+            message: `This endpoint cannot produce any of the media types you accept.`,
+            hint: `Send Accept: ${offers.join(" or ")}, or omit the header entirely.`,
+            allowed: [...offers],
+          }),
+          limitHeaders
+        )
+      }
+
       // HEAD is GET without a body — same headers, same status.
       if (request.method === "HEAD" && methods.GET) {
         const response = await methods.GET(request)
         return new Response(null, {
           status: response.status,
-          headers: response.headers,
+          headers: withHeaders(response, limitHeaders).headers,
         })
       }
 
       const method = methods[request.method]
       if (!method) {
-        return error({
-          code: "method_not_allowed",
-          message: `${request.method} is not supported by this endpoint.`,
-          hint: `Use ${allow.join(", ")}. The full endpoint contract is published at ${OPENAPI_URL}.`,
-          allowed: allow,
-          headers: { Allow: allow.join(", ") },
-        })
+        return withHeaders(
+          error({
+            code: "method_not_allowed",
+            message: `${request.method} is not supported by this endpoint.`,
+            hint: `Use ${allow.join(", ")}. The full endpoint contract is published at ${OPENAPI_URL}.`,
+            allowed: allow,
+            headers: { Allow: allow.join(", ") },
+          }),
+          limitHeaders
+        )
       }
 
-      return await method(request)
+      return withHeaders(await method(request), limitHeaders)
     } catch (cause) {
       return error({
         code: "internal_error",

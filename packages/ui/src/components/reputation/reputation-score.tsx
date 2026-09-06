@@ -7,7 +7,7 @@ import {
   type AgentIdentityProps,
 } from "../../lib/useAgentIdentity"
 import { cn } from "../../lib/cn"
-import { Skeleton } from "../_internal"
+import { LoadingLabel, Skeleton } from "../_internal"
 import * as v from "valibot"
 
 type ReputationStatsResponse = {
@@ -111,7 +111,8 @@ export function ReputationScore({
 
   if (isLoading) {
     return (
-      <div className={cn("inline-flex items-center gap-3", className)}>
+      <div aria-busy="true" className={cn("inline-flex items-center gap-3", className)}>
+        <LoadingLabel />
         <Skeleton className="h-8 w-16" />
         <div className="space-y-1">
           <Skeleton className="h-3 w-8" />
@@ -130,9 +131,13 @@ export function ReputationScore({
   if (error || !summary || reviewCount <= 0) {
     return (
       <div className={cn("inline-flex items-center gap-3", className)}>
-        <span className="text-2xl font-semibold tabular-nums text-erc8004-muted-fg">
-          --
+        <span
+          aria-hidden="true"
+          className="text-2xl font-semibold tabular-nums text-erc8004-muted-fg"
+        >
+          &#8212;
         </span>
+        <span className="sr-only">No reviews yet</span>
       </div>
     )
   }
@@ -147,11 +152,22 @@ export function ReputationScore({
       className={cn("inline-flex items-center gap-3 cursor-default", className)}
       title={`${totalFeedback} ${totalFeedback === 1 ? "review" : "reviews"}`}
     >
-      <span className="text-2xl font-semibold tabular-nums text-erc8004-card-fg">
+      <span
+        aria-hidden="true"
+        className="text-2xl font-semibold tabular-nums text-erc8004-card-fg"
+      >
         {score}
       </span>
+      {/* Carries the whole badge for assistive tech: the number alone is
+          meaningless, "AVG" is an unexpanded abbreviation, and with
+          showCount off the count existed only in the `title`. */}
+      <span className="sr-only">
+        {`Average score ${score} from ${totalFeedback} ${
+          totalFeedback === 1 ? "review" : "reviews"
+        }`}
+      </span>
       {showCount && (
-        <div className="flex flex-col">
+        <div aria-hidden="true" className="flex flex-col">
           <span className="text-xs text-erc8004-muted-fg uppercase tracking-wide">
             AVG
           </span>

@@ -3,167 +3,167 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://erc8004-ui.vercel.app/</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>1.00</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/introduction</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/installation</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/concepts</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/api-keys</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/theming</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/mcp</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/erc8004-provider</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/agent-provider</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/agent-name</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/agent-image</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/agent-description</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/agent-card</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/endpoint-status</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/reputation-score</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/reputation-timeline</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/reputation-distribution</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/feedback-list</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/tag-cloud</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/verification-badge</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/validation-score</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/validation-list</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/validation-display</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/last-activity</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/docs/components/activity-log</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.64</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/about</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.50</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/contact</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.50</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/privacy</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.50</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/llms.txt</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/llms-full.txt</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/agents.md</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.80</priority>
   </url>
   <url>
     <loc>https://erc8004-ui.vercel.app/openapi.json</loc>
-    <lastmod>2026-09-05T08:29:15+00:00</lastmod>
+    <lastmod>2026-09-06T07:13:49+00:00</lastmod>
     <priority>0.60</priority>
   </url>
 </urlset>

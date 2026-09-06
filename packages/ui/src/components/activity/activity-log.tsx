@@ -4,9 +4,10 @@ import { useERC8004Config } from "../../provider/ERC8004Provider"
 import { parseAgentRegistry } from "../../lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "../../lib/useAgentIdentity"
-import { truncateAddress, formatRelativeTime } from "../../lib/utils"
+import { formatRelativeTime } from "../../lib/utils"
 import { cn } from "../../lib/cn"
 import * as v from "valibot"
+import { Address, LoadingLabel } from "../_internal"
 
 // ============================================================================
 // TYPES
@@ -212,11 +213,10 @@ function FeedbackRow({ event }: { event: FeedbackEvent }) {
           {/* Fixed width: scores range from "1.0" to "100.0", and an auto-width
               column pushed every row's address to a different x. */}
           <span className={`w-11 shrink-0 text-right font-mono text-sm font-semibold tabular-nums ${scoreColor(event.value)}`}>
-            {event.value.toFixed(1)}
+            <span aria-hidden="true">{event.value.toFixed(1)}</span>
+            <span className="sr-only">{`Score ${event.value.toFixed(1)}`}</span>
           </span>
-          <span className="font-mono text-xs text-erc8004-muted-fg" title={event.clientAddress}>
-            {truncateAddress(event.clientAddress)}
-          </span>
+          <Address address={event.clientAddress} />
           {tags.map((tag) => (
             <span
               key={tag}
@@ -287,9 +287,7 @@ function ValidationRow({ event }: { event: ValidationEvent }) {
           <span className={`text-xs font-medium ${statusColor(event.status)}`}>
             {event.status.charAt(0) + event.status.slice(1).toLowerCase()}
           </span>
-          <span className="font-mono text-xs text-erc8004-muted-fg" title={event.validatorAddress}>
-            {truncateAddress(event.validatorAddress)}
-          </span>
+          <Address address={event.validatorAddress} />
           {event.tag && (
             <span
               title={event.tag}
@@ -345,12 +343,12 @@ export function ActivityLog({
       <div
         className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card", className)}
         aria-busy="true"
-        aria-live="polite"
       >
-        <div className="border-b border-erc8004-border px-5 py-4">
+        <LoadingLabel />
+        <div aria-hidden="true" className="border-b border-erc8004-border px-5 py-4">
           <div className="h-4 w-20 animate-pulse rounded-erc8004-sm bg-erc8004-muted" />
         </div>
-        <div className="space-y-4 p-5">
+        <div aria-hidden="true" className="space-y-4 p-5">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="flex items-start gap-3">
               <div className="h-7 w-7 animate-pulse rounded-full bg-erc8004-muted" />
@@ -367,7 +365,7 @@ export function ActivityLog({
 
   if (error) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
+      <div role="alert" className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
         <p className="text-sm text-erc8004-negative">Failed to load activity log.</p>
         <p className="mt-1 text-xs text-erc8004-negative/70">
           {error instanceof Error ? error.message : "Unknown error"}
@@ -378,7 +376,7 @@ export function ActivityLog({
 
   if (events.length === 0) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
+      <div role="status" className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
         <p className="text-sm text-erc8004-muted-fg">No activity yet.</p>
       </div>
     )
@@ -392,16 +390,26 @@ export function ActivityLog({
           <span className="text-xs text-erc8004-muted-fg">{events.length} events</span>
         </div>
       </div>
-      <div className="max-h-[32rem] divide-y divide-erc8004-border overflow-y-auto">
-        {events.map((event) => (
-          <div key={event.id} className="px-5 py-3.5">
-            {event.kind === "feedback" ? (
-              <FeedbackRow event={event} />
-            ) : (
-              <ValidationRow event={event} />
-            )}
-          </div>
-        ))}
+      {/* tabIndex makes the scroll container reachable by keyboard — a
+          scrollable region that cannot be focused cannot be scrolled without
+          a pointer. */}
+      <div
+        tabIndex={0}
+        role="region"
+        aria-label="Agent activity"
+        className="max-h-[32rem] overflow-y-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-erc8004-ring"
+      >
+        <ul className="divide-y divide-erc8004-border">
+          {events.map((event) => (
+            <li key={event.id} className="px-5 py-3.5">
+              {event.kind === "feedback" ? (
+                <FeedbackRow event={event} />
+              ) : (
+                <ValidationRow event={event} />
+              )}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   )

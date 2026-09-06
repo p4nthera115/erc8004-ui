@@ -555,6 +555,14 @@ function App() {
         default: "true",
         description: "Show the agent's description text.",
       },
+      {
+        name: "headingLevel",
+        type: "1 | 2 | 3 | 4 | 5 | 6",
+        required: false,
+        default: "2",
+        description:
+          "Heading level for the agent name. Set this so a card placed in a grid or section doesn't break the surrounding page's heading order.",
+      },
     ],
   },
   {

@@ -6,7 +6,7 @@ import { useERC8004Config } from "../../provider/ERC8004Provider"
 import { parseAgentRegistry } from "../../lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { cn } from "../../lib/cn"
-import { Card, Skeleton, EmptyState, ErrorState } from "../_internal"
+import { Card, EmptyState, ErrorState, LoadingLabel, Skeleton } from "../_internal"
 import * as v from "valibot"
 
 type TimelineResponse = {
@@ -375,7 +375,8 @@ export function ReputationTimeline({
 
   if (isLoading) {
     return (
-      <Card className={cn("w-full p-5", className)}>
+      <Card busy className={cn("w-full p-5", className)}>
+        <LoadingLabel />
         <Skeleton className="mb-4 h-4 w-32" />
         <Skeleton className="h-[200px] w-full" />
       </Card>
@@ -416,6 +417,16 @@ export function ReputationTimeline({
         ref={svgRef}
         viewBox={`0 0 ${LAYOUT.width} ${LAYOUT.height}`}
         className="w-full"
+        role="img"
+        aria-label={`Line chart of ${sorted.length} feedback ${
+          sorted.length === 1 ? "score" : "scores"
+        } from ${formatFullDate(minTime)} to ${formatFullDate(maxTime)}. ${
+          sorted.length === 1
+            ? `Score ${sorted[0].value.toFixed(1)}.`
+            : `First ${sorted[0].value.toFixed(1)}, latest ${sorted[
+                sorted.length - 1
+              ].value.toFixed(1)}.`
+        }`}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
@@ -599,6 +610,16 @@ export function ReputationTimeline({
           )
         })()}
       </svg>
+
+      {/* The tooltip above is pointer-driven and the chart itself is an
+          image to assistive tech, so the readings live here as text. */}
+      <ol className="sr-only">
+        {sorted.map((fb, i) => (
+          <li key={i}>
+            {`${formatFullDate(fb.createdAt)}: score ${fb.value.toFixed(1)}`}
+          </li>
+        ))}
+      </ol>
     </Card>
   )
 }

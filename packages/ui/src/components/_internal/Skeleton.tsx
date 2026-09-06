@@ -6,6 +6,13 @@ interface SkeletonProps {
   style?: CSSProperties
 }
 
+/**
+ * A loading placeholder.
+ *
+ * Hidden from assistive tech: a skeleton carries no content, and a card full
+ * of them previously announced one empty `aria-live` region per box. The
+ * container that owns the loading state carries `aria-busy` instead.
+ */
 export function Skeleton({ className, style }: SkeletonProps) {
   return (
     <div
@@ -14,8 +21,7 @@ export function Skeleton({ className, style }: SkeletonProps) {
         className
       )}
       style={style}
-      aria-busy="true"
-      aria-live="polite"
+      aria-hidden="true"
     />
   )
 }

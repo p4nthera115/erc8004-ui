@@ -5,7 +5,7 @@ import { useERC8004Config } from "../../provider/ERC8004Provider"
 import { parseAgentRegistry } from "../../lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { cn } from "../../lib/cn"
-import { Card, Tag, Skeleton, EmptyState, ErrorState } from "../_internal"
+import { Card, EmptyState, ErrorState, LoadingLabel, Skeleton, Tag } from "../_internal"
 import * as v from "valibot"
 
 // ============================================================================
@@ -112,10 +112,13 @@ function computeTagFrequency(
 // opacity. Three tiers keeps it readable without needing inline styles.
 // ============================================================================
 
+// Weight is carried by size and font weight rather than opacity: the base
+// `text-erc8004-muted-fg` is already the lowest-contrast token in the palette,
+// and fading it to 70% pushed the least-frequent tags under 4.5:1.
 function tagSizeClass(weight: number): string {
-  if (weight >= 0.66) return "text-sm"
-  if (weight >= 0.33) return "text-xs"
-  return "text-xs opacity-70"
+  if (weight >= 0.66) return "text-sm font-semibold"
+  if (weight >= 0.33) return "text-xs font-medium"
+  return "text-xs font-normal"
 }
 
 // ============================================================================
@@ -151,7 +154,8 @@ export function TagCloud({
 
   if (isLoading) {
     return (
-      <Card className={cn("w-full p-4", className)}>
+      <Card busy className={cn("w-full p-4", className)}>
+        <LoadingLabel />
         <Skeleton className="mb-4 h-4 w-24" />
         <div className="flex flex-wrap gap-2">
           {[80, 56, 96, 64, 48, 72, 40, 88].map((w) => (
@@ -203,6 +207,10 @@ export function TagCloud({
             title={`${tag} \u2014 ${count} mention${count === 1 ? "" : "s"}`}
           >
             <span className="truncate">{tag}</span>
+            {/* The count is conveyed visually by pill size alone. */}
+            <span className="sr-only">
+              {`, ${count} mention${count === 1 ? "" : "s"}`}
+            </span>
           </Tag>
         ))}
       </div>

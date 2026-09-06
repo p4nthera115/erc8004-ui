@@ -79,10 +79,11 @@ export function LastActivity({ className, ...props }: LastActivityProps) {
 
   if (isLoading) {
     return (
+      // A bare placeholder bar with nothing to announce: an aria-live region
+      // here fired an empty update on every mount.
       <div
+        aria-hidden="true"
         className={cn("h-3 w-24 animate-pulse rounded-erc8004-sm bg-erc8004-muted", className)}
-        aria-busy="true"
-        aria-live="polite"
       />
     )
   }

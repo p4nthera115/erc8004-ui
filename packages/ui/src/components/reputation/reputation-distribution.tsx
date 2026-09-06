@@ -9,7 +9,7 @@ import { useERC8004Config } from "../../provider/ERC8004Provider"
 import { parseAgentRegistry } from "../../lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { cn } from "../../lib/cn"
-import { Card, Skeleton, EmptyState, ErrorState } from "../_internal"
+import { Card, EmptyState, ErrorState, LoadingLabel, Skeleton } from "../_internal"
 import * as v from "valibot"
 
 type DistributionResponse = {
@@ -246,7 +246,8 @@ export function ReputationDistribution({
 
   if (isLoading) {
     return (
-      <Card className={cn("w-full p-4", className)}>
+      <Card busy className={cn("w-full p-4", className)}>
+        <LoadingLabel />
         <Skeleton className="mb-4 h-4 w-36" />
         <div
           className={
@@ -307,8 +308,18 @@ export function ReputationDistribution({
         </span>
       </div>
 
+      {/* One accessible summary for the chart, then the bars themselves as a
+          list. With showAxisLabels off the bars carried no label at all. */}
+      <ul className="sr-only">
+        {bucketCounts.map(({ bucket, count }) => (
+          <li key={bucket.label}>
+            {`${bucket.label}: ${count} ${count === 1 ? "review" : "reviews"}`}
+          </li>
+        ))}
+      </ul>
+
       {orientation === "vertical" ? (
-        <div className="flex flex-col gap-2">
+        <div aria-hidden="true" className="flex flex-col gap-2">
           {bucketCounts.map(({ bucket, count }) => {
             const widthPercent = (count / maxCount) * 100
             return (
@@ -339,7 +350,7 @@ export function ReputationDistribution({
           })}
         </div>
       ) : (
-        <div className="flex items-end gap-2" style={{ height: 120 }}>
+        <div aria-hidden="true" className="flex items-end gap-2" style={{ height: 120 }}>
           {[...bucketCounts].reverse().map(({ bucket, count }) => {
             const heightPercent = (count / maxCount) * 100
             return (

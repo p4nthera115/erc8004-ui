@@ -115,10 +115,19 @@ export function VerificationBadge({ className, ...props }: VerificationBadgeProp
       ? summary.scoreSum / completedValidations
       : 0
 
-  if (error || !summary) {
+  if (error) {
+    return (
+      <Tag className={className} title="Validation data could not be loaded">
+        <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full border border-erc8004-muted-fg" />
+        Unknown
+      </Tag>
+    )
+  }
+
+  if (!summary) {
     return (
       <Tag className={className}>
-        <span className="h-1.5 w-1.5 rounded-full border border-erc8004-muted-fg" />
+        <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full border border-erc8004-muted-fg" />
         Unverified
       </Tag>
     )
@@ -129,7 +138,7 @@ export function VerificationBadge({ className, ...props }: VerificationBadgeProp
   if (tier === "unverified") {
     return (
       <Tag className={className}>
-        <span className="h-1.5 w-1.5 rounded-full border border-erc8004-muted-fg" />
+        <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full border border-erc8004-muted-fg" />
         Unverified
       </Tag>
     )
@@ -141,7 +150,7 @@ export function VerificationBadge({ className, ...props }: VerificationBadgeProp
         variant="positive"
         className={className}
       >
-        <span className="h-1.5 w-1.5 rounded-full bg-erc8004-positive-fg" />
+        <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-erc8004-positive-fg" />
         {`Highly Verified · ${completedValidations}`}
       </Tag>
     )
@@ -152,7 +161,7 @@ export function VerificationBadge({ className, ...props }: VerificationBadgeProp
       variant="positive"
       className={className}
     >
-      <span className="h-1.5 w-1.5 rounded-full bg-erc8004-positive-fg" />
+      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-erc8004-positive-fg" />
       Verified
     </Tag>
   )

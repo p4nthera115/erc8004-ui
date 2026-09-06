@@ -6,10 +6,9 @@ import {
   type AgentIdentityProps,
 } from "../../lib/useAgentIdentity"
 import { cn } from "../../lib/cn"
-import { truncateAddress } from "../../lib/utils"
 import type { AgentRegistrationFile } from "../../types"
 import { useQuery } from "@tanstack/react-query"
-import { Skeleton } from "../_internal"
+import { Address, Skeleton } from "../_internal"
 import * as v from "valibot"
 
 type AgentNameResponse = {
@@ -103,12 +102,8 @@ export function AgentName({ className, ...props }: AgentNameProps) {
     )
   }
 
-  return (
-    <span
-      className={cn("font-mono text-xs text-erc8004-muted-fg", className)}
-      title={data.agent.owner}
-    >
-      {truncateAddress(data.agent.owner)}
-    </span>
-  )
+  // Falling back to the owner address. Address renders the shortened form
+  // visibly and the full value for assistive tech, rather than stranding it
+  // in a `title` that only a mouse can reach.
+  return <Address address={data.agent.owner} className={className} />
 }

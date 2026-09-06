@@ -225,7 +225,6 @@ These render data from the `Agent` and `AgentRegistrationFile` subgraph entities
 
 5. **AgentCard** — summary card combining FingerprintBadge/AgentImage + AgentName + AgentDescription + protocol icons (which services are active: MCP, A2A, OASF, web, email) + owner address (truncated). Fetches from both `Agent` and `AgentRegistrationFile` top-level fields. Think of it like a contact card or social media profile preview.
 6. **EndpointStatus** — list of the agent's service endpoints (MCP, A2A, OASF, web, email) with protocol labels and optional live health check indicators (HTTP pings). Fetches the endpoint-related fields from `AgentRegistrationFile`. Endpoints are part of the agent's identity registration — they describe what services the agent provides and where to reach them.
-7. **IdentityDisplay** — composed convenience component combining AgentCard + EndpointStatus into a complete identity profile view. For developers who want a full agent identity section without assembling pieces.
 
 ### Reputation Components (Reputation Registry)
 

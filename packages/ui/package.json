@@ -1,6 +1,6 @@
 {
   "name": "@p4n/erc8004-ui",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Unofficial, independent React components for displaying verified ERC-8004 agent identity, reputation and validation data. Not affiliated with or endorsed by the ERC-8004 authors. Pass an on-chain identifier; the component fetches and renders the verified data itself.",
   "keywords": [
     "erc8004",

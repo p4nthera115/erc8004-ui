@@ -246,7 +246,6 @@ Data source: `Agent` + `AgentRegistrationFile` subgraph entities.
 
 5. **AgentCard** — FingerprintBadge/AgentImage + AgentName + AgentDescription + protocol icons + owner address. Fetches `Agent` + `AgentRegistrationFile` top-level fields.
 6. **EndpointStatus** — service endpoints list (MCP, A2A, OASF, web, email) with protocol labels + optional live health checks. Fetches endpoint fields from `AgentRegistrationFile`.
-7. **IdentityDisplay** — AgentCard + EndpointStatus combined.
 
 ### Reputation Components (Reputation Registry)
 
@@ -316,7 +315,6 @@ Category-specific utilities live in their component directories (e.g., `componen
 14. LastActivity — atomic, fetches `Agent.lastActivity`
 15. AgentCard — composed identity card from atomic pieces
 16. EndpointStatus — endpoint listing + optional health check logic
-17. IdentityDisplay — composed identity view
 18. VerificationBadge — compact verification indicator with tier metadata
 19. ValidationScore — aggregate validation stats badge
 20. ValidationList — individual validation entries with pagination
@@ -419,7 +417,6 @@ export { AgentImage } from "./components/identity/AgentImage"
 export { AgentDescription } from "./components/identity/AgentDescription"
 export { AgentCard } from "./components/identity/AgentCard"
 export { EndpointStatus } from "./components/identity/EndpointStatus"
-export { IdentityDisplay } from "./components/identity/IdentityDisplay"
 
 // Reputation Components
 export { ReputationScore } from "./components/reputation/ReputationScore"

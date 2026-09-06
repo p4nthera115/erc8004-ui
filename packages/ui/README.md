@@ -66,7 +66,7 @@ set the identifiers once:
 | Group | Components |
 | --- | --- |
 | Providers | `ERC8004Provider`, `AgentProvider` |
-| Identity | `AgentName`, `AgentImage`, `AgentDescription`, `AgentCard`, `EndpointStatus`, `IdentityDisplay`, `FingerprintBadge` |
+| Identity | `AgentName`, `AgentImage`, `AgentDescription`, `AgentCard`, `EndpointStatus`, `FingerprintBadge` |
 | Reputation | `ReputationScore`, `ReputationTimeline`, `ReputationDistribution`, `FeedbackList`, `TagCloud` |
 | Validation | `VerificationBadge`, `ValidationScore`, `ValidationList`, `ValidationDisplay` |
 | Activity | `LastActivity`, `ActivityLog` |

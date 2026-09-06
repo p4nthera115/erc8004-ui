@@ -73,9 +73,9 @@ export interface AgentAvatarProps {
   size: number
   /**
    * Hide the avatar from assistive tech. Set this when the caller already
-   * renders the agent's name next to it — AgentCard and IdentityDisplay both
-   * do — so the name isn't announced twice. Standalone AgentImage leaves it
-   * off, since the avatar is then the only thing identifying the agent.
+   * renders the agent's name next to it — AgentCard does — so the name isn't
+   * announced twice. Standalone AgentImage leaves it off, since the avatar is
+   * then the only thing identifying the agent.
    */
   decorative?: boolean
   className?: string

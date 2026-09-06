@@ -70,10 +70,16 @@ export const ROUTE_BY_PATH: Record<string, ManifestRoute> = Object.fromEntries(
 `
 }
 
+/**
+ * No `<lastmod>`. It is optional in the sitemap protocol, and the only value
+ * available at generation time was the wall clock — which made every run
+ * rewrite this tracked file, dirtying the working tree and blocking
+ * `pnpm publish`'s git check. Crawlers discount lastmod they cannot trust,
+ * so a per-build timestamp bought nothing and cost determinism.
+ */
 export function renderSitemap(
   routes: ManifestRoute[],
   siteUrl: string,
-  lastmod: string,
   extraUrls: Array<{ loc: string; priority: number }> = []
 ): string {
   const entries = [
@@ -89,7 +95,6 @@ export function renderSitemap(
       (entry) =>
         `  <url>\n` +
         `    <loc>${entry.loc}</loc>\n` +
-        `    <lastmod>${lastmod}</lastmod>\n` +
         `    <priority>${entry.priority.toFixed(2)}</priority>\n` +
         `  </url>`
     )

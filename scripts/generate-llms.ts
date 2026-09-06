@@ -906,14 +906,12 @@ function main() {
   console.log(`[generate-llms] wrote ${manifestFile} (${routes.length} routes)`)
 
   // 8. Sitemap — canonical HTML pages plus the machine-readable entry points
-  const lastmod = new Date().toISOString().replace(/\.\d{3}Z$/, "+00:00")
   const sitemapFile = join(PUBLIC_DIR, "sitemap.xml")
   writeFileSync(
     sitemapFile,
     renderSitemap(
       routes.filter((route) => route.priority > 0),
       SITE_URL,
-      lastmod,
       [
         { loc: `${SITE_URL}/llms.txt`, priority: 0.8 },
         { loc: `${SITE_URL}/llms-full.txt`, priority: 0.8 },

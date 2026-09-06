@@ -16,7 +16,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "pretest": "pnpm gen:registry",
-    "build:ui": "pnpm -C packages/ui build"
+    "build:ui": "pnpm -C packages/ui build",
+    "release:ui": "cd packages/ui && pnpm typecheck && pnpm publish",
+    "release:ui:dry": "cd packages/ui && pnpm typecheck && npm_config_git_checks=false pnpm publish --dry-run",
+    "release:mcp": "pnpm gen:registry && cd packages/mcp-server && pnpm typecheck && pnpm publish",
+    "release:mcp:dry": "pnpm gen:registry && cd packages/mcp-server && pnpm typecheck && npm_config_git_checks=false pnpm publish --dry-run",
+    "release": "pnpm release:ui && pnpm release:mcp"
   },
   "dependencies": {
     "@p4n/erc8004-ui": "workspace:*",

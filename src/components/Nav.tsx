@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router"
 import { useEffect, useId, useState } from "react"
 import { FaGithub } from "react-icons/fa"
+import { FaXTwitter } from "react-icons/fa6"
 import { BsSun, BsMoon } from "react-icons/bs"
 import { DocsNavLinks } from "./docs/nav-links"
 
@@ -91,6 +92,15 @@ export function Nav({ isDark, onToggle }: NavProps) {
             className="hover:scale-110 transition hover:cursor-pointer p-1.5"
           >
             <FaGithub size={26} className="md:h-[30px] md:w-[30px]" />
+          </a>
+          <a
+            href="https://x.com/p4nthera_"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="@p4nthera_ on X"
+            className="hover:scale-110 transition hover:cursor-pointer p-1.5"
+          >
+            <FaXTwitter size={24} className="md:h-[27px] md:w-[27px]" />
           </a>
           <button
             onClick={() => setOpenedAt(menuOpen ? null : pathname)}

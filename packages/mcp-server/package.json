@@ -1,7 +1,7 @@
 {
   "name": "@p4n/erc8004-ui-mcp",
   "version": "0.2.0",
-  "description": "MCP server for @p4n/erc8004-ui \u2014 component documentation plus live subgraph checks for ERC-8004 agent UIs. Unofficial, not affiliated with the ERC-8004 authors.",
+  "description": "MCP server for @p4n/erc8004-ui — component documentation plus live subgraph checks for ERC-8004 agent UIs. Unofficial, not affiliated with the ERC-8004 authors.",
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -14,7 +14,8 @@
   ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --clean --platform node --target node20",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm -w run gen:registry && pnpm build"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.28.0",
@@ -24,5 +25,8 @@
     "@types/node": "^24.12.0",
     "tsup": "^8.0.0",
     "typescript": "~5.9.3"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

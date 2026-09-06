@@ -19,8 +19,8 @@
     "build:ui": "pnpm -C packages/ui build",
     "release:ui": "cd packages/ui && pnpm typecheck && pnpm publish",
     "release:ui:dry": "cd packages/ui && pnpm typecheck && npm_config_git_checks=false pnpm publish --dry-run",
-    "release:mcp": "pnpm gen:registry && cd packages/mcp-server && pnpm typecheck && pnpm publish",
-    "release:mcp:dry": "pnpm gen:registry && cd packages/mcp-server && pnpm typecheck && npm_config_git_checks=false pnpm publish --dry-run",
+    "release:mcp": "cd packages/mcp-server && pnpm typecheck && pnpm publish",
+    "release:mcp:dry": "cd packages/mcp-server && pnpm typecheck && npm_config_git_checks=false pnpm publish --dry-run",
     "release:dry": "pnpm release:ui:dry && pnpm release:mcp:dry",
     "release": "pnpm release:ui && pnpm release:mcp"
   },

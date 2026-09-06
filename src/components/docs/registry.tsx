@@ -1,6 +1,8 @@
 import type React from "react"
 import {
   AgentProvider,
+  FingerprintBadge,
+  FingerprintCircleMini,
   AgentName,
   AgentImage,
   AgentDescription,
@@ -252,6 +254,154 @@ function App() {
   // =========================================================================
   // IDENTITY
   // =========================================================================
+  {
+    slug: "fingerprint-badge",
+    name: "FingerprintBadge",
+    description:
+      "Deterministic SVG identity generated from the agent's registry and id — an ordered-dithered wave-interference pattern that is the same on every page and every reload, and different for every agent. It fetches nothing: there is no subgraph query, no API key and no network request, so it renders instantly and works offline.",
+    notes: [
+      {
+        variant: "info",
+        title: "Props are required here",
+        body: "Unlike every other component, FingerprintBadge does not read [AgentProvider](/docs/components/agent-provider) context. It takes agentRegistry and agentId directly, and both are required. Being a pure renderer with no data layer, it also works outside ERC8004Provider — no API key needed.",
+      },
+    ],
+    preview: (
+      <FingerprintBadge
+        agentRegistry={DEMO_REGISTRY}
+        agentId={DEMO_AGENT_ID}
+        size={96}
+      />
+    ),
+    importLine: `import { FingerprintBadge } from "@p4n/erc8004-ui"`,
+    usage: `<FingerprintBadge agentRegistry="eip155:8453:0x8004A169FB4a3325136EB29fA0ceB6D2e539a432" agentId={888} size={96} />`,
+    examples: [
+      {
+        name: "One Per Agent",
+        description:
+          "The pattern is derived from the registry and id alone, so each agent keeps its own figure permanently and no two agents collide.",
+        preview: (
+          <div className="flex flex-wrap items-center gap-3">
+            {[888, 10, 2205, 41, 1337].map((id) => (
+              <FingerprintBadge
+                key={id}
+                agentRegistry={DEMO_REGISTRY}
+                agentId={id}
+                size={56}
+              />
+            ))}
+          </div>
+        ),
+        code: `{agentIds.map((id) => (
+  <FingerprintBadge
+    key={id}
+    agentRegistry="eip155:8453:0x8004...a432"
+    agentId={id}
+    size={56}
+  />
+))}`,
+      },
+      {
+        name: "FingerprintCircleMini",
+        description:
+          "A second export rendering the same interference pattern in the fingerprint's primary hue on a dark tinted disc. Built to stay legible at avatar and favicon scale, where the full badge's detail muddies.",
+        preview: (
+          <div className="flex flex-wrap items-center gap-3">
+            {[888, 10, 2205].map((id) => (
+              <FingerprintCircleMini
+                key={id}
+                agentRegistry={DEMO_REGISTRY}
+                agentId={id}
+                size={32}
+              />
+            ))}
+          </div>
+        ),
+        code: `import { FingerprintCircleMini } from "@p4n/erc8004-ui"
+
+<FingerprintCircleMini
+  agentRegistry="eip155:8453:0x8004...a432"
+  agentId={888}
+  size={32}
+/>`,
+      },
+      {
+        name: "Filling a Container",
+        description:
+          "Omit the size prop and the SVG fills its parent, which is how AgentImage and AgentCard use it. Give the wrapper the dimensions and any clipping.",
+        preview: (
+          <div className="h-20 w-20 overflow-hidden rounded-full border border-white/20">
+            <FingerprintBadge
+              agentRegistry={DEMO_REGISTRY}
+              agentId={DEMO_AGENT_ID}
+            />
+          </div>
+        ),
+        code: `<div className="h-20 w-20 overflow-hidden rounded-full border border-white/20">
+  <FingerprintBadge agentRegistry="eip155:8453:0x8004...a432" agentId={888} />
+</div>`,
+      },
+    ],
+    inContext: {
+      description:
+        "You rarely place this yourself — AgentImage, AgentCard and IdentityDisplay all fall back to it when an agent has neither a registered image nor a name, which is the common case rather than the exception. Reach for it directly when you want the fingerprint unconditionally.",
+      preview: (
+        <div className="flex items-center gap-4 rounded-lg border border-white/20 bg-neutral-900 p-4">
+          <FingerprintBadge
+            agentRegistry={DEMO_REGISTRY}
+            agentId={10}
+            size={48}
+          />
+          <div className="flex min-w-0 flex-col">
+            <span className="text-sm font-medium text-white">Agent #10</span>
+            <span className="font-mono text-xs text-white/50">
+              No registered name or image
+            </span>
+          </div>
+        </div>
+      ),
+      code: `<div className="flex items-center gap-4 rounded-lg border border-white/20 bg-neutral-900 p-4">
+  <FingerprintBadge agentRegistry="eip155:8453:0x8004...a432" agentId={10} size={48} />
+  <div className="flex min-w-0 flex-col">
+    <span className="text-sm font-medium text-white">Agent #10</span>
+    <span className="font-mono text-xs text-white/50">No registered name or image</span>
+  </div>
+</div>`,
+    },
+    states:
+      "No states to handle. The component fetches nothing, so it cannot load, error, or be empty — it renders the same figure synchronously on every mount.",
+    props: [
+      {
+        name: "agentRegistry",
+        type: "string",
+        required: true,
+        description:
+          'Agent registry in the format "eip155:{chainId}:{contractAddress}". Required — this component does not read AgentProvider context.',
+      },
+      {
+        name: "agentId",
+        type: "number",
+        required: true,
+        description:
+          "ERC-721 token ID of the agent. Required — this component does not read AgentProvider context. Together with agentRegistry it is the only input to the pattern.",
+      },
+      {
+        name: "size",
+        type: "number",
+        required: false,
+        description:
+          "Explicit width and height in pixels. Omit it and the SVG fills its container instead.",
+      },
+      {
+        name: "className",
+        type: "string",
+        required: false,
+        default: '"w-full h-full"',
+        description:
+          "Classes applied to the <svg> root. The default fills the parent, so pass your own sizing classes or use the size prop to override it.",
+      },
+    ],
+  },
   {
     slug: "agent-name",
     name: "AgentName",

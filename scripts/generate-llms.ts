@@ -127,6 +127,7 @@ const GROUPS: Array<{ title: string; slugs: string[] }> = [
   {
     title: "Identity",
     slugs: [
+      "fingerprint-badge",
       "agent-name",
       "agent-image",
       "agent-description",

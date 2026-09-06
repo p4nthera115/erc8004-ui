@@ -17,7 +17,7 @@ Reach for it when a task involves **showing ERC-8004 agent data in a React UI**.
 - **Add a trust signal next to an agent's name** in an existing product — a reputation badge or verification mark that the surrounding app cannot fake, because the component fetches the number itself and takes no data as a prop.
 - **Avoid writing subgraph plumbing** — GraphQL queries, CAIP-style identifier parsing, IPFS/HTTPS/base64 URI resolution, revoked-feedback filtering, offset pagination, and the loading/error/empty states for all of it.
 
-18 components ship. All are read-only, none require a wallet connection, and none ever write on-chain.
+19 components ship. All are read-only, none require a wallet connection, and none ever write on-chain.
 
 ## When not to use this
 

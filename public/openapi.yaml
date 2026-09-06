@@ -438,7 +438,7 @@ paths:
             examples:
               - erc8004-provider
               - agent-provider
-              - agent-name
+              - fingerprint-badge
         - name: format
           in: query
           required: false
@@ -1554,6 +1554,7 @@ components:
           enum:
             - erc8004-provider
             - agent-provider
+            - fingerprint-badge
             - agent-name
             - agent-image
             - agent-description

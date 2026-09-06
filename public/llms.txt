@@ -29,6 +29,7 @@ Full agent instructions, including how to call the MCP endpoint and the JSON API
 
 ### Identity
 
+- [FingerprintBadge](https://erc8004-ui.vercel.app/docs/components/fingerprint-badge.md): Deterministic SVG identity generated from the agent's registry and id — an ordered-dithered wave-interference pattern that is the same on every page and every reload, and different for every agent.
 - [AgentName](https://erc8004-ui.vercel.app/docs/components/agent-name.md): Fetches and renders the agent's registered name from the identity registry.
 - [AgentImage](https://erc8004-ui.vercel.app/docs/components/agent-image.md): Renders the agent's registered image.
 - [AgentDescription](https://erc8004-ui.vercel.app/docs/components/agent-description.md): Renders the agent's registered description text from the identity registry.

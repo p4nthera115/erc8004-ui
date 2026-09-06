@@ -44,6 +44,11 @@ export const NAV: NavGroup[] = [
   {
     title: "IDENTITY",
     items: [
+      {
+        label: "FingerprintBadge",
+        to: "/docs/components/$slug",
+        slug: "fingerprint-badge",
+      },
       { label: "AgentName", to: "/docs/components/$slug", slug: "agent-name" },
       {
         label: "AgentImage",

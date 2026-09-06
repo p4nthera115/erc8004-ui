@@ -37,6 +37,7 @@ export default defineConfig(async () => {
           "/docs/mcp",
           "/docs/components/erc8004-provider",
           "/docs/components/agent-provider",
+          "/docs/components/fingerprint-badge",
           "/docs/components/agent-name",
           "/docs/components/agent-image",
           "/docs/components/agent-description",

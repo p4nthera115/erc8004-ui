@@ -40,8 +40,10 @@ Remember every display component also gets `agentRegistry`, `agentId` and
 actually exported from `src/index.ts`. Check both directions: a documented
 component that is not exported is broken, and an exported component with no
 registry entry is invisible to the docs site, `llms.txt` and the MCP server.
-`FingerprintBadge`, `FingerprintCircleMini` and `IdentityDisplay` were in that
-second category as of 2026-09-04 — confirm whether that is still true.
+`FingerprintBadge` and `FingerprintCircleMini` were in that second category
+until 2026-09-06, when FingerprintBadge gained a registry entry covering both.
+`IdentityDisplay` was removed from the library rather than documented, since it
+only duplicated `AgentCard` + `EndpointStatus`. Confirm both still hold.
 
 **3. Code examples are real.** Every `usage`, `examples[].code` and
 `inContext.code` snippet must use props that exist with valid values. Watch for

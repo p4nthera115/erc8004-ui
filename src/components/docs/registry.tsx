@@ -354,7 +354,7 @@ function App() {
     ],
     inContext: {
       description:
-        "You rarely place this yourself — AgentImage, AgentCard and IdentityDisplay all fall back to it when an agent has neither a registered image nor a name, which is the common case rather than the exception. Reach for it directly when you want the fingerprint unconditionally.",
+        "You rarely place this yourself — AgentImage and AgentCard both fall back to it when an agent has neither a registered image nor a name, which is the common case rather than the exception. Reach for it directly when you want the fingerprint unconditionally.",
       preview: (
         <div className="flex items-center gap-4 rounded-lg border border-white/20 bg-neutral-900 p-4">
           <FingerprintBadge

@@ -135,7 +135,7 @@ export function ReputationScore({
           aria-hidden="true"
           className="text-2xl font-semibold tabular-nums text-erc8004-muted-fg"
         >
-          &#8212;
+          --
         </span>
         <span className="sr-only">No reviews yet</span>
       </div>

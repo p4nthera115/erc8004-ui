@@ -10,7 +10,7 @@ import { cn } from "../../lib/cn"
 import { Address, Card, EmptyState, ErrorState, LoadingLabel, Skeleton, Tag } from "../_internal"
 import * as v from "valibot"
 import { AgentAvatar } from "./agent-avatar"
-import type { HeadingLevel } from "./agent-card"
+import type { HeadingLevel } from "../../types"
 
 type IdentityDisplayResponse = {
   agent: {

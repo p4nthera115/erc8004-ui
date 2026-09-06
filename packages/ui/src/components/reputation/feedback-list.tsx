@@ -7,6 +7,7 @@ import { parseAgentRegistry } from "../../lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { formatRelativeTime } from "../../lib/utils"
 import { cn } from "../../lib/cn"
+import type { HeadingLevel } from "../../types"
 import { Address, Card, EmptyState, ErrorState, LoadingLabel, Skeleton, Tag } from "../_internal"
 import * as v from "valibot"
 
@@ -327,6 +328,11 @@ export interface FeedbackListProps extends AgentIdentityProps {
   coloredScores?: boolean
   /** Message when there's no feedback. Default `"No feedback yet."`. */
   emptyMessage?: string
+  /**
+   * Heading level for this component's title. Default `3` — the level it was
+   * previously hardcoded to, so the default renders identically.
+   */
+  headingLevel?: HeadingLevel
   className?: string
 }
 
@@ -338,9 +344,11 @@ export function FeedbackList({
   showResponses = true,
   coloredScores = true,
   emptyMessage = "No feedback yet.",
+  headingLevel = 3,
   className,
   ...props
 }: FeedbackListProps) {
+  const Heading = `h${headingLevel}` as const
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const [page, setPage] = useState(0)
   const { data, isLoading, error, refetch } = useFeedbackList(agentRegistry, agentId, page, pageSize)
@@ -401,7 +409,7 @@ export function FeedbackList({
   return (
     <Card className={cn("@container w-full", className)}>
       <div className="border-b border-erc8004-border px-4 py-3">
-        <h3 className="text-sm font-medium text-erc8004-card-fg">Feedback</h3>
+        <Heading className="text-sm font-medium text-erc8004-card-fg">Feedback</Heading>
       </div>
 
       <ul className="divide-y divide-erc8004-border">

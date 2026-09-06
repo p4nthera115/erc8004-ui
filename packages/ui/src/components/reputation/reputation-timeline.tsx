@@ -6,6 +6,7 @@ import { useERC8004Config } from "../../provider/ERC8004Provider"
 import { parseAgentRegistry } from "../../lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { cn } from "../../lib/cn"
+import type { HeadingLevel } from "../../types"
 import { Card, EmptyState, ErrorState, LoadingLabel, Skeleton } from "../_internal"
 import * as v from "valibot"
 
@@ -242,6 +243,11 @@ export interface ReputationTimelineProps extends AgentIdentityProps {
    * points stay distinguishable and hoverable. Default `40`.
    */
   maxPoints?: number
+  /**
+   * Heading level for this component's title. Default `3` — the level it was
+   * previously hardcoded to, so the default renders identically.
+   */
+  headingLevel?: HeadingLevel
   className?: string
 }
 
@@ -251,9 +257,11 @@ export function ReputationTimeline({
   curve = "linear",
   showDataPoints = true,
   maxPoints = 40,
+  headingLevel = 3,
   className,
   ...props
 }: ReputationTimelineProps) {
+  const Heading = `h${headingLevel}` as const
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -394,9 +402,9 @@ export function ReputationTimeline({
   if (sorted.length === 0) {
     return (
       <Card className={cn("w-full", className)}>
-        <h3 className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">
+        <Heading className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">
           Score Timeline
-        </h3>
+        </Heading>
         <EmptyState message="No feedback yet" />
       </Card>
     )
@@ -405,9 +413,9 @@ export function ReputationTimeline({
   return (
     <Card className={cn("w-full p-5", className)}>
       <div className="mb-4 flex items-baseline justify-between">
-        <h3 className="text-sm font-medium text-erc8004-card-fg">
+        <Heading className="text-sm font-medium text-erc8004-card-fg">
           Score Timeline
-        </h3>
+        </Heading>
         <span className="text-xs text-erc8004-muted-fg">
           {sorted.length} review{sorted.length === 1 ? "" : "s"}
         </span>

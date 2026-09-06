@@ -4,6 +4,7 @@ import { parseAgentRegistry } from "../../lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "../../lib/useAgentIdentity"
 import { cn } from "../../lib/cn"
+import type { HeadingLevel } from "../../types"
 import { Card, EmptyState, ErrorState, LoadingLabel, Skeleton } from "../_internal"
 import * as v from "valibot"
 
@@ -88,15 +89,22 @@ export interface ValidationScoreProps extends AgentIdentityProps {
   showFillBar?: boolean
   /** Show the pending validation count. Default `true`. */
   showPendingCount?: boolean
+  /**
+   * Heading level for this component's title. Default `3` — the level it was
+   * previously hardcoded to, so the default renders identically.
+   */
+  headingLevel?: HeadingLevel
   className?: string
 }
 
 export function ValidationScore({
   showFillBar = true,
   showPendingCount = true,
+  headingLevel = 3,
   className,
   ...props
 }: ValidationScoreProps) {
+  const Heading = `h${headingLevel}` as const
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useValidationStats(agentRegistry, agentId)
 
@@ -131,7 +139,7 @@ export function ValidationScore({
   if (!summary || completedValidations === 0) {
     return (
       <Card className={cn("w-full", className)}>
-        <h3 className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">Validation Score</h3>
+        <Heading className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">Validation Score</Heading>
         <EmptyState message="No validations yet" />
       </Card>
     )
@@ -142,7 +150,7 @@ export function ValidationScore({
   return (
     <Card className={cn("w-full p-5", className)}>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-erc8004-card-fg">Validation Score</h3>
+        <Heading className="text-sm font-medium text-erc8004-card-fg">Validation Score</Heading>
         <span className="text-xs text-erc8004-muted-fg">
           {completedValidations} completed
           {showPendingCount && pendingCount > 0 && ` · ${pendingCount} pending`}

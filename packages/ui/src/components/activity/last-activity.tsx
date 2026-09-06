@@ -88,8 +88,12 @@ export function LastActivity({ className, ...props }: LastActivityProps) {
     )
   }
 
+  // Nothing visible on failure — an error string wedged inline next to an
+  // agent's name reads worse than an absent timestamp. But say so for
+  // assistive tech rather than vanishing silently. Deliberately not a live
+  // region: it should be found when navigating, not announced unprompted.
   if (error) {
-    return null
+    return <span className="sr-only">Last activity unavailable</span>
   }
 
   // `agent` is null when the id doesn't exist on this chain. Falling back to 0

@@ -6,6 +6,7 @@ import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "../../lib/useAgentIdentity"
 import { formatRelativeTime } from "../../lib/utils"
 import { cn } from "../../lib/cn"
+import type { HeadingLevel } from "../../types"
 import type { Validation } from "../../types"
 import * as v from "valibot"
 import { Address, LoadingLabel } from "../_internal"
@@ -194,6 +195,11 @@ export interface ValidationListProps extends AgentIdentityProps {
   statusFilter?: ValidationStatusFilter
   /** Message when there are no validations. Default `"No validations yet."`. */
   emptyMessage?: string
+  /**
+   * Heading level for this component's title. Default `3` — the level it was
+   * previously hardcoded to, so the default renders identically.
+   */
+  headingLevel?: HeadingLevel
   className?: string
 }
 
@@ -203,12 +209,14 @@ export function ValidationList({
   showTimestamp = true,
   statusFilter = "all",
   emptyMessage = "No validations yet.",
+  headingLevel = 3,
   className,
   ...props
 }: ValidationListProps) {
+  const Heading = `h${headingLevel}` as const
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const [page, setPage] = useState(0)
-  const { data, isLoading, error } = useValidationList(agentRegistry, agentId, page, pageSize, statusFilter)
+  const { data, isLoading, error, refetch } = useValidationList(agentRegistry, agentId, page, pageSize, statusFilter)
 
   const cardOptions: ValidationCardOptions = { showValidatorAddress, showTimestamp }
 
@@ -241,6 +249,15 @@ export function ValidationList({
         <p className="mt-1 text-xs text-erc8004-negative/70">
           {error instanceof Error ? error.message : "Unknown error"}
         </p>
+        {/* Every other list in the library offers a retry; this one
+            dead-ended. */}
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="mt-3 rounded-erc8004-md bg-erc8004-muted px-3 py-1.5 text-sm text-erc8004-fg hover:bg-erc8004-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
+        >
+          Retry
+        </button>
       </div>
     )
   }
@@ -260,7 +277,7 @@ export function ValidationList({
   return (
     <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card", className)}>
       <div className="border-b border-erc8004-border px-5 py-4">
-        <h3 className="text-sm font-semibold text-erc8004-card-fg">Validations</h3>
+        <Heading className="text-sm font-semibold text-erc8004-card-fg">Validations</Heading>
       </div>
       <div className="space-y-3 p-5">
         <ul role="list" className="space-y-3">

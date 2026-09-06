@@ -10,6 +10,7 @@ import { cn } from "../../lib/cn"
 import { Address, Card, EmptyState, ErrorState, LoadingLabel, Skeleton, Tag } from "../_internal"
 import * as v from "valibot"
 import { AgentAvatar } from "./agent-avatar"
+import type { HeadingLevel } from "../../types"
 
 type AgentCardResponse = {
   agent: {
@@ -112,13 +113,6 @@ const PROTOCOL_LABELS: Array<{
 ]
 
 export type AgentCardLayout = "horizontal" | "vertical"
-
-/**
- * Heading level for a component's title, so consumers can slot it into their
- * own document outline. A card in a grid under an `<h1>` wants `3`, not the
- * `2` that suits a profile page.
- */
-export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6
 
 export interface AgentCardProps extends AgentIdentityProps {
   /**

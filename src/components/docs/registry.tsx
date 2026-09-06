@@ -105,6 +105,16 @@ const AGENT_IDENTITY_PROPS: PropDef[] = [
   },
 ]
 
+/** Title heading level, on every component that renders its own heading. */
+const HEADING_LEVEL_PROP: PropDef = {
+  name: "headingLevel",
+  type: "1 | 2 | 3 | 4 | 5 | 6",
+  required: false,
+  default: "3",
+  description:
+    "Heading level for this component's title. The default is the level it was previously hardcoded to, so leaving it alone renders exactly as before. Set it to keep the component from breaking the surrounding page's heading order.",
+}
+
 function withAgent(children: React.ReactNode): React.ReactNode {
   return (
     <AgentProvider agentRegistry={DEMO_REGISTRY} agentId={DEMO_AGENT_ID}>
@@ -526,7 +536,17 @@ function App() {
 </AgentProvider>`,
     },
     states: INLINE_COMPONENT_STATES,
-    props: AGENT_IDENTITY_PROPS,
+    props: [
+      ...AGENT_IDENTITY_PROPS,
+      {
+        name: "size",
+        type: "number",
+        required: false,
+        default: "64",
+        description:
+          "Rendered width and height in pixels. Also sets the size of the initials avatar or FingerprintBadge fallback.",
+      },
+    ],
   },
   {
     slug: "agent-description",
@@ -669,14 +689,6 @@ function App() {
     props: [
       ...AGENT_IDENTITY_PROPS,
       {
-        name: "size",
-        type: "number",
-        required: false,
-        default: "64",
-        description:
-          "Rendered width and height in pixels. Also sets the size of the initials or FingerprintBadge fallback.",
-      },
-      {
         name: "layout",
         type: '"horizontal" | "vertical"',
         required: false,
@@ -771,6 +783,7 @@ function App() {
         required: false,
         description: "Filter which protocols are shown. Default shows all.",
       },
+          HEADING_LEVEL_PROP,
     ],
   },
 
@@ -938,6 +951,7 @@ function App() {
         default: "true",
         description: "Show individual score dots on the chart.",
       },
+          HEADING_LEVEL_PROP,
     ],
   },
   {
@@ -1016,6 +1030,7 @@ function App() {
         description:
           "Colour bars by score band (green → gold → red). When false, uses a single accent colour.",
       },
+          HEADING_LEVEL_PROP,
     ],
   },
   {
@@ -1134,6 +1149,7 @@ function App() {
         default: '"No feedback yet."',
         description: "Custom message when there is no feedback.",
       },
+          HEADING_LEVEL_PROP,
     ],
   },
   {
@@ -1202,6 +1218,7 @@ function App() {
         default: "1",
         description: "Minimum mention count for a tag to appear.",
       },
+          HEADING_LEVEL_PROP,
     ],
   },
 
@@ -1329,6 +1346,7 @@ function App() {
         default: "true",
         description: "Show the pending validation count.",
       },
+          HEADING_LEVEL_PROP,
     ],
   },
   {
@@ -1414,6 +1432,7 @@ function App() {
         default: '"No validations yet."',
         description: "Custom message when there are no validations.",
       },
+          HEADING_LEVEL_PROP,
     ],
   },
   {
@@ -1592,6 +1611,7 @@ function App() {
         required: false,
         description: "Filter by event type. Default shows all.",
       },
+          HEADING_LEVEL_PROP,
     ],
   },
 ]

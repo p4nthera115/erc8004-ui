@@ -6,6 +6,7 @@ import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "../../lib/useAgentIdentity"
 import { formatRelativeTime } from "../../lib/utils"
 import { cn } from "../../lib/cn"
+import type { HeadingLevel } from "../../types"
 import * as v from "valibot"
 import { Address, LoadingLabel } from "../_internal"
 
@@ -318,15 +319,22 @@ export interface ActivityLogProps extends AgentIdentityProps {
   pageSize?: number
   /** Filter by event type. Default shows all. */
   eventTypes?: ActivityEventType[]
+  /**
+   * Heading level for this component's title. Default `3` — the level it was
+   * previously hardcoded to, so the default renders identically.
+   */
+  headingLevel?: HeadingLevel
   className?: string
 }
 
 export function ActivityLog({
   pageSize = 20,
   eventTypes,
+  headingLevel = 3,
   className,
   ...props
 }: ActivityLogProps) {
+  const Heading = `h${headingLevel}` as const
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { events: allEvents, isLoading, error } = useActivityLog(agentRegistry, agentId)
 
@@ -386,7 +394,7 @@ export function ActivityLog({
     <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card", className)}>
       <div className="border-b border-erc8004-border px-5 py-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-erc8004-card-fg">Activity</h3>
+          <Heading className="text-sm font-semibold text-erc8004-card-fg">Activity</Heading>
           <span className="text-xs text-erc8004-muted-fg">{events.length} events</span>
         </div>
       </div>

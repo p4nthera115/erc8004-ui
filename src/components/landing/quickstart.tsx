@@ -6,26 +6,21 @@ const STEPS = [
   {
     n: "01",
     title: "Install",
-    body: "The library plus its one peer dependency. React 18 or 19.",
+    body: "The library plus its one peer dependency. React 18 or 19. TanStack Query is the cache the components run on — you install it, but you never have to configure it.",
     code: `npm install @p4n/erc8004-ui @tanstack/react-query`,
     language: "terminal",
   },
   {
     n: "02",
     title: "Wrap your app once",
-    body: "ERC8004Provider holds infrastructure config only — your Graph API key, and optional subgraph overrides. It stores no agent data.",
-    code: `import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { ERC8004Provider } from "@p4n/erc8004-ui"
-
-const queryClient = new QueryClient()
+    body: "ERC8004Provider holds infrastructure config only — your Graph API key, and optional subgraph overrides. It stores no agent data, and sets up its own query cache unless your app already has one.",
+    code: `import { ERC8004Provider } from "@p4n/erc8004-ui"
 
 export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ERC8004Provider apiKey={import.meta.env.VITE_GRAPH_API_KEY}>
-        <Profile />
-      </ERC8004Provider>
-    </QueryClientProvider>
+    <ERC8004Provider apiKey="your-graph-api-key">
+      <Profile />
+    </ERC8004Provider>
   )
 }`,
   },

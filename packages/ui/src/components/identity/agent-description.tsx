@@ -4,7 +4,7 @@ import { useERC8004Config } from "../../provider/ERC8004Provider"
 import { useAgentIdentity, type AgentIdentityProps } from "../../lib/useAgentIdentity"
 import { cn } from "../../lib/cn"
 import { useQuery } from "@tanstack/react-query"
-import { Skeleton } from "../_internal"
+import { LoadingLabel, Skeleton } from "../_internal"
 import * as v from "valibot"
 
 type AgentDescriptionResponse = {
@@ -75,7 +75,8 @@ export function AgentDescription({ className, ...props }: AgentDescriptionProps)
 
   if (isLoading) {
     return (
-      <div className={cn("space-y-2", className)}>
+      <div aria-busy="true" className={cn("space-y-2", className)}>
+        <LoadingLabel />
         <Skeleton className="h-3 w-full" />
         <Skeleton className="h-3 w-4/5" />
       </div>

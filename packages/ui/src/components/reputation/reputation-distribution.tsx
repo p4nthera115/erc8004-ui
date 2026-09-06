@@ -9,7 +9,8 @@ import { useERC8004Config } from "../../provider/ERC8004Provider"
 import { parseAgentRegistry } from "../../lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { cn } from "../../lib/cn"
-import { Card, Skeleton, EmptyState, ErrorState } from "../_internal"
+import type { HeadingLevel } from "../../types"
+import { Card, EmptyState, ErrorState, LoadingLabel, Skeleton } from "../_internal"
 import * as v from "valibot"
 
 type DistributionResponse = {
@@ -190,6 +191,11 @@ export interface ReputationDistributionProps extends AgentIdentityProps {
    * colour. Default `true`.
    */
   colored?: boolean
+  /**
+   * Heading level for this component's title. Default `3` — the level it was
+   * previously hardcoded to, so the default renders identically.
+   */
+  headingLevel?: HeadingLevel
   className?: string
 }
 
@@ -198,9 +204,11 @@ export function ReputationDistribution({
   orientation = "vertical",
   showAxisLabels = true,
   colored = true,
+  headingLevel = 3,
   className,
   ...props
 }: ReputationDistributionProps) {
+  const Heading = `h${headingLevel}` as const
   const { agentRegistry, agentId } = useAgentIdentity(props)
   // Fetch reputation data. If another reputation component on the page
   // already requested data for the same agent, TanStack Query reuses the
@@ -246,7 +254,8 @@ export function ReputationDistribution({
 
   if (isLoading) {
     return (
-      <Card className={cn("w-full p-4", className)}>
+      <Card busy className={cn("w-full p-4", className)}>
+        <LoadingLabel />
         <Skeleton className="mb-4 h-4 w-36" />
         <div
           className={
@@ -287,9 +296,9 @@ export function ReputationDistribution({
   if (!bucketCounts || totalReviews === 0) {
     return (
       <Card className={cn("w-full", className)}>
-        <h3 className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">
+        <Heading className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">
           Score Distribution
-        </h3>
+        </Heading>
         <EmptyState message="No feedback yet" />
       </Card>
     )
@@ -298,17 +307,27 @@ export function ReputationDistribution({
   return (
     <Card className={cn("w-full p-4", className)}>
       <div className="mb-4 flex items-baseline justify-between">
-        <h3 className="text-sm font-medium text-erc8004-card-fg">
+        <Heading className="text-sm font-medium text-erc8004-card-fg">
           Score Distribution
-        </h3>
+        </Heading>
         <span className="text-xs text-erc8004-muted-fg">
           {totalReviews}
           {countCapped ? "+" : ""} review{totalReviews === 1 ? "" : "s"}
         </span>
       </div>
 
+      {/* One accessible summary for the chart, then the bars themselves as a
+          list. With showAxisLabels off the bars carried no label at all. */}
+      <ul className="sr-only">
+        {bucketCounts.map(({ bucket, count }) => (
+          <li key={bucket.label}>
+            {`${bucket.label}: ${count} ${count === 1 ? "review" : "reviews"}`}
+          </li>
+        ))}
+      </ul>
+
       {orientation === "vertical" ? (
-        <div className="flex flex-col gap-2">
+        <div aria-hidden="true" className="flex flex-col gap-2">
           {bucketCounts.map(({ bucket, count }) => {
             const widthPercent = (count / maxCount) * 100
             return (
@@ -339,7 +358,7 @@ export function ReputationDistribution({
           })}
         </div>
       ) : (
-        <div className="flex items-end gap-2" style={{ height: 120 }}>
+        <div aria-hidden="true" className="flex items-end gap-2" style={{ height: 120 }}>
           {[...bucketCounts].reverse().map(({ bucket, count }) => {
             const heightPercent = (count / maxCount) * 100
             return (

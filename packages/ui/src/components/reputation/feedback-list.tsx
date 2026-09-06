@@ -7,7 +7,8 @@ import { parseAgentRegistry } from "../../lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { formatRelativeTime } from "../../lib/utils"
 import { cn } from "../../lib/cn"
-import { Card, Tag, Address, Skeleton, EmptyState, ErrorState } from "../_internal"
+import type { HeadingLevel } from "../../types"
+import { Address, Card, EmptyState, ErrorState, LoadingLabel, Skeleton, Tag } from "../_internal"
 import * as v from "valibot"
 
 const DEFAULT_PAGE_SIZE = 10
@@ -206,7 +207,8 @@ function FeedbackRow({ item, options }: { item: FeedbackItem; options: FeedbackR
       )}
       style={options.coloredScores ? { color: scoreColorVar(item.value) } : undefined}
     >
-      {item.value.toFixed(1)}
+      <span aria-hidden="true">{item.value.toFixed(1)}</span>
+      <span className="sr-only">Score {item.value.toFixed(1)}</span>
     </span>
   )
 
@@ -326,6 +328,11 @@ export interface FeedbackListProps extends AgentIdentityProps {
   coloredScores?: boolean
   /** Message when there's no feedback. Default `"No feedback yet."`. */
   emptyMessage?: string
+  /**
+   * Heading level for this component's title. Default `3` — the level it was
+   * previously hardcoded to, so the default renders identically.
+   */
+  headingLevel?: HeadingLevel
   className?: string
 }
 
@@ -337,9 +344,11 @@ export function FeedbackList({
   showResponses = true,
   coloredScores = true,
   emptyMessage = "No feedback yet.",
+  headingLevel = 3,
   className,
   ...props
 }: FeedbackListProps) {
+  const Heading = `h${headingLevel}` as const
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const [page, setPage] = useState(0)
   const { data, isLoading, error, refetch } = useFeedbackList(agentRegistry, agentId, page, pageSize)
@@ -355,7 +364,8 @@ export function FeedbackList({
 
   if (isLoading) {
     return (
-      <Card className={cn("@container w-full", className)}>
+      <Card busy className={cn("@container w-full", className)}>
+        <LoadingLabel />
         <div className="border-b border-erc8004-border px-4 py-3">
           <Skeleton className="h-4 w-16" />
         </div>
@@ -399,35 +409,46 @@ export function FeedbackList({
   return (
     <Card className={cn("@container w-full", className)}>
       <div className="border-b border-erc8004-border px-4 py-3">
-        <h3 className="text-sm font-medium text-erc8004-card-fg">Feedback</h3>
+        <Heading className="text-sm font-medium text-erc8004-card-fg">Feedback</Heading>
       </div>
 
-      <div className="divide-y divide-erc8004-border" role="list">
+      <ul className="divide-y divide-erc8004-border">
         {feedbacks.map((item) => (
-          <FeedbackRow key={item.id} item={item} options={rowOptions} />
+          <li key={item.id}>
+            <FeedbackRow item={item} options={rowOptions} />
+          </li>
         ))}
-      </div>
+      </ul>
 
       {(page > 0 || hasNextPage) && (
         <div className="border-t border-erc8004-border px-4 py-2.5 flex items-center justify-between">
           <button
+            type="button"
             onClick={() => setPage((p) => p - 1)}
             disabled={page === 0}
+            aria-label="Previous page of feedback"
             className="bg-erc8004-muted hover:bg-erc8004-border text-erc8004-fg text-sm px-3 py-1.5 rounded-erc8004-md disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
           >
-            &#8592;
+            <span aria-hidden="true">&#8592;</span>
           </button>
-          <span className="text-xs text-erc8004-muted-fg tabular-nums">
+          {/* Announced on change so a keyboard user paging through hears
+              where they landed. */}
+          <span
+            role="status"
+            className="text-xs text-erc8004-muted-fg tabular-nums"
+          >
             {totalPages !== undefined
               ? `${page + 1} / ${totalPages}${countCapped ? "+" : ""}`
               : `Page ${page + 1}`}
           </span>
           <button
+            type="button"
             onClick={() => setPage((p) => p + 1)}
             disabled={!hasNextPage}
+            aria-label="Next page of feedback"
             className="bg-erc8004-muted hover:bg-erc8004-border text-erc8004-fg text-sm px-3 py-1.5 rounded-erc8004-md disabled:opacity-40 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
           >
-            &#8594;
+            <span aria-hidden="true">&#8594;</span>
           </button>
         </div>
       )}

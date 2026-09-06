@@ -4,7 +4,8 @@ import { parseAgentRegistry } from "../../lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "../../lib/useAgentIdentity"
 import { cn } from "../../lib/cn"
-import { Card, Skeleton, EmptyState, ErrorState } from "../_internal"
+import type { HeadingLevel } from "../../types"
+import { Card, EmptyState, ErrorState, LoadingLabel, Skeleton } from "../_internal"
 import * as v from "valibot"
 
 type ValidationStatsResponse = {
@@ -88,21 +89,29 @@ export interface ValidationScoreProps extends AgentIdentityProps {
   showFillBar?: boolean
   /** Show the pending validation count. Default `true`. */
   showPendingCount?: boolean
+  /**
+   * Heading level for this component's title. Default `3` — the level it was
+   * previously hardcoded to, so the default renders identically.
+   */
+  headingLevel?: HeadingLevel
   className?: string
 }
 
 export function ValidationScore({
   showFillBar = true,
   showPendingCount = true,
+  headingLevel = 3,
   className,
   ...props
 }: ValidationScoreProps) {
+  const Heading = `h${headingLevel}` as const
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useValidationStats(agentRegistry, agentId)
 
   if (isLoading) {
     return (
-      <Card className={cn("w-full p-5", className)}>
+      <Card busy className={cn("w-full p-5", className)}>
+        <LoadingLabel />
         <Skeleton className="mb-4 h-4 w-28" />
         <Skeleton className="mb-3 h-7 w-20" />
         <Skeleton className="h-1.5 w-full rounded-full" />
@@ -130,7 +139,7 @@ export function ValidationScore({
   if (!summary || completedValidations === 0) {
     return (
       <Card className={cn("w-full", className)}>
-        <h3 className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">Validation Score</h3>
+        <Heading className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">Validation Score</Heading>
         <EmptyState message="No validations yet" />
       </Card>
     )
@@ -141,7 +150,7 @@ export function ValidationScore({
   return (
     <Card className={cn("w-full p-5", className)}>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-erc8004-card-fg">Validation Score</h3>
+        <Heading className="text-sm font-medium text-erc8004-card-fg">Validation Score</Heading>
         <span className="text-xs text-erc8004-muted-fg">
           {completedValidations} completed
           {showPendingCount && pendingCount > 0 && ` · ${pendingCount} pending`}
@@ -149,14 +158,31 @@ export function ValidationScore({
       </div>
 
       <div className={cn("flex items-end gap-2", showFillBar && "mb-3")}>
-        <span className="text-3xl font-semibold tabular-nums leading-none text-erc8004-card-fg">
+        <span
+          aria-hidden="true"
+          className="text-3xl font-semibold tabular-nums leading-none text-erc8004-card-fg"
+        >
           {averageValidationScore.toFixed(0)}
         </span>
-        <span className="text-base text-erc8004-muted-fg mb-0.5">/ 100</span>
+        <span aria-hidden="true" className="text-base text-erc8004-muted-fg mb-0.5">
+          / 100
+        </span>
+        <span className="sr-only">
+          {`Average validation score ${averageValidationScore.toFixed(
+            0
+          )} out of 100, from ${completedValidations} completed ${
+            completedValidations === 1 ? "validation" : "validations"
+          }`}
+        </span>
       </div>
 
       {showFillBar && (
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-erc8004-muted">
+        // The bar restates the score above, so it stays out of the tree
+        // rather than announcing the same number a second time.
+        <div
+          aria-hidden="true"
+          className="h-1.5 w-full overflow-hidden rounded-full bg-erc8004-muted"
+        >
           <div
             className="h-full rounded-full bg-erc8004-positive"
             style={{

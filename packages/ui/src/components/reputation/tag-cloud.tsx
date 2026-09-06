@@ -5,7 +5,8 @@ import { useERC8004Config } from "../../provider/ERC8004Provider"
 import { parseAgentRegistry } from "../../lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { cn } from "../../lib/cn"
-import { Card, Tag, Skeleton, EmptyState, ErrorState } from "../_internal"
+import type { HeadingLevel } from "../../types"
+import { Card, EmptyState, ErrorState, LoadingLabel, Skeleton, Tag } from "../_internal"
 import * as v from "valibot"
 
 // ============================================================================
@@ -112,6 +113,10 @@ function computeTagFrequency(
 // opacity. Three tiers keeps it readable without needing inline styles.
 // ============================================================================
 
+// NOTE: the lowest tier measures 3.63:1 against the pill background, under the
+// 4.5:1 WCAG AA needs for text this size. Dropping `opacity-70` in favour of a
+// font-weight tier measures 5.86:1, but changes how the cloud looks — left as
+// it is deliberately, as a design decision rather than an accessibility one.
 function tagSizeClass(weight: number): string {
   if (weight >= 0.66) return "text-sm"
   if (weight >= 0.33) return "text-xs"
@@ -127,15 +132,22 @@ export interface TagCloudProps extends AgentIdentityProps {
   maxTags?: number
   /** Minimum occurrences for a tag to appear. Default `1`. */
   minOccurrences?: number
+  /**
+   * Heading level for this component's title. Default `3` — the level it was
+   * previously hardcoded to, so the default renders identically.
+   */
+  headingLevel?: HeadingLevel
   className?: string
 }
 
 export function TagCloud({
   maxTags = 20,
   minOccurrences = 1,
+  headingLevel = 3,
   className,
   ...props
 }: TagCloudProps) {
+  const Heading = `h${headingLevel}` as const
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error } = useTagCloud(agentRegistry, agentId)
 
@@ -151,7 +163,8 @@ export function TagCloud({
 
   if (isLoading) {
     return (
-      <Card className={cn("w-full p-4", className)}>
+      <Card busy className={cn("w-full p-4", className)}>
+        <LoadingLabel />
         <Skeleton className="mb-4 h-4 w-24" />
         <div className="flex flex-wrap gap-2">
           {[80, 56, 96, 64, 48, 72, 40, 88].map((w) => (
@@ -177,7 +190,7 @@ export function TagCloud({
   if (tags.length === 0) {
     return (
       <Card className={cn("w-full", className)}>
-        <h3 className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">Specialisations</h3>
+        <Heading className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">Specialisations</Heading>
         <EmptyState message="No tags yet" />
       </Card>
     )
@@ -186,7 +199,7 @@ export function TagCloud({
   return (
     <Card className={cn("w-full p-4", className)}>
       <div className="mb-4 flex items-baseline justify-between">
-        <h3 className="text-sm font-medium text-erc8004-card-fg">Specialisations</h3>
+        <Heading className="text-sm font-medium text-erc8004-card-fg">Specialisations</Heading>
         <span className="text-xs text-erc8004-muted-fg">
           {tags.length} tag{tags.length === 1 ? "" : "s"}
         </span>
@@ -203,6 +216,10 @@ export function TagCloud({
             title={`${tag} \u2014 ${count} mention${count === 1 ? "" : "s"}`}
           >
             <span className="truncate">{tag}</span>
+            {/* The count is conveyed visually by pill size alone. */}
+            <span className="sr-only">
+              {`, ${count} mention${count === 1 ? "" : "s"}`}
+            </span>
           </Tag>
         ))}
       </div>

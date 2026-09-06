@@ -7,16 +7,10 @@ import {
   type AgentIdentityProps,
 } from "../../lib/useAgentIdentity"
 import { cn } from "../../lib/cn"
-import {
-  Card,
-  Address,
-  Tag,
-  Skeleton,
-  EmptyState,
-  ErrorState,
-} from "../_internal"
+import { Address, Card, EmptyState, ErrorState, LoadingLabel, Skeleton, Tag } from "../_internal"
 import * as v from "valibot"
 import { AgentAvatar } from "./agent-avatar"
+import type { HeadingLevel } from "../../types"
 
 type AgentCardResponse = {
   agent: {
@@ -133,6 +127,11 @@ export interface AgentCardProps extends AgentIdentityProps {
   showProtocolBadges?: boolean
   /** Show description text. Default `true`. */
   showDescription?: boolean
+  /**
+   * Heading level for the agent name. Default `2`. Set this to keep the card
+   * from breaking the surrounding page's heading order.
+   */
+  headingLevel?: HeadingLevel
   className?: string
 }
 
@@ -141,9 +140,11 @@ export function AgentCard({
   showOwner = true,
   showProtocolBadges = true,
   showDescription = true,
+  headingLevel = 2,
   className,
   ...props
 }: AgentCardProps) {
+  const Heading = `h${headingLevel}` as const
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error, refetch } = useAgentCard(
     agentRegistry,
@@ -153,7 +154,8 @@ export function AgentCard({
   if (isLoading) {
     if (layout === "vertical") {
       return (
-        <Card shadow className={cn("w-full p-6", className)}>
+        <Card shadow busy className={cn("w-full p-6", className)}>
+          <LoadingLabel />
           <Skeleton className="h-20 w-20 rounded-erc8004-md" />
           <Skeleton className="mt-4 h-5 w-36" />
           <div className="mt-2 flex items-center gap-2">
@@ -166,7 +168,8 @@ export function AgentCard({
       )
     }
     return (
-      <Card shadow className={cn("w-full p-6", className)}>
+      <Card shadow busy className={cn("w-full p-6", className)}>
+        <LoadingLabel />
         <div className="flex gap-4">
           <Skeleton className="h-12 w-12 shrink-0 rounded-erc8004-md" />
           <div className="flex-1 space-y-3 pt-0.5">
@@ -226,14 +229,15 @@ export function AgentCard({
               name={registeredName}
               image={rf?.image}
               size={avatarSize}
+              decorative
             />
           </div>
 
           {/* Name + agent id */}
           <div className="mt-4 w-full min-w-0">
-            <h2 className="truncate text-lg font-medium text-erc8004-card-fg">
+            <Heading className="truncate text-lg font-medium text-erc8004-card-fg">
               {name}
-            </h2>
+            </Heading>
             <p className="mt-0.5 text-xs text-erc8004-muted-fg tabular-nums">
               #{agentId}
             </p>
@@ -275,13 +279,14 @@ export function AgentCard({
             name={registeredName}
             image={rf?.image}
             size={48}
+            decorative
           />
         </div>
 
         <div className="min-w-0 flex-1">
-          <h2 className="truncate text-lg font-medium text-erc8004-card-fg">
+          <Heading className="truncate text-lg font-medium text-erc8004-card-fg">
             {name}
-          </h2>
+          </Heading>
 
           {(showOwner ||
             (showProtocolBadges && activeProtocols.length > 0)) && (
@@ -291,7 +296,7 @@ export function AgentCard({
               {showOwner &&
                 showProtocolBadges &&
                 activeProtocols.length > 0 && (
-                  <span className="h-1 w-1 rounded-full bg-erc8004-border" />
+                  <span aria-hidden="true" className="h-1 w-1 rounded-full bg-erc8004-border" />
                 )}
 
               {showProtocolBadges &&

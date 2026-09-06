@@ -8,7 +8,10 @@ interface ErrorStateProps {
 
 export function ErrorState({ message, onRetry, className }: ErrorStateProps) {
   return (
-    <div className={cn("flex flex-col items-center justify-center gap-3 py-8", className)}>
+    <div
+      role="alert"
+      className={cn("flex flex-col items-center justify-center gap-3 py-8", className)}
+    >
       <p className="text-erc8004-muted-fg text-sm">{message}</p>
       {onRetry && (
         <button

@@ -61,6 +61,7 @@ export type {
 // Data types
 export type {
   SharedProps,
+  HeadingLevel,
   AgentData,
   ReputationData,
   Feedback,

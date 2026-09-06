@@ -201,6 +201,15 @@ function discPattern(
 
 // ── Full component ─────────────────────────────────────────────────────────
 
+/*
+ * Both SVG roots below carry role="img" and a label. For an agent with no
+ * registered name or image the badge is the only thing identifying it on the
+ * page, and that is the common case rather than the exception — most
+ * registered agents have no registration file at all, so AgentAvatar falls
+ * through image and initials to land here. An ancestor's aria-hidden still
+ * wins where a caller renders the badge decoratively.
+ */
+
 interface Props {
   agentRegistry: string
   agentId: number
@@ -343,6 +352,8 @@ export function FingerprintBadge({ agentRegistry, agentId, size, className = "w-
       viewBox="0 0 100 100"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
+      role="img"
+      aria-label={`Identity fingerprint for agent #${agentId}`}
       style={{ display: "block", ...sizeStyle }}
     >
       <defs>
@@ -470,6 +481,8 @@ export function FingerprintCircleMini({
       viewBox="0 0 100 100"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
+      role="img"
+      aria-label={`Identity fingerprint for agent #${agentId}`}
       style={{ display: "block", ...(size ? { width: size, height: size } : { width: "100%", height: "100%" }) }}
     >
       <defs>

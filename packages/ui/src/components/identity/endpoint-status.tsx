@@ -4,7 +4,8 @@ import { parseAgentRegistry } from "../../lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "../../lib/useAgentIdentity"
 import { cn } from "../../lib/cn"
-import { Card, Tag, Skeleton, EmptyState, ErrorState } from "../_internal"
+import type { HeadingLevel } from "../../types"
+import { Card, EmptyState, ErrorState, LoadingLabel, Skeleton, Tag } from "../_internal"
 import * as v from "valibot"
 
 type EndpointStatusResponse = {
@@ -144,12 +145,21 @@ function HealthIndicator({ url }: { url: string }) {
 
   if (isLoading) {
     return (
-      <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-erc8004-muted" />
+      <span
+        role="img"
+        aria-label="Checking endpoint…"
+        title="Checking…"
+        className="inline-block h-2 w-2 animate-pulse rounded-full bg-erc8004-muted"
+      />
     )
   }
 
+  // Status is conveyed by colour alone in the visual design, so the label is
+  // the only thing carrying it for anyone who cannot distinguish the two dots.
   return (
     <span
+      role="img"
+      aria-label={ok ? "Endpoint reachable" : "Endpoint unreachable"}
       className={`inline-block h-2 w-2 rounded-full ${ok ? "bg-erc8004-positive" : "bg-erc8004-negative"}`}
       title={ok ? "Reachable" : "Unreachable"}
     />
@@ -163,16 +173,29 @@ export interface EndpointStatusProps extends AgentIdentityProps {
   showHealthChecks?: boolean
   /** Filter which protocols are shown. Default shows all. */
   protocols?: EndpointProtocol[]
+  /**
+   * Heading level for this component's title. Default `3` — the level it was
+   * previously hardcoded to, so the default renders identically.
+   */
+  headingLevel?: HeadingLevel
   className?: string
 }
 
-export function EndpointStatus({ showHealthChecks = false, protocols, className, ...agentProps }: EndpointStatusProps) {
+export function EndpointStatus({
+  showHealthChecks = false,
+  protocols,
+  headingLevel = 3,
+  className,
+  ...agentProps
+}: EndpointStatusProps) {
+  const Heading = `h${headingLevel}` as const
   const { agentRegistry, agentId } = useAgentIdentity(agentProps)
-  const { data, isLoading, error } = useEndpointStatus(agentRegistry, agentId)
+  const { data, isLoading, error, refetch } = useEndpointStatus(agentRegistry, agentId)
 
   if (isLoading) {
     return (
-      <Card className={cn("w-full p-4", className)}>
+      <Card busy className={cn("w-full p-4", className)}>
+        <LoadingLabel />
         <Skeleton className="mb-4 h-4 w-24" />
         <div className="space-y-2.5">
           {[1, 2, 3].map((i) => (
@@ -189,7 +212,7 @@ export function EndpointStatus({ showHealthChecks = false, protocols, className,
   if (error) {
     return (
       <Card className={cn("w-full", className)}>
-        <ErrorState message="Couldn't load endpoints" onRetry={() => void 0} />
+        <ErrorState message="Couldn't load endpoints" onRetry={() => refetch()} />
       </Card>
     )
   }
@@ -203,9 +226,9 @@ export function EndpointStatus({ showHealthChecks = false, protocols, className,
   if (endpoints.length === 0) {
     return (
       <Card className={cn("w-full", className)}>
-        <h3 className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">
+        <Heading className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">
           Endpoints
-        </h3>
+        </Heading>
         <EmptyState message="No endpoints registered" />
       </Card>
     )
@@ -213,9 +236,9 @@ export function EndpointStatus({ showHealthChecks = false, protocols, className,
 
   return (
     <Card className={cn("w-full p-4", className)}>
-      <h3 className="mb-4 text-sm font-medium text-erc8004-card-fg">
+      <Heading className="mb-4 text-sm font-medium text-erc8004-card-fg">
         Endpoints
-      </h3>
+      </Heading>
 
       <div className="flex flex-col gap-2">
         {endpoints.map(({ protocol, url, version, isEmail }) => (
@@ -230,7 +253,8 @@ export function EndpointStatus({ showHealthChecks = false, protocols, className,
                 className="min-w-0 flex-1 truncate font-mono text-xs text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
                 title={url}
               >
-                {url}
+                <span aria-hidden="true">{url}</span>
+                <span className="sr-only">{`Email ${protocol} endpoint ${url}`}</span>
               </a>
             ) : (
               <a
@@ -240,7 +264,10 @@ export function EndpointStatus({ showHealthChecks = false, protocols, className,
                 className="min-w-0 flex-1 truncate font-mono text-xs text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
                 title={url}
               >
-                {truncateUrl(url)}
+                <span aria-hidden="true">{truncateUrl(url)}</span>
+                <span className="sr-only">
+                  {`${protocol} endpoint ${url} (opens in a new tab)`}
+                </span>
               </a>
             )}
 

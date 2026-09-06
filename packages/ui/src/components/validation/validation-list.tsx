@@ -4,10 +4,12 @@ import { useERC8004Config } from "../../provider/ERC8004Provider"
 import { parseAgentRegistry } from "../../lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { useAgentIdentity, type AgentIdentityProps } from "../../lib/useAgentIdentity"
-import { truncateAddress, formatRelativeTime } from "../../lib/utils"
+import { formatRelativeTime } from "../../lib/utils"
 import { cn } from "../../lib/cn"
+import type { HeadingLevel } from "../../types"
 import type { Validation } from "../../types"
 import * as v from "valibot"
+import { Address, LoadingLabel } from "../_internal"
 
 const DEFAULT_PAGE_SIZE = 10
 
@@ -142,11 +144,17 @@ function ValidationCard({ item, options }: { item: ValidationItem; options: Vali
         <div className="flex items-center gap-2 min-w-0">
           {item.response !== null ? (
             <span className={`font-mono text-lg font-semibold tabular-nums ${scoreColor(item.response)}`}>
-              {item.response}
-              <span className="text-xs font-normal text-erc8004-muted-fg">/100</span>
+              <span aria-hidden="true">
+                {item.response}
+                <span className="text-xs font-normal text-erc8004-muted-fg">/100</span>
+              </span>
+              <span className="sr-only">{`Score ${item.response} out of 100`}</span>
             </span>
           ) : (
-            <span className="font-mono text-lg font-semibold text-erc8004-muted-fg">—</span>
+            <span className="font-mono text-lg font-semibold text-erc8004-muted-fg">
+              <span aria-hidden="true">—</span>
+              <span className="sr-only">No score yet</span>
+            </span>
           )}
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusBadge(item.status)}`}
@@ -162,9 +170,7 @@ function ValidationCard({ item, options }: { item: ValidationItem; options: Vali
         {(options.showValidatorAddress || options.showTimestamp) && (
           <div className="shrink-0 text-right">
             {options.showValidatorAddress && (
-              <div className="font-mono text-xs text-erc8004-muted-fg" title={item.validatorAddress}>
-                {truncateAddress(item.validatorAddress)}
-              </div>
+              <Address address={item.validatorAddress} />
             )}
             {options.showTimestamp && (
               <div className="text-xs text-erc8004-muted-fg">
@@ -189,6 +195,11 @@ export interface ValidationListProps extends AgentIdentityProps {
   statusFilter?: ValidationStatusFilter
   /** Message when there are no validations. Default `"No validations yet."`. */
   emptyMessage?: string
+  /**
+   * Heading level for this component's title. Default `3` — the level it was
+   * previously hardcoded to, so the default renders identically.
+   */
+  headingLevel?: HeadingLevel
   className?: string
 }
 
@@ -198,12 +209,14 @@ export function ValidationList({
   showTimestamp = true,
   statusFilter = "all",
   emptyMessage = "No validations yet.",
+  headingLevel = 3,
   className,
   ...props
 }: ValidationListProps) {
+  const Heading = `h${headingLevel}` as const
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const [page, setPage] = useState(0)
-  const { data, isLoading, error } = useValidationList(agentRegistry, agentId, page, pageSize, statusFilter)
+  const { data, isLoading, error, refetch } = useValidationList(agentRegistry, agentId, page, pageSize, statusFilter)
 
   const cardOptions: ValidationCardOptions = { showValidatorAddress, showTimestamp }
 
@@ -212,12 +225,12 @@ export function ValidationList({
       <div
         className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card", className)}
         aria-busy="true"
-        aria-live="polite"
       >
-        <div className="border-b border-erc8004-border px-5 py-4">
+        <LoadingLabel />
+        <div aria-hidden="true" className="border-b border-erc8004-border px-5 py-4">
           <div className="h-4 w-20 animate-pulse rounded-erc8004-sm bg-erc8004-muted" />
         </div>
-        <div className="space-y-3 p-5">
+        <div aria-hidden="true" className="space-y-3 p-5">
           {Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
@@ -231,18 +244,27 @@ export function ValidationList({
 
   if (error) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
+      <div role="alert" className={cn("w-full rounded-erc8004-xl border border-erc8004-negative/30 bg-erc8004-negative/10 p-5", className)}>
         <p className="text-sm text-erc8004-negative">Failed to load validations.</p>
         <p className="mt-1 text-xs text-erc8004-negative/70">
           {error instanceof Error ? error.message : "Unknown error"}
         </p>
+        {/* Every other list in the library offers a retry; this one
+            dead-ended. */}
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="mt-3 rounded-erc8004-md bg-erc8004-muted px-3 py-1.5 text-sm text-erc8004-fg hover:bg-erc8004-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
+        >
+          Retry
+        </button>
       </div>
     )
   }
 
   if (!data?.validations.length && page === 0) {
     return (
-      <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
+      <div role="status" className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card p-5", className)}>
         <p className="text-sm text-erc8004-muted-fg">{emptyMessage}</p>
       </div>
     )
@@ -255,7 +277,7 @@ export function ValidationList({
   return (
     <div className={cn("w-full rounded-erc8004-xl border border-erc8004-border bg-erc8004-card", className)}>
       <div className="border-b border-erc8004-border px-5 py-4">
-        <h3 className="text-sm font-semibold text-erc8004-card-fg">Validations</h3>
+        <Heading className="text-sm font-semibold text-erc8004-card-fg">Validations</Heading>
       </div>
       <div className="space-y-3 p-5">
         <ul role="list" className="space-y-3">
@@ -276,7 +298,9 @@ export function ValidationList({
             >
               ← Previous
             </button>
-            <span className="text-xs text-erc8004-muted-fg">Page {page + 1}</span>
+            <span role="status" className="text-xs text-erc8004-muted-fg">
+              Page {page + 1}
+            </span>
             <button
               onClick={() => setPage((p) => p + 1)}
               disabled={!hasNext}

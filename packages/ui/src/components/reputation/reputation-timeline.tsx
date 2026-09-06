@@ -6,7 +6,8 @@ import { useERC8004Config } from "../../provider/ERC8004Provider"
 import { parseAgentRegistry } from "../../lib/parse-registry"
 import { getSubgraphUrl, subgraphFetch } from "../../lib/subgraph-client"
 import { cn } from "../../lib/cn"
-import { Card, Skeleton, EmptyState, ErrorState } from "../_internal"
+import type { HeadingLevel } from "../../types"
+import { Card, EmptyState, ErrorState, LoadingLabel, Skeleton } from "../_internal"
 import * as v from "valibot"
 
 type TimelineResponse = {
@@ -242,6 +243,11 @@ export interface ReputationTimelineProps extends AgentIdentityProps {
    * points stay distinguishable and hoverable. Default `40`.
    */
   maxPoints?: number
+  /**
+   * Heading level for this component's title. Default `3` — the level it was
+   * previously hardcoded to, so the default renders identically.
+   */
+  headingLevel?: HeadingLevel
   className?: string
 }
 
@@ -251,9 +257,11 @@ export function ReputationTimeline({
   curve = "linear",
   showDataPoints = true,
   maxPoints = 40,
+  headingLevel = 3,
   className,
   ...props
 }: ReputationTimelineProps) {
+  const Heading = `h${headingLevel}` as const
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -375,7 +383,8 @@ export function ReputationTimeline({
 
   if (isLoading) {
     return (
-      <Card className={cn("w-full p-5", className)}>
+      <Card busy className={cn("w-full p-5", className)}>
+        <LoadingLabel />
         <Skeleton className="mb-4 h-4 w-32" />
         <Skeleton className="h-[200px] w-full" />
       </Card>
@@ -393,9 +402,9 @@ export function ReputationTimeline({
   if (sorted.length === 0) {
     return (
       <Card className={cn("w-full", className)}>
-        <h3 className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">
+        <Heading className="px-4 pt-4 text-sm font-medium text-erc8004-card-fg">
           Score Timeline
-        </h3>
+        </Heading>
         <EmptyState message="No feedback yet" />
       </Card>
     )
@@ -404,9 +413,9 @@ export function ReputationTimeline({
   return (
     <Card className={cn("w-full p-5", className)}>
       <div className="mb-4 flex items-baseline justify-between">
-        <h3 className="text-sm font-medium text-erc8004-card-fg">
+        <Heading className="text-sm font-medium text-erc8004-card-fg">
           Score Timeline
-        </h3>
+        </Heading>
         <span className="text-xs text-erc8004-muted-fg">
           {sorted.length} review{sorted.length === 1 ? "" : "s"}
         </span>
@@ -416,6 +425,16 @@ export function ReputationTimeline({
         ref={svgRef}
         viewBox={`0 0 ${LAYOUT.width} ${LAYOUT.height}`}
         className="w-full"
+        role="img"
+        aria-label={`Line chart of ${sorted.length} feedback ${
+          sorted.length === 1 ? "score" : "scores"
+        } from ${formatFullDate(minTime)} to ${formatFullDate(maxTime)}. ${
+          sorted.length === 1
+            ? `Score ${sorted[0].value.toFixed(1)}.`
+            : `First ${sorted[0].value.toFixed(1)}, latest ${sorted[
+                sorted.length - 1
+              ].value.toFixed(1)}.`
+        }`}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
@@ -599,6 +618,16 @@ export function ReputationTimeline({
           )
         })()}
       </svg>
+
+      {/* The tooltip above is pointer-driven and the chart itself is an
+          image to assistive tech, so the readings live here as text. */}
+      <ol className="sr-only">
+        {sorted.map((fb, i) => (
+          <li key={i}>
+            {`${formatFullDate(fb.createdAt)}: score ${fb.value.toFixed(1)}`}
+          </li>
+        ))}
+      </ol>
     </Card>
   )
 }

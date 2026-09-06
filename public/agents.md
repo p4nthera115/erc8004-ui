@@ -17,7 +17,7 @@ Reach for it when a task involves **showing ERC-8004 agent data in a React UI**.
 - **Add a trust signal next to an agent's name** in an existing product — a reputation badge or verification mark that the surrounding app cannot fake, because the component fetches the number itself and takes no data as a prop.
 - **Avoid writing subgraph plumbing** — GraphQL queries, CAIP-style identifier parsing, IPFS/HTTPS/base64 URI resolution, revoked-feedback filtering, offset pagination, and the loading/error/empty states for all of it.
 
-18 components ship. All are read-only, none require a wallet connection, and none ever write on-chain.
+19 components ship. All are read-only, none require a wallet connection, and none ever write on-chain.
 
 ## When not to use this
 
@@ -125,6 +125,7 @@ These are the reasons to call `get_component` rather than writing the query your
 - [Concepts](https://erc8004-ui.vercel.app/docs/concepts.md): Core concepts: registries, agentRegistry/agentId, trustless data, supported chains.
 - [API Keys](https://erc8004-ui.vercel.app/docs/api-keys.md): How to get a Graph API key and why it's safe to use in frontend code.
 - [Components](https://erc8004-ui.vercel.app/docs/components.md): All components in the library, grouped by registry.
+- [Accessibility](https://erc8004-ui.vercel.app/docs/accessibility.md): What the components handle on their own — labelled graphics, keyboard controls, reduced motion — and what is left to you.
 - [Theming](https://erc8004-ui.vercel.app/docs/theming.md): Styling, dark mode, and customisation patterns.
 - [MCP Server](https://erc8004-ui.vercel.app/docs/mcp.md): MCP server giving AI coding agents component docs plus live subgraph and agent checks.
 

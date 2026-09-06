@@ -22,6 +22,12 @@ const COMPONENT_GROUPS = [
     title: "Identity",
     items: [
       {
+        slug: "fingerprint-badge",
+        name: "FingerprintBadge",
+        description:
+          "Deterministic SVG identity. No data fetch, no API key.",
+      },
+      {
         slug: "agent-name",
         name: "AgentName",
         description: "Registered name from the identity registry.",

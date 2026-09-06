@@ -178,3 +178,26 @@
   --radius-erc8004-xl: calc(var(--erc8004-radius) * 1.4);
   --radius-erc8004-2xl: calc(var(--erc8004-radius) * 1.8);
 }
+
+/* ============================================
+   Reduced motion
+
+   Lives here rather than in styles.css because this is the one file both
+   consumption paths load: the prebuilt stylesheet imports it, and consumers
+   running their own Tailwind are told to import it directly. A rule in the
+   prebuilt sheet's base layer would reach only half of them.
+
+   `!important` is load-bearing: the bar fills, chart tooltip glide and score
+   dot transitions are set as inline styles, which nothing else can override.
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .erc8004,
+  .erc8004 *,
+  .erc8004 *::before,
+  .erc8004 *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

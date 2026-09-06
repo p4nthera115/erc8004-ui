@@ -650,7 +650,7 @@
               "examples": [
                 "erc8004-provider",
                 "agent-provider",
-                "agent-name"
+                "fingerprint-badge"
               ]
             }
           },
@@ -1065,6 +1065,7 @@
                 "concepts",
                 "api-keys",
                 "components",
+                "accessibility",
                 "theming",
                 "mcp"
               ]
@@ -2361,6 +2362,7 @@
             "enum": [
               "erc8004-provider",
               "agent-provider",
+              "fingerprint-badge",
               "agent-name",
               "agent-image",
               "agent-description",
@@ -2533,6 +2535,7 @@
               "concepts",
               "api-keys",
               "components",
+              "accessibility",
               "theming",
               "mcp"
             ]

@@ -7,9 +7,10 @@ import {
   type AgentIdentityProps,
 } from "../../lib/useAgentIdentity"
 import { cn } from "../../lib/cn"
-import { Card, Address, Tag, Skeleton, EmptyState, ErrorState } from "../_internal"
+import { Address, Card, EmptyState, ErrorState, LoadingLabel, Skeleton, Tag } from "../_internal"
 import * as v from "valibot"
 import { AgentAvatar } from "./agent-avatar"
+import type { HeadingLevel } from "../../types"
 
 type IdentityDisplayResponse = {
   agent: {
@@ -124,16 +125,29 @@ const ENDPOINT_DEFS = [
 
 interface IdentityDisplayProps extends AgentIdentityProps {
   showHealthChecks?: boolean
+  /**
+   * Heading level for the agent name. Default `2`. The endpoints heading
+   * always sits one level below it.
+   */
+  headingLevel?: HeadingLevel
   className?: string
 }
 
-export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
+export function IdentityDisplay({
+  headingLevel = 2,
+  className,
+  ...props
+}: IdentityDisplayProps) {
+  const Heading = `h${headingLevel}` as const
+  const SubHeading = `h${Math.min(headingLevel + 1, 6)}` as
+    | "h2" | "h3" | "h4" | "h5" | "h6"
   const { agentRegistry, agentId } = useAgentIdentity(props)
   const { data, isLoading, error, refetch } = useIdentityDisplay(agentRegistry, agentId)
 
   if (isLoading) {
     return (
-      <Card className={cn("w-full overflow-hidden", className)}>
+      <Card busy className={cn("w-full overflow-hidden", className)}>
+        <LoadingLabel />
         <div className="flex gap-4 p-6">
           <Skeleton className="h-12 w-12 shrink-0 rounded-erc8004-md" />
           <div className="flex-1 space-y-3 pt-0.5">
@@ -194,13 +208,14 @@ export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
             name={rf?.name}
             image={rf?.image}
             size={48}
+            decorative
           />
         </div>
 
         <div className="min-w-0 flex-1">
-          <h2 className="truncate text-lg font-medium text-erc8004-card-fg">
+          <Heading className="truncate text-lg font-medium text-erc8004-card-fg">
             {name}
-          </h2>
+          </Heading>
           {description && (
             <p className="mt-1 line-clamp-2 break-words text-sm text-erc8004-muted-fg leading-relaxed">
               {description}
@@ -213,9 +228,9 @@ export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
       {/* Endpoints */}
       {endpoints.length > 0 && (
         <div className="border-t border-erc8004-border px-6 py-4">
-          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-erc8004-muted-fg">
+          <SubHeading className="mb-3 text-xs font-medium uppercase tracking-wide text-erc8004-muted-fg">
             Endpoints
-          </p>
+          </SubHeading>
           <div className="flex flex-col gap-2">
             {endpoints.map(({ label, url, version, isEmail }) => (
               <div key={label} className="flex items-center gap-3">
@@ -229,7 +244,8 @@ export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
                     className="min-w-0 flex-1 truncate font-mono text-xs text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
                     title={url}
                   >
-                    {url}
+                    <span aria-hidden="true">{url}</span>
+                    <span className="sr-only">{`Email ${label} endpoint ${url}`}</span>
                   </a>
                 ) : (
                   <a
@@ -239,7 +255,12 @@ export function IdentityDisplay({ className, ...props }: IdentityDisplayProps) {
                     className="min-w-0 flex-1 truncate font-mono text-xs text-erc8004-muted-fg hover:text-erc8004-card-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-erc8004-ring"
                     title={url}
                   >
-                    {truncateUrl(url)}
+                    {/* The visible text is shortened, and the link opens a new
+                        tab — both belong in the accessible name. */}
+                    <span aria-hidden="true">{truncateUrl(url)}</span>
+                    <span className="sr-only">
+                      {`${label} endpoint ${url} (opens in a new tab)`}
+                    </span>
                   </a>
                 )}
 

@@ -71,6 +71,13 @@ export interface AgentAvatarProps {
   image: string | null | undefined
   /** Rendered size in pixels; drives the letter size and fingerprint size. */
   size: number
+  /**
+   * Hide the avatar from assistive tech. Set this when the caller already
+   * renders the agent's name next to it — AgentCard and IdentityDisplay both
+   * do — so the name isn't announced twice. Standalone AgentImage leaves it
+   * off, since the avatar is then the only thing identifying the agent.
+   */
+  decorative?: boolean
   className?: string
 }
 
@@ -90,6 +97,7 @@ export function AgentAvatar({
   name,
   image,
   size,
+  decorative = false,
   className,
 }: AgentAvatarProps) {
   const [failedUrl, setFailedUrl] = useState<string | null>(null)
@@ -97,11 +105,22 @@ export function AgentAvatar({
   const imageUrl = image ? resolveImageUrl(image) : null
   const alt = name ?? `Agent #${agentId}`
 
+  // One shape for all three branches: either the avatar names the agent, or
+  // it drops out of the accessibility tree entirely. Never an unlabelled node.
+  const labelProps = decorative
+    ? ({ "aria-hidden": true } as const)
+    : ({ role: "img", "aria-label": alt } as const)
+
   if (imageUrl && imageUrl !== failedUrl) {
     return (
       <img
         src={imageUrl}
-        alt={alt}
+        alt={decorative ? "" : alt}
+        // Intrinsic dimensions so the browser reserves the box before the
+        // image lands; a grid of avatars otherwise reflows as each resolves.
+        width={size}
+        height={size}
+        loading="lazy"
         className={cn("h-full w-full object-cover", className)}
         onError={() => setFailedUrl(imageUrl)}
       />
@@ -112,19 +131,23 @@ export function AgentAvatar({
 
   if (!initials) {
     return (
-      // No className here: FingerprintBadge defaults it to "w-full h-full",
-      // which is what fills the caller's frame.
-      <FingerprintBadge
-        agentRegistry={agentRegistry}
-        agentId={agentId}
-        size={size}
-      />
+      // The badge is the agent's only visual identity in this branch, so the
+      // wrapper carries the label — the bare <svg> underneath has none.
+      <span {...labelProps} className="block h-full w-full">
+        {/* No className here: FingerprintBadge defaults it to "w-full h-full",
+            which is what fills the caller's frame. */}
+        <FingerprintBadge
+          agentRegistry={agentRegistry}
+          agentId={agentId}
+          size={size}
+        />
+      </span>
     )
   }
 
   return (
     <div
-      aria-hidden="true"
+      {...labelProps}
       className={cn(
         "flex h-full w-full select-none items-center justify-center font-medium leading-none",
         className

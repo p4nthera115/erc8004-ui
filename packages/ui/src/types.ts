@@ -1,5 +1,12 @@
 // === Component Props ===
 
+/**
+ * Heading level for a component's own title, so consumers can slot it into
+ * their document outline. Card titles default to 3 and AgentCard's agent name
+ * to 2 — the levels they were previously hardcoded to.
+ */
+export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6
+
 export interface SharedProps {
   agentRegistry: string // "eip155:{chainId}:{contractAddress}"
   agentId: number // ERC-721 token ID

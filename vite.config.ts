@@ -33,6 +33,7 @@ export default defineConfig(async () => {
           "/docs/concepts",
           "/docs/api-keys",
           "/docs/components",
+          "/docs/accessibility",
           "/docs/theming",
           "/docs/mcp",
           "/docs/components/erc8004-provider",

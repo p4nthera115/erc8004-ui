@@ -125,6 +125,7 @@ These are the reasons to call `get_component` rather than writing the query your
 - [Concepts](https://erc8004-ui.vercel.app/docs/concepts.md): Core concepts: registries, agentRegistry/agentId, trustless data, supported chains.
 - [API Keys](https://erc8004-ui.vercel.app/docs/api-keys.md): How to get a Graph API key and why it's safe to use in frontend code.
 - [Components](https://erc8004-ui.vercel.app/docs/components.md): All components in the library, grouped by registry.
+- [Accessibility](https://erc8004-ui.vercel.app/docs/accessibility.md): What the components handle on their own — labelled graphics, keyboard controls, reduced motion — and what is left to you.
 - [Theming](https://erc8004-ui.vercel.app/docs/theming.md): Styling, dark mode, and customisation patterns.
 - [MCP Server](https://erc8004-ui.vercel.app/docs/mcp.md): MCP server giving AI coding agents component docs plus live subgraph and agent checks.
 

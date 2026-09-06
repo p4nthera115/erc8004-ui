@@ -108,6 +108,40 @@ own build instead, so the utilities merge with the rest of your CSS:
 See [docs/theming](https://erc8004-ui.vercel.app/docs/theming) for the full
 token list and an interactive playground.
 
+## Accessibility
+
+Accessible by default — there is no `a11y` prop and nothing to switch on. This
+matters more than usual here, because most of what these components render
+isn't text: a fingerprint is an SVG, a reputation trend is a line chart, a
+verification tier is a coloured dot.
+
+- Meaningful SVGs are `role="img"` with a label; decorative marks are
+  `aria-hidden`, so nothing is announced twice.
+- Nothing depends on colour alone — score bands, validation status and endpoint
+  health all carry text as well.
+- The charts emit their readings as visually hidden text, since the
+  ReputationTimeline tooltip is pointer-driven.
+- Truncated addresses and URLs expose the full value to assistive tech rather
+  than hiding it in a `title`.
+- Pagination and copy are real `<button>`s with labels; scrollable regions are
+  focusable.
+- Loading sets `aria-busy` and announces once, errors are `role="alert"`, empty
+  states `role="status"`.
+- `prefers-reduced-motion: reduce` disables every animation and transition, in
+  both the prebuilt stylesheet and the Tailwind-source path.
+
+Components that render their own title take `headingLevel`, defaulting to the
+level they already used, so your document outline stays yours:
+
+```tsx
+<AgentCard agentRegistry={registry} agentId={id} headingLevel={3} />
+```
+
+Two known gaps are documented rather than papered over: TagCloud's faintest
+tags measure 3.63:1 against the pill (AA wants 4.5:1), and the timeline tooltip
+has no keyboard equivalent — though its data is fully available as text. See
+[docs/accessibility](https://erc8004-ui.vercel.app/docs/accessibility).
+
 ## Server components
 
 Every export is a client component — the bundle ships with a `"use client"`

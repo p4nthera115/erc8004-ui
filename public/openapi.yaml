@@ -702,6 +702,7 @@ paths:
               - concepts
               - api-keys
               - components
+              - accessibility
               - theming
               - mcp
         - name: format
@@ -1679,6 +1680,7 @@ components:
             - concepts
             - api-keys
             - components
+            - accessibility
             - theming
             - mcp
         name:

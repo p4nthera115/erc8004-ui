@@ -3,6 +3,7 @@ export type NavItem =
   | { label: string; to: "/docs/installation" }
   | { label: string; to: "/docs/concepts" }
   | { label: string; to: "/docs/api-keys" }
+  | { label: string; to: "/docs/accessibility" }
   | { label: string; to: "/docs/theming" }
   | { label: string; to: "/docs/mcp" }
   | { label: string; to: "/docs/components" }
@@ -22,6 +23,7 @@ export const NAV: NavGroup[] = [
       { label: "Concepts", to: "/docs/concepts" },
       { label: "API Keys", to: "/docs/api-keys" },
       { label: "Components", to: "/docs/components" },
+      { label: "Accessibility", to: "/docs/accessibility" },
       { label: "Theming", to: "/docs/theming" },
       { label: "MCP Server", to: "/docs/mcp" },
     ],

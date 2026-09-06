@@ -22,6 +22,7 @@ import { Route as DocsIntroductionRouteImport } from './routes/docs/introduction
 import { Route as DocsInstallationRouteImport } from './routes/docs/installation'
 import { Route as DocsConceptsRouteImport } from './routes/docs/concepts'
 import { Route as DocsApiKeysRouteImport } from './routes/docs/api-keys'
+import { Route as DocsAccessibilityRouteImport } from './routes/docs/accessibility'
 import { Route as DocsSplatRouteImport } from './routes/docs/$'
 import { Route as DocsComponentsIndexRouteImport } from './routes/docs/components/index'
 import { Route as DocsComponentsSlugRouteImport } from './routes/docs/components/$slug'
@@ -91,6 +92,11 @@ const DocsApiKeysRoute = DocsApiKeysRouteImport.update({
   path: '/api-keys',
   getParentRoute: () => DocsRoute,
 } as any)
+const DocsAccessibilityRoute = DocsAccessibilityRouteImport.update({
+  id: '/accessibility',
+  path: '/accessibility',
+  getParentRoute: () => DocsRoute,
+} as any)
 const DocsSplatRoute = DocsSplatRouteImport.update({
   id: '/$',
   path: '/$',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/docs': typeof DocsRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/docs/$': typeof DocsSplatRoute
+  '/docs/accessibility': typeof DocsAccessibilityRoute
   '/docs/api-keys': typeof DocsApiKeysRoute
   '/docs/concepts': typeof DocsConceptsRoute
   '/docs/installation': typeof DocsInstallationRoute
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/docs/$': typeof DocsSplatRoute
+  '/docs/accessibility': typeof DocsAccessibilityRoute
   '/docs/api-keys': typeof DocsApiKeysRoute
   '/docs/concepts': typeof DocsConceptsRoute
   '/docs/installation': typeof DocsInstallationRoute
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/docs': typeof DocsRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/docs/$': typeof DocsSplatRoute
+  '/docs/accessibility': typeof DocsAccessibilityRoute
   '/docs/api-keys': typeof DocsApiKeysRoute
   '/docs/concepts': typeof DocsConceptsRoute
   '/docs/installation': typeof DocsInstallationRoute
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/privacy'
     | '/docs/$'
+    | '/docs/accessibility'
     | '/docs/api-keys'
     | '/docs/concepts'
     | '/docs/installation'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/privacy'
     | '/docs/$'
+    | '/docs/accessibility'
     | '/docs/api-keys'
     | '/docs/concepts'
     | '/docs/installation'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/privacy'
     | '/docs/$'
+    | '/docs/accessibility'
     | '/docs/api-keys'
     | '/docs/concepts'
     | '/docs/installation'
@@ -319,6 +331,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsApiKeysRouteImport
       parentRoute: typeof DocsRoute
     }
+    '/docs/accessibility': {
+      id: '/docs/accessibility'
+      path: '/accessibility'
+      fullPath: '/docs/accessibility'
+      preLoaderRoute: typeof DocsAccessibilityRouteImport
+      parentRoute: typeof DocsRoute
+    }
     '/docs/$': {
       id: '/docs/$'
       path: '/$'
@@ -345,6 +364,7 @@ declare module '@tanstack/react-router' {
 
 interface DocsRouteChildren {
   DocsSplatRoute: typeof DocsSplatRoute
+  DocsAccessibilityRoute: typeof DocsAccessibilityRoute
   DocsApiKeysRoute: typeof DocsApiKeysRoute
   DocsConceptsRoute: typeof DocsConceptsRoute
   DocsInstallationRoute: typeof DocsInstallationRoute
@@ -358,6 +378,7 @@ interface DocsRouteChildren {
 
 const DocsRouteChildren: DocsRouteChildren = {
   DocsSplatRoute: DocsSplatRoute,
+  DocsAccessibilityRoute: DocsAccessibilityRoute,
   DocsApiKeysRoute: DocsApiKeysRoute,
   DocsConceptsRoute: DocsConceptsRoute,
   DocsInstallationRoute: DocsInstallationRoute,

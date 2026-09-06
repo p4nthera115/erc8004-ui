@@ -770,6 +770,54 @@ const mcpBody = [
   "The specification is at [/openapi.json]({{SITE_URL}}/openapi.json) (YAML at [/openapi.yaml]({{SITE_URL}}/openapi.yaml)), and [/agents.md]({{SITE_URL}}/agents.md) covers when to reach for this library at all.",
 ].join("\n")
 
+const accessibilityBody = [
+  "Every component ships accessible by default. There is nothing to switch on and no `a11y` prop — the markup, labelling and keyboard behaviour described here are what you get from a plain import.",
+  "",
+  "This matters more than usual for this library, because most of what these components render is *not text*. A fingerprint is an SVG. A reputation trend is a line chart. A verification tier is a coloured dot. Left alone, all of that is invisible to a screen reader and unreachable from a keyboard.",
+  "",
+  "## What every component does",
+  "",
+  '- **Graphics carry names.** Every SVG that means something — the FingerprintBadge, the ReputationTimeline chart — is `role="img"` with a descriptive `aria-label`. Decorative marks (status dots, separators, icon glyphs beside their own text) are `aria-hidden`, so they are never announced twice.',
+  '- **Nothing depends on colour alone.** Score bands, validation status and endpoint health are all colour-coded visually, and every one of them also carries text. An unreachable endpoint reads as "Endpoint unreachable", not just a red dot.',
+  "- **Charts have text alternatives.** ReputationTimeline's tooltip follows the pointer, so the same readings are also emitted as a visually hidden list — one entry per data point, with its date and score. ReputationDistribution does the same for its buckets.",
+  "- **Truncated values keep their full form.** Addresses and URLs are shortened for display, so the complete value is exposed to assistive tech rather than stranded in a `title` attribute that only a mouse can reach.",
+  "- **Controls are real controls.** Pagination and copy-to-clipboard are `<button>` elements with `aria-label`s, reachable by Tab and activated by Enter or Space. Scrollable regions (ActivityLog) are focusable so they can be scrolled without a pointer.",
+  '- **State changes are announced.** Loading regions set `aria-busy` and announce once — not once per skeleton. Errors are `role="alert"`, empty states `role="status"`, and paging announces the page you landed on.',
+  "- **Motion respects the system setting.** Under `prefers-reduced-motion: reduce`, every animation and transition in the library is disabled — skeleton pulses, bar fills, chart tooltips. This ships in the stylesheet, so it applies whether you use the prebuilt CSS or run Tailwind yourself.",
+  "",
+  "## Headings fit your page, not ours",
+  "",
+  'Components that render their own title take a `headingLevel` prop. The defaults are the levels these titles have always used — `2` for the agent name in AgentCard, `3` for card titles like "Feedback" or "Score Timeline" — so leaving it alone changes nothing.',
+  "",
+  "Set it when the default would break your document outline. A card in a grid under an `<h1>` usually wants its titles a level deeper:",
+  "",
+  "```tsx",
+  "<AgentCard agentRegistry={registry} agentId={id} headingLevel={3} />",
+  "<FeedbackList agentRegistry={registry} agentId={id} headingLevel={4} />",
+  "```",
+  "",
+  "Accepted by: AgentCard, EndpointStatus, FeedbackList, TagCloud, ReputationTimeline, ReputationDistribution, ValidationScore, ValidationList, ActivityLog.",
+  "",
+  "## Avatars: labelled or decorative",
+  "",
+  "`AgentImage` names the agent it shows, because on its own the avatar is the only thing identifying it. Inside `AgentCard`, the same avatar is hidden from assistive tech instead — the name is already rendered right beside it, and announcing it twice is noise. You get the correct behaviour in both cases without configuring anything.",
+  "",
+  "## What is still on you",
+  "",
+  "The library controls its own markup, not your page. Three things remain yours:",
+  "",
+  "- **Colour contrast against your background.** The default tokens are checked, but retheming via [Theming](/docs/theming) can push text under 4.5:1. Re-check after you change `--erc8004-muted-fg` or the surface colours.",
+  "- **Heading order.** Components emit the level you ask for. Only you know what surrounds them.",
+  "- **Landmarks and page structure.** Wrap the components in your own `<main>`, `<nav>` and headings.",
+  "",
+  "## Known gaps",
+  "",
+  "Stated plainly rather than left for you to discover:",
+  "",
+  "- **TagCloud's least-frequent tags measure 3.63:1** against the pill background, under the 4.5:1 WCAG AA wants for text that size. The fade is what communicates frequency; removing it fixes contrast but flattens the visual. Raise `--erc8004-muted-fg` in your theme if you need AA here.",
+  "- **ReputationTimeline's hover tooltip is pointer-only.** The underlying readings are fully available as text, but there is no keyboard focus ring that walks the data points.",
+].join("\n")
+
 // ---------------------------------------------------------------------------
 // Registry
 // ---------------------------------------------------------------------------
@@ -808,6 +856,13 @@ export const GUIDE_REGISTRY: Record<string, GuideDoc> = {
     description: "All components in the library, grouped by registry.",
     body: componentsBody,
   },
+  accessibility: {
+    slug: "accessibility",
+    name: "Accessibility",
+    description:
+      "What the components handle on their own — labelled graphics, keyboard controls, reduced motion — and what is left to you.",
+    body: accessibilityBody,
+  },
   theming: {
     slug: "theming",
     name: "Theming",
@@ -833,6 +888,7 @@ export const GUIDE_ORDER: string[] = [
   "concepts",
   "api-keys",
   "components",
+  "accessibility",
   "theming",
   "mcp",
 ]
